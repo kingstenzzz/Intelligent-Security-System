@@ -61,6 +61,7 @@ static uint8_t name_count = 0;
 
 
 
+
 ///////////////////
 TaskHandle_t NetTask_Handler;
 TaskHandle_t ReceiveCmdTask_Handler;
@@ -200,6 +201,18 @@ static void ReceiveCmdTask(void *pvParameters)
 	{			
 		OneNET_CmdHandle();
 		NET_Event_CallBack(NET_EVENT_Recv);
+		
+	//	NET_Event_CallBack(NET_EVENT_Send_Data);//更新平台数据
+		vTaskDelay(400/portTICK_RATE_MS);
+	}
+}
+
+
+static void CheckSensor(void *pvParameters) 
+{
+	while(1)
+	{			
+		Check_sensor(&data_value);
 		
 	//	NET_Event_CallBack(NET_EVENT_Send_Data);//更新平台数据
 		vTaskDelay(400/portTICK_RATE_MS);
