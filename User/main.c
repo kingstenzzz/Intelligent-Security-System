@@ -16,6 +16,9 @@
 #include "EdpKit.h"
 //网络设备
 #include "esp8266.h"
+#include "M8266WIFIDrv.h"
+#include "M8266HostIf.h"
+#include "M8266WIFI_ops.h"
 //硬件驱动
 #include "delay.h"
 #include "hwtimer.h"
@@ -48,6 +51,7 @@ volatile u8 secend;
 extern u8 err_count;
 extern uint8_t Ov7725_vsync;
 extern _Bool photo;
+
 unsigned int Task_Delay[NumOfTask]; 
 extern OV7725_MODE_PARAM cam_mode;
 char name[40];
@@ -55,7 +59,7 @@ FATFS fs;													/* FatFs文件系统对象 */
 FRESULT res_sd;                /* 文件操作结果 */
 float frame_count = 0;
 volatile data_Stream data_value;
-u16 time_count=10;
+u16 time_count=20;
 static uint8_t name_count = 0;
 
 
@@ -67,12 +71,12 @@ TaskHandle_t NetTask_Handler;
 TaskHandle_t ReceiveCmdTask_Handler;
 
 
-//////////////////
-#define Net_Task_Stack 1000//500+
+//////////////////任务要分配栈空间
+#define Net_Task_Stack 1500//500+
 #define ReceiveCmd_Stack 256//54
 
 /////////////////
-#define Net_Task_Prioruty 5
+#define Net_Task_Prioruty 6
 #define ReceiveCMd_Priority 6
 
 
@@ -84,11 +88,18 @@ void NET_Event_CallBack(NET_EVENT net_event);
 void Hardware_Init()
 {
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);	//中断控制器分组设置
-  USART_Config();
+  USART_Config();  //调试串口
 	LED_GPIO_Config();
 	OV7725_GPIO_Config();
-  Usart3_Init(115200);
-  ESP8266_Init();
+  //Usart3_Init(115200);  //WIFI串口初始化
+  //ESP8266_Init();
+	printf("wifi init \r\n");
+
+	 M8266_init();
+
+	
+	
+	
 	//SysTick_Init();
 
 	printf("Hardware init ok\r\n");
@@ -96,21 +107,15 @@ void Hardware_Init()
 
 
 
-/*
-检查网络状态
-*/
-void Check_Network()
-{
-
-		Net_status=(enum net_status)Check_Wifi();
-
-}
 
 
 
 //检查网络
 static void  CheckNetWork_Task(void **pvParameters)
-{			  Check_Network();	
+{			  
+	Net_status=(enum net_status)Check_Wifi(); //检查wifi模块的网络状态
+
+
 			if( Net_status!=Conneted)
 			{
 				if(Net_status==Lost)
@@ -259,6 +264,8 @@ int main(void)
 	u8 retry = 0;
 	char name[40];
 	Hardware_Init();
+	
+	
 	/* 液晶初始化 */
 while(OneNet_DevLink())			//接入OneNET
 		mDelay(500);
@@ -275,7 +282,7 @@ while(OneNet_DevLink())			//接入OneNET
 	/* ov7725 gpio 初始化 */
 	
 	
-	LED_BLUE;
+	LED_BLUE;  
 	
  if(OV7725_Init() != SUCCESS)
 	{
@@ -288,8 +295,6 @@ while(OneNet_DevLink())			//接入OneNET
 		printf("\r\nOV7725摄像头初始化完成\r\n");
 
 
-
-	
 	/*根据摄像头参数组配置模式*/
 	OV7725_Special_Effect(cam_mode.effect);
 	/*光照模式*/
@@ -311,11 +316,9 @@ while(OneNet_DevLink())			//接入OneNET
 														cam_mode.QVGA_VGA);
 															Ov7725_vsync = 0;
 
-
-
-
-printf("start TASK");
-xTaskCreate((TaskFunction_t)ReceiveCmdTask,"ReceiveCmdTask",ReceiveCmd_Stack,"ReceiveCmdTask",ReceiveCMd_Priority,&ReceiveCmdTask_Handler);
+/////////下面开始新建任务
+printf("start TASK\r\n");
+//xTaskCreate((TaskFunction_t)ReceiveCmdTask,"ReceiveCmdTask",ReceiveCmd_Stack,"ReceiveCmdTask",ReceiveCMd_Priority,&ReceiveCmdTask_Handler);
 xTaskCreate((TaskFunction_t)Net_Task,"Net_Task",Net_Task_Stack,"Net_Task",Net_Task_Prioruty,&NetTask_Handler);
 vTaskStartScheduler();
 

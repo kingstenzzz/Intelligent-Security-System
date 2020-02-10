@@ -136,7 +136,7 @@
             <Capability>1</Capability>
             <DriverSelection>4101</DriverSelection>
           </Flash1>
-          <bUseTDR>0</bUseTDR>
+          <bUseTDR>1</bUseTDR>
           <Flash2>STLink\ST-LINKIII-KEIL_SWO.dll</Flash2>
           <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_HD, USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Libraries\CMSIS;..\..\User;..\..\Libraries\FWlib\inc;..\..\User\FATFS\option;..\..\User\FATFS;..\..\User\delay;..\..\User\onenet\inc;..\..\User\device\inc;..\..\User\EDP;..\..\User\onenet\inc;..\..\User\hwtimer;..\..\User\JPEGENCODE;..\..\User\MALLOC;..\..\User\dht11;..\..\User\flame;..\..\User\warning;..\..\User\beep;..\..\User\adc;..\..\User\IIC;..\..\Freee-RTOS\include;..\..\Freee-RTOS\portable\RVDS\ARM_CM3;..\..\User\IWDG;..\..\User\light_moto</IncludePath>
+              <IncludePath>..\..\Libraries\CMSIS;..\..\User;..\..\Libraries\FWlib\inc;..\..\User\FATFS\option;..\..\User\FATFS;..\..\User\delay;..\..\User\onenet\inc;..\..\User\device\inc;..\..\User\EDP;..\..\User\onenet\inc;..\..\User\hwtimer;..\..\User\JPEGENCODE;..\..\User\MALLOC;..\..\User\dht11;..\..\User\flame;..\..\User\warning;..\..\User\beep;..\..\User\adc;..\..\User\IIC;..\..\Freee-RTOS\include;..\..\Freee-RTOS\portable\RVDS\ARM_CM3;..\..\User\IWDG;..\..\User\light_moto;..\..\User\M8266WIFI</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -725,6 +725,36 @@
               <FileName>heap_4.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\Freee-RTOS\portable\MemMang\heap_4.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>M8266</GroupName>
+          <Files>
+            <File>
+              <FileName>M8266WIFIDrv_STM32F1xx.a</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\User\M8266WIFI\M8266WIFIDrv_STM32F1xx.a</FilePath>
+            </File>
+            <File>
+              <FileName>M8266.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\M8266WIFI\M8266.c</FilePath>
+            </File>
+            <File>
+              <FileName>M8266HostIf.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\User\M8266WIFI\M8266HostIf.h</FilePath>
+            </File>
+            <File>
+              <FileName>M8266WIFI_ops.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\M8266WIFI\M8266WIFI_ops.c</FilePath>
+            </File>
+            <File>
+              <FileName>M8266HostIf_STM32xx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\M8266WIFI\M8266HostIf_STM32xx.c</FilePath>
             </File>
           </Files>
         </Group>

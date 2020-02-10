@@ -56,6 +56,10 @@
 "..\..\output\croutine.o"
 "..\..\output\port.o"
 "..\..\output\heap_4.o"
+"..\..\User\M8266WIFI\M8266WIFIDrv_STM32F1xx.a"
+"..\..\output\m8266.o"
+"..\..\output\m8266wifi_ops.o"
+"..\..\output\m8266hostif_stm32xx.o"
 --library_type=microlib --strict --scatter "..\..\Output\OV7725.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers

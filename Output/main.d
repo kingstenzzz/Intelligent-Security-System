@@ -46,6 +46,9 @@
 ..\..\output\main.o: ..\..\User\EDP\Common.h
 ..\..\output\main.o: F:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 ..\..\output\main.o: ..\..\User\device\inc\esp8266.h
+..\..\output\main.o: ..\..\User\M8266WIFI\M8266WIFIDrv.h
+..\..\output\main.o: ..\..\User\M8266WIFI\M8266HostIf.h
+..\..\output\main.o: ..\..\User\M8266WIFI\M8266WIFI_ops.h
 ..\..\output\main.o: ..\..\User\hwtimer\hwtimer.h
 ..\..\output\main.o: ..\..\User\stm32f10x_it.h
 ..\..\output\main.o: ..\..\User\warning\warning.h

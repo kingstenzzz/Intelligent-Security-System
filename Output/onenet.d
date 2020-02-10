@@ -25,6 +25,9 @@
 ..\..\output\onenet.o: ..\..\Libraries\FWlib\inc\stm32f10x_usart.h
 ..\..\output\onenet.o: ..\..\Libraries\FWlib\inc\stm32f10x_wwdg.h
 ..\..\output\onenet.o: ..\..\Libraries\FWlib\inc\misc.h
+..\..\output\onenet.o: ..\..\User\M8266WIFI\M8266WIFIDrv.h
+..\..\output\onenet.o: ..\..\User\M8266WIFI\M8266HostIf.h
+..\..\output\onenet.o: ..\..\User\M8266WIFI\M8266WIFI_ops.h
 ..\..\output\onenet.o: ..\..\User\onenet\inc\onenet.h
 ..\..\output\onenet.o: ..\..\User\EDP\edpkit.h
 ..\..\output\onenet.o: ..\..\User\EDP\Common.h

@@ -6,6 +6,10 @@
 //网络设备
 #include "esp8266.h"
 
+#include "M8266WIFIDrv.h"
+#include "M8266HostIf.h"
+#include "M8266WIFI_ops.h"
+
 //协议文件
 #include "onenet.h"
 #include "edpkit.h"
@@ -33,6 +37,8 @@ u8 err_count;
 extern enum data_type Data_type;
 _Bool photo=0;
 extern   u16 time_count;
+extern u16 link_status;
+extern u8 link_no;
 unsigned char camera_buf[1000];
 FIL bmpfsrc; 
 FRESULT bmpres;
@@ -71,9 +77,10 @@ _Bool OneNet_DevLink(void)
 
 	if(EDP_PacketConnect1(DEVID, APIKEY, 256, &edpPacket) == 0)		//根据devid 和 apikey封装协议包
 	{
-		ESP8266_SendData(edpPacket._data, edpPacket._len);			//上传平台
-		
-		dataPtr = ESP8266_GetIPD(250);								//等待平台响应
+		//ESP8266_SendData(edpPacket._data, edpPacket._len);			//上传平台
+		M8266WIFI_SPI_Send_Data(edpPacket._data, edpPacket._len,link_no,&link_status);
+	
+		dataPtr = M8266_GetIPD(250);								//等待平台响应
 		if(dataPtr != NULL)
 		{
 			if(EDP_UnPacketRecv(dataPtr) == CONNRESP)
@@ -159,7 +166,8 @@ void OneNet_SendData(volatile data_Stream *data_stream)
 			for(; i < body_len; i++)
 				edpPacket._data[edpPacket._len++] = buf[i];
 			
-			ESP8266_SendData(edpPacket._data, edpPacket._len);										//上传数据到平台
+		M8266WIFI_SPI_Send_Data(edpPacket._data, edpPacket._len,link_no,&link_status);
+										//上传数据到平台
 			EDP_DeleteBuffer(&edpPacket);
 		}
 		else
@@ -228,7 +236,7 @@ void OneNet_RevPro(unsigned char *cmd)
 			
 			if(cmd[3] == MSG_ID_HIGH && cmd[4] == MSG_ID_LOW)
 			{
-				UsartPrintf(USART_DEBUG, "Tips:	Send %s\r\n", cmd[5] ? "Err" : "Ok");
+				//UsartPrintf(USART_DEBUG, "Tips:	Send %s\r\n", cmd[5] ? "Err" : "Ok");
 			}
 			else
 				UsartPrintf(USART_DEBUG, "Tips:	Message ID Err\r\n");
@@ -306,8 +314,8 @@ void OneNet_Send_heart(void)
 		if(!EDP_PacketPing(&edpPacket))
 		{
 		printf("send ping pkt to server, bytes: %d\r\n", edpPacket._len);
-		ESP8266_SendData(edpPacket._data, edpPacket._len);				//上传数据到平台
-		hexdump(edpPacket._data,edpPacket._len);
+		M8266WIFI_SPI_Send_Data(edpPacket._data, edpPacket._len,link_no,&link_status);
+			hexdump(edpPacket._data,edpPacket._len);
 		EDP_DeleteBuffer(&edpPacket);									//删包
 		}
 		else 
@@ -342,8 +350,9 @@ void OneNet_SendData_Picture(char *devid,  char * pic_name)
 	{	
 		ESP8266_Clear();
 		
-		UsartPrintf(USART_DEBUG, "Send %d Bytes\r\n", edpPacket._len);
-		ESP8266_SendData(edpPacket._data, edpPacket._len);				//上传数据到平台
+		//UsartPrintf(USART_DEBUG, "Send %d Bytes\r\n", edpPacket._len);
+				M8266WIFI_SPI_Send_Data(edpPacket._data, edpPacket._len,link_no,&link_status);
+				//上传数据到平台
 		//hexdump(edpPacket._data,edpPacket._len);
 		EDP_DeleteBuffer(&edpPacket);									//删包
 		
@@ -359,7 +368,8 @@ void OneNet_SendData_Picture(char *devid,  char * pic_name)
 bmpres=f_read(&bmpfsrc,&camera_buf,PKT_SIZE*sizeof(unsigned char),&read_num);
 //if(read_num||res==0) break;
 
-				ESP8266_SendData(camera_buf, PKT_SIZE);						//串口发送分片
+						M8266WIFI_SPI_Send_Data(camera_buf,PKT_SIZE,link_no,&link_status);
+				//串口发送分片
 				
 		//		pImage += PKT_SIZE;
 				pic_len -= PKT_SIZE;
@@ -369,8 +379,8 @@ bmpres=f_read(&bmpfsrc,&camera_buf,PKT_SIZE*sizeof(unsigned char),&read_num);
 			{
 			
 				bmpres=f_read(&bmpfsrc,&camera_buf,ucAlign*sizeof(unsigned char),&read_num);
-			
-				ESP8266_SendData(camera_buf, ucAlign);					//串口发送最后一个分片
+				M8266WIFI_SPI_Send_Data(camera_buf,ucAlign,link_no,&link_status);
+				//ESP8266_SendData(camera_buf, ucAlign);					//串口发送最后一个分片
 				pic_len = 0;
 			}
 		}
@@ -403,7 +413,7 @@ void OneNET_CmdHandle(void)
 	
 	unsigned char *dataPtr = NULL;		//数据指针
 	unsigned char *cmd=NULL;
-	dataPtr = ESP8266_GetIPD(5);		//检查是否是平台数据
+	dataPtr = M8266_GetIPD(5);		//检查是否是平台数据
 		if(dataPtr != NULL)
 		{	
 				OneNet_RevPro(dataPtr);					//集中处理

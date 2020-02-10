@@ -1,6 +1,4 @@
 
-
-
 #include "./usart/bsp_usart.h"
 
 
@@ -13,7 +11,7 @@ void USART_Config(void)
 {
 	GPIO_InitTypeDef GPIO_InitStructure;
 	USART_InitTypeDef USART_InitStructure;
-		NVIC_InitTypeDef nvic_initstruct;
+	NVIC_InitTypeDef nvic_initstruct;
 
 	// 打开串口GPIO的时钟
 	DEBUG_USART_GPIO_APBxClkCmd(DEBUG_USART_GPIO_CLK, ENABLE);

@@ -3,8 +3,8 @@
 	   
 #include "stm32f10x.h"
 
-#define camera_HEIGHT 240
-#define camera_WIDTH   320
+#define camera_HEIGHT 320
+#define camera_WIDTH   480
 
 
 /*摄像头配置结构体*/

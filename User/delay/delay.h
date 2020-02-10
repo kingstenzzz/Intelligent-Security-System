@@ -10,6 +10,7 @@
 
 
 void mDelay(uint32_t i);
+   void udelay(u16 time);
 
 
 
