@@ -253,7 +253,8 @@ void OneNet_RevPro(unsigned char *cmd)
 		break;
 	}
 	
-	ESP8266_Clear();									//清空缓存
+		//M8266_Clear();
+			
 	
 	if(result == -1)
 		return;
@@ -291,16 +292,13 @@ void OneNet_RevPro(unsigned char *cmd)
 					time_count=num;   //赋值
 
 				}
-
-
-		
 	}
 	
 	if(type == CMDREQ && result == 0)						//如果是命令包 且 解包成功
 	{
 		EDP_FreeBuffer(cmdid_devid);						//释放内存
 		EDP_FreeBuffer(req);												//回复命令
-		ESP8266_SendData(edpPacket._data, edpPacket._len);	//上传平台
+		M8266WIFI_SPI_Send_Data(edpPacket._data, edpPacket._len,link_no,&link_status);	//上传平台
 		EDP_DeleteBuffer(&edpPacket);						//删包
 	}
 
@@ -348,7 +346,8 @@ void OneNet_SendData_Picture(char *devid,  char * pic_name)
 	
 	if(EDP_PacketSaveData(devid, pic_len, type_bin_head, kTypeBin, &edpPacket) == 0)
 	{	
-		ESP8266_Clear();
+			M8266_Clear();
+			
 		
 		//UsartPrintf(USART_DEBUG, "Send %d Bytes\r\n", edpPacket._len);
 				M8266WIFI_SPI_Send_Data(edpPacket._data, edpPacket._len,link_no,&link_status);
@@ -408,7 +407,7 @@ bmpres=f_read(&bmpfsrc,&camera_buf,PKT_SIZE*sizeof(unsigned char),&read_num);
 //
 //	说明：		
 //==========================================================
-void OneNET_CmdHandle(void)
+unsigned char  OneNET_CmdHandle(void)
 {
 	
 	unsigned char *dataPtr = NULL;		//数据指针
@@ -417,9 +416,10 @@ void OneNET_CmdHandle(void)
 		if(dataPtr != NULL)
 		{	
 				OneNet_RevPro(dataPtr);					//集中处理
+			  return 1;
 			
-	
 		}
+		return 0;
 	
 	
 

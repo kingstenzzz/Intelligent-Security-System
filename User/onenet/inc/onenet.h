@@ -72,6 +72,6 @@ void OneNet_RevPro(unsigned char *cmd);
 //unsigned char EDP_UnPacketRecv(unsigned char *cmd);
 void OneNet_SendData_Picture(char *devid,  char * pic_name);
 void OneNet_Send_heart(void);
-void OneNET_CmdHandle(void);
+unsigned char OneNET_CmdHandle(void);
 
 #endif

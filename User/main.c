@@ -59,7 +59,7 @@ FATFS fs;													/* FatFs文件系统对象 */
 FRESULT res_sd;                /* 文件操作结果 */
 float frame_count = 0;
 volatile data_Stream data_value;
-u16 time_count=20;
+u16 time_count=10;
 static uint8_t name_count = 0;
 
 
@@ -74,10 +74,12 @@ TaskHandle_t ReceiveCmdTask_Handler;
 //////////////////任务要分配栈空间
 #define Net_Task_Stack 1500//500+
 #define ReceiveCmd_Stack 256//54
+#define NetCheck_Stack   256
 
 /////////////////
-#define Net_Task_Prioruty 6
-#define ReceiveCMd_Priority 6
+#define Net_Task_Prioruty 5
+#define ReceiveCMd_Priority 5
+#define NetCheck_Prioruty   3
 
 
 
@@ -111,26 +113,15 @@ void Hardware_Init()
 
 
 //检查网络
-static void  CheckNetWork_Task(void **pvParameters)
+static void  CheckNetWork_Task(void *pvParameters)
 {			  
-	Net_status=(enum net_status)Check_Wifi(); //检查wifi模块的网络状态
+	Net_status=(enum net_status)M8266_NetCheck(); //检查wifi模块的网络状态
 
 
 			if( Net_status!=Conneted)
 			{
-				if(Net_status==Lost)
-	UsartPrintf(USART_DEBUG, "4. CIPSTART\r\n");
-	while(ESP8266_SendCmd(CIPSTART, "CONNECT"))
-		mDelay(500);
-						while(OneNet_DevLink())			//接入OneNET
-	          mDelay(500);
-				if(Net_status==Closed)
-				{
-					reLink();////重新连接
-					printf("wifi is unusable");
-			
-				}
-				
+				M8266_ReLink(Net_status);
+					
 			}
 }
 
@@ -204,10 +195,11 @@ static void ReceiveCmdTask(void *pvParameters)
 {
 	while(1)
 	{			
-		OneNET_CmdHandle();
-		NET_Event_CallBack(NET_EVENT_Recv);
-		
-	//	NET_Event_CallBack(NET_EVENT_Send_Data);//更新平台数据
+		if(OneNET_CmdHandle())
+		{
+		//	NET_Event_CallBack(NET_EVENT_Send_Data);//更新平台数据
+		}
+	
 		vTaskDelay(400/portTICK_RATE_MS);
 	}
 }
@@ -318,8 +310,9 @@ while(OneNet_DevLink())			//接入OneNET
 
 /////////下面开始新建任务
 printf("start TASK\r\n");
-//xTaskCreate((TaskFunction_t)ReceiveCmdTask,"ReceiveCmdTask",ReceiveCmd_Stack,"ReceiveCmdTask",ReceiveCMd_Priority,&ReceiveCmdTask_Handler);
+xTaskCreate((TaskFunction_t)ReceiveCmdTask,"ReceiveCmdTask",ReceiveCmd_Stack,"ReceiveCmdTask",ReceiveCMd_Priority,&ReceiveCmdTask_Handler);
 xTaskCreate((TaskFunction_t)Net_Task,"Net_Task",Net_Task_Stack,"Net_Task",Net_Task_Prioruty,&NetTask_Handler);
+xTaskCreate((TaskFunction_t)CheckNetWork_Task,"Net_Check",NetCheck_Stack,"Net_Check",NetCheck_Prioruty,NULL);
 vTaskStartScheduler();
 
 }

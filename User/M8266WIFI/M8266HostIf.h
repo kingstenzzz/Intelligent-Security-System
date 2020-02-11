@@ -23,8 +23,8 @@
 	 #define TEST_CONNECTION_TYPE   1
 	 #define TEST_REMOTE_ADDR    	 	"183.230.40.39"  // "onenet"
    #define TEST_REMOTE_PORT  	    876						// 80
-	 #define REV_OK		0	//接收完成标志
-   #define REV_WAIT	1	//接收未完成标志
+	 #define REV_OK		1	//接收完成标志
+   #define REV_WAIT	0	//接收未完成标志
 
 
  
@@ -43,6 +43,10 @@ void M8266_init();
 
 unsigned char *M8266_GetIPD(unsigned short timeOut);
 u8 M8266_WaitRecive();
+void M8266_Clear(void);
+unsigned char M8266_NetCheck();
+void M8266_ReLink(u8 status );
+
 
 
 #endif

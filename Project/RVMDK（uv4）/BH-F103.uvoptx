@@ -157,85 +157,37 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>58</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134235852</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>F:\姣旇禌\鏅鸿兘瀹夐槻-纭欢浠ｇ爜 - SPI wifi\鏅鸿兘瀹夐槻-纭欢浠ｇ爜\Project\User\M8266WIFI\M8266.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\OV7725\../../User/M8266WIFI/M8266.c\58</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
           <LineNumber>66</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134235896</Address>
+          <Address>134235780</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>F:\姣旇禌\鏅鸿兘瀹夐槻-纭欢浠ｇ爜 - SPI wifi\鏅鸿兘瀹夐槻-纭欢浠ｇ爜\Project\User\M8266WIFI\M8266.c</Filename>
+          <Filename>F:\鏅鸿兘瀹夐槻\Intelligent-Security-System\Project\User\M8266WIFI\M8266.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\OV7725\../../User/M8266WIFI/M8266.c\66</Expression>
         </Bp>
         <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>418</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134237478</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>F:\鏅鸿兘瀹夐槻\Intelligent-Security-System\Project\User\onenet\src\onenet.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\OV7725\../../User/onenet/src/onenet.c\418</Expression>
+        </Bp>
+        <Bp>
           <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>83</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134237662</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>F:\姣旇禌\鏅鸿兘瀹夐槻-纭欢浠ｇ爜 - SPI wifi\鏅鸿兘瀹夐槻-纭欢浠ｇ爜\Project\User\onenet\src\onenet.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\OV7725\../../User/onenet/src/onenet.c\83</Expression>
-        </Bp>
-        <Bp>
-          <Number>3</Number>
-          <Type>0</Type>
-          <LineNumber>320</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134260520</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>F:\姣旇禌\鏅鸿兘瀹夐槻-纭欢浠ｇ爜 - SPI wifi\鏅鸿兘瀹夐槻-纭欢浠ｇ爜\Project\User\main.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\OV7725\../../User/main.c\320</Expression>
-        </Bp>
-        <Bp>
-          <Number>4</Number>
-          <Type>0</Type>
-          <LineNumber>150</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\..\User\M8266WIFI\M8266.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
-        </Bp>
-        <Bp>
-          <Number>5</Number>
           <Type>0</Type>
           <LineNumber>9</LineNumber>
           <EnabledFlag>1</EnabledFlag>
@@ -447,7 +399,7 @@
         <Ww>
           <count>7</count>
           <WinNumber>2</WinNumber>
-          <ItemText>M8266buf,0x0A</ItemText>
+          <ItemText>M8266buf</ItemText>
         </Ww>
         <Ww>
           <count>8</count>
@@ -478,6 +430,36 @@
           <count>13</count>
           <WinNumber>2</WinNumber>
           <ItemText>dataPtr[0]</ItemText>
+        </Ww>
+        <Ww>
+          <count>14</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>pre_received,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>15</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>received,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>16</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>M8266_WaitRecive()==REV_OK</ItemText>
+        </Ww>
+        <Ww>
+          <count>17</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>cmd</ItemText>
+        </Ww>
+        <Ww>
+          <count>18</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>numBuf</ItemText>
+        </Ww>
+        <Ww>
+          <count>19</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>req</ItemText>
         </Ww>
       </WatchWindow2>
       <MemoryWindow1>
