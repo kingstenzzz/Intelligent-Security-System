@@ -59,7 +59,7 @@ FATFS fs;													/* FatFs文件系统对象 */
 FRESULT res_sd;                /* 文件操作结果 */
 float frame_count = 0;
 volatile data_Stream data_value;
-u16 time_count=10;
+u16 time_count=20;
 static uint8_t name_count = 0;
 
 
@@ -69,6 +69,7 @@ static uint8_t name_count = 0;
 ///////////////////
 TaskHandle_t NetTask_Handler;
 TaskHandle_t ReceiveCmdTask_Handler;
+TaskHandle_t NetCheck_Handler;
 
 
 //////////////////任务要分配栈空间
@@ -113,7 +114,7 @@ void Hardware_Init()
 
 
 //检查网络
-static void  CheckNetWork_Task(void *pvParameters)
+void CheckNetWork_Task()
 {			  
 	Net_status=(enum net_status)M8266_NetCheck(); //检查wifi模块的网络状态
 
@@ -121,13 +122,16 @@ static void  CheckNetWork_Task(void *pvParameters)
 			if( Net_status!=Conneted)
 			{
 				M8266_ReLink(Net_status);
+				
 					
 			}
+	
+		
 }
 
 static void Net_Task(void *pvParameters)
 {
-	unsigned short data_count=0,photo_count=0,check_count;
+	unsigned short data_count=0,photo_count=0,check_count=0;
 	
 	while(1)
 	{
@@ -154,8 +158,9 @@ static void Net_Task(void *pvParameters)
 
 				
 		}
-		else if(check_count>=20)
+		else if(++check_count>=20)
 		{			
+			check_count=0;
 			NET_Event_CallBack(NET_EVENT_Check_Status);
 		}
 		
@@ -173,7 +178,7 @@ static void Net_Task(void *pvParameters)
  void OneNet_SendPhoto()
 {
 		name_count++;
-			sprintf(name,"0:photo_%d.jpg",name_count); //字符串格式化
+			sprintf(name,"0:photos_%d.jpg",name_count); //字符串格式化
 			LED_BLUE;
 			printf("\r\n正在拍照...");	
 	Ov7725_vsync=0;
@@ -238,7 +243,10 @@ void NET_Event_CallBack(NET_EVENT net_event)
 		break;		
 		case NET_EVENT_Connect_Err:
 		printf("重连网络");
-		reLink();
+		///reLink();
+		break;
+		case NET_EVENT_Check_Status:
+		CheckNetWork_Task();
 		break;
 	}
 }
@@ -312,7 +320,7 @@ while(OneNet_DevLink())			//接入OneNET
 printf("start TASK\r\n");
 xTaskCreate((TaskFunction_t)ReceiveCmdTask,"ReceiveCmdTask",ReceiveCmd_Stack,"ReceiveCmdTask",ReceiveCMd_Priority,&ReceiveCmdTask_Handler);
 xTaskCreate((TaskFunction_t)Net_Task,"Net_Task",Net_Task_Stack,"Net_Task",Net_Task_Prioruty,&NetTask_Handler);
-xTaskCreate((TaskFunction_t)CheckNetWork_Task,"Net_Check",NetCheck_Stack,"Net_Check",NetCheck_Prioruty,NULL);
+//xTaskCreate((TaskFunction_t)CheckNetWork_Task,"Net_Check",NetCheck_Stack,"Net_Check",NetCheck_Prioruty,&NetCheck_Handler);
 vTaskStartScheduler();
 
 }

@@ -27,7 +27,24 @@ Project File Date:  12/26/2019
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 6 (build 750)', folder: 'F:\Keil_v5\ARM\ARMCC\Bin'
 Build target '≈ƒ’’'
-"..\..\Output\OV7725.axf" - 0 Error(s), 0 Warning(s).
+compiling M8266.c...
+..\..\User\M8266WIFI\M8266HostIf.h(40): warning:  #1295-D: Deprecated declaration M8266_init - give arg types
+  void M8266_init();
+..\..\User\M8266WIFI\M8266HostIf.h(45): warning:  #1295-D: Deprecated declaration M8266_WaitRecive - give arg types
+  u8 M8266_WaitRecive();
+..\..\User\M8266WIFI\M8266HostIf.h(47): warning:  #1295-D: Deprecated declaration M8266_NetCheck - give arg types
+  unsigned char M8266_NetCheck();
+..\..\User\M8266WIFI\M8266.c(42): warning:  #223-D: function "M8266HostIf_GPIO_CS_RESET_Init" declared implicitly
+  	 M8266HostIf_GPIO_CS_RESET_Init();
+..\..\User\M8266WIFI\M8266.c(44): warning:  #223-D: function "M8266HostIf_SPI_Init" declared implicitly
+  	 M8266HostIf_SPI_Init();
+..\..\User\M8266WIFI\M8266.c(145): warning:  #177-D: variable "ptrIPD"  was declared but never referenced
+  	char *ptrIPD = NULL;
+..\..\User\M8266WIFI\M8266.c: 6 warnings, 0 errors
+linking...
+Program Size: Code=46452 RO-data=3768 RW-data=440 ZI-data=270512  
+FromELF: creating hex file...
+"..\..\Output\OV7725.axf" - 0 Error(s), 6 Warning(s).
 
 <h2>Software Packages used:</h2>
 

@@ -210,7 +210,7 @@ void M8266_ReLink(u8 status )
 		}
 		
 	}
-	if(status==2)
+	if(status==2) //lost
 	{
 		while(M8266WIFI_SPI_Setup_Connection(TEST_CONNECTION_TYPE, 80, TEST_REMOTE_ADDR, TEST_REMOTE_PORT, link_no, 20, &link_status)==0)
 		{		 

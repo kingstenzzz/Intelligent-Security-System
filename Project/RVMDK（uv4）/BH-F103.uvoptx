@@ -157,50 +157,18 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>66</LineNumber>
+          <LineNumber>119</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134235780</Address>
+          <Address>134230426</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>F:\鏅鸿兘瀹夐槻\Intelligent-Security-System\Project\User\M8266WIFI\M8266.c</Filename>
+          <Filename>F:\鏅鸿兘瀹夐槻\Intelligent-Security-System\Project\User\main.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\OV7725\../../User/M8266WIFI/M8266.c\66</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>418</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134237478</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>F:\鏅鸿兘瀹夐槻\Intelligent-Security-System\Project\User\onenet\src\onenet.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\OV7725\../../User/onenet/src/onenet.c\418</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>9</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\..\User\light_moto\light_moto.h</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
+          <Expression>\\OV7725\../../User/main.c\119</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -460,6 +428,11 @@
           <count>19</count>
           <WinNumber>2</WinNumber>
           <ItemText>req</ItemText>
+        </Ww>
+        <Ww>
+          <count>20</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>Net_status</ItemText>
         </Ww>
       </WatchWindow2>
       <MemoryWindow1>
