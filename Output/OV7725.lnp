@@ -42,6 +42,7 @@
 "..\..\output\bsp_ili9341_lcd.o"
 "..\..\output\fonts.o"
 "..\..\output\beep.o"
+"..\..\output\bsp_key.o"
 "..\..\output\diskio.o"
 "..\..\output\ff.o"
 "..\..\output\ccsbcs.o"
@@ -62,5 +63,5 @@
 "..\..\output\m8266hostif_stm32xx.o"
 --library_type=microlib --strict --scatter "..\..\Output\OV7725.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
---info sizes --info totals --info unused --info veneers
+--info sizes --info totals --info unused
 --list "..\..\Listing\OV7725.map" -o ..\..\Output\OV7725.axf

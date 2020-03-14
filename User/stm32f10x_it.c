@@ -35,10 +35,7 @@
 
 extern uint8_t Ov7725_vsync;
 extern u8 secend;
-extern float frame_count;
-
 extern void xPortSysTickHandler();
-extern unsigned int Task_Delay[];
 extern void TimingDelay_Decrement(void);
 /** @addtogroup STM32F10x_StdPeriph_Template
   * @{

@@ -1,0 +1,846 @@
+L 1 "..\..\User\FATFS\option\syscall.c"
+N/*------------------------------------------------------------------------*/
+N/* Sample code of OS dependent controls for FatFs                         */
+N/* (C)ChaN, 2014                                                          */
+N/*------------------------------------------------------------------------*/
+N
+N
+N#include "../ff.h"
+L 1 "..\..\User\FATFS\option\../ff.h" 1
+N/*---------------------------------------------------------------------------/
+N/  FatFs - FAT file system module include R0.11a    (C)ChaN, 2015
+N/----------------------------------------------------------------------------/
+N/ FatFs module is a free software that opened under license policy of
+N/ following conditions.
+N/
+N/ Copyright (C) 2015, ChaN, all right reserved.
+N/
+N/ 1. Redistributions of source code must retain the above copyright notice,
+N/    this condition and the following disclaimer.
+N/
+N/ This software is provided by the copyright holder and contributors "AS IS"
+N/ and any warranties related to this software are DISCLAIMED.
+N/ The copyright owner or contributors be NOT LIABLE for any damages caused
+N/ by use of this software.
+N/---------------------------------------------------------------------------*/
+N
+N
+N#ifndef _FATFS
+N#define _FATFS	64180	/* Revision ID */
+N
+N#ifdef __cplusplus
+Sextern "C" {
+N#endif
+N
+N#include "integer.h"	/* Basic integer types */
+L 1 "..\..\User\FATFS\option\../integer.h" 1
+N/*-------------------------------------------*/
+N/* Integer type definitions for FatFs module */
+N/*-------------------------------------------*/
+N
+N#ifndef _FF_INTEGER
+N#define _FF_INTEGER
+N
+N#ifdef _WIN32	/* Development platform */
+S
+S#include <windows.h>
+S#include <tchar.h>
+S
+N#else			/* Embedded platform */
+N
+N/* This type MUST be 8-bit */
+Ntypedef unsigned char	BYTE;
+N
+N/* These types MUST be 16-bit */
+Ntypedef short			SHORT;
+Ntypedef unsigned short	WORD;
+Ntypedef unsigned short	WCHAR;
+N
+N/* These types MUST be 16-bit or 32-bit */
+Ntypedef int				INT;
+Ntypedef unsigned int	UINT;
+N
+N/* These types MUST be 32-bit */
+Ntypedef long			LONG;
+Ntypedef unsigned long	DWORD;
+N
+N#endif
+N
+N#endif
+L 27 "..\..\User\FATFS\option\../ff.h" 2
+N#include "ffconf.h"		/* FatFs configuration options */
+L 1 "..\..\User\FATFS\option\../ffconf.h" 1
+N/*---------------------------------------------------------------------------/
+N/  FatFs - FAT file system module configuration file  R0.11a (C)ChaN, 2015
+N/---------------------------------------------------------------------------*/
+N
+N#define _FFCONF 64180	/* Revision ID */
+N
+N/*---------------------------------------------------------------------------/
+N/ Function Configurations
+N/---------------------------------------------------------------------------*/
+N
+N#define _FS_READONLY	0
+N/* This option switches read-only configuration. (0:Read/Write or 1:Read-only)
+N/  Read-only configuration removes writing API functions, f_write(), f_sync(),
+N/  f_unlink(), f_mkdir(), f_chmod(), f_rename(), f_truncate(), f_getfree()
+N/  and optional writing functions as well. */
+N
+N
+N#define _FS_MINIMIZE	0
+N/* This option defines minimization level to remove some basic API functions.
+N/
+N/   0: All basic functions are enabled.
+N/   1: f_stat(), f_getfree(), f_unlink(), f_mkdir(), f_chmod(), f_utime(),
+N/      f_truncate() and f_rename() function are removed.
+N/   2: f_opendir(), f_readdir() and f_closedir() are removed in addition to 1.
+N/   3: f_lseek() function is removed in addition to 2. */
+N
+N
+N#define	_USE_STRFUNC	1
+N/* This option switches string functions, f_gets(), f_putc(), f_puts() and
+N/  f_printf().
+N/
+N/  0: Disable string functions.
+N/  1: Enable without LF-CRLF conversion.
+N/  2: Enable with LF-CRLF conversion. */
+N
+N
+N#define _USE_FIND		0
+N/* This option switches filtered directory read feature and related functions,
+N/  f_findfirst() and f_findnext(). (0:Disable or 1:Enable) */
+N
+N
+N#define	_USE_MKFS		1
+N/* This option switches f_mkfs() function. (0:Disable or 1:Enable) */
+N
+N
+N#define	_USE_FASTSEEK	0
+N/* This option switches fast seek feature. (0:Disable or 1:Enable) */
+N
+N
+N#define _USE_LABEL		0
+N/* This option switches volume label functions, f_getlabel() and f_setlabel().
+N/  (0:Disable or 1:Enable) */
+N
+N
+N#define	_USE_FORWARD	0
+N/* This option switches f_forward() function. (0:Disable or 1:Enable)
+N/  To enable it, also _FS_TINY need to be set to 1. */
+N
+N
+N/*---------------------------------------------------------------------------/
+N/ Locale and Namespace Configurations
+N/---------------------------------------------------------------------------*/
+N
+N#define _CODE_PAGE	437
+N/* This option specifies the OEM code page to be used on the target system.
+N/  Incorrect setting of the code page can cause a file open failure.
+N/
+N/   1   - ASCII (No extended character. Non-LFN cfg. only)
+N/   437 - U.S.
+N/   720 - Arabic
+N/   737 - Greek
+N/   771 - KBL
+N/   775 - Baltic
+N/   850 - Latin 1
+N/   852 - Latin 2
+N/   855 - Cyrillic
+N/   857 - Turkish
+N/   860 - Portuguese
+N/   861 - Icelandic
+N/   862 - Hebrew
+N/   863 - Canadian French
+N/   864 - Arabic
+N/   865 - Nordic
+N/   866 - Russian
+N/   869 - Greek 2
+N/   932 - Japanese (DBCS)
+N/   936 - Simplified Chinese (DBCS)
+N/   949 - Korean (DBCS)
+N/   950 - Traditional Chinese (DBCS)
+N*/
+N
+N
+N#define	_USE_LFN	2
+N#define	_MAX_LFN	255
+N/* The _USE_LFN option switches the LFN feature.
+N/
+N/   0: Disable LFN feature. _MAX_LFN has no effect.
+N/   1: Enable LFN with static working buffer on the BSS. Always NOT thread-safe.
+N/   2: Enable LFN with dynamic working buffer on the STACK.
+N/   3: Enable LFN with dynamic working buffer on the HEAP.
+N/
+N/  When enable the LFN feature, Unicode handling functions (option/unicode.c) must
+N/  be added to the project. The LFN working buffer occupies (_MAX_LFN + 1) * 2 bytes.
+N/  When use stack for the working buffer, take care on stack overflow. When use heap
+N/  memory for the working buffer, memory management functions, ff_memalloc() and
+N/  ff_memfree(), must be added to the project. */
+N
+N
+N#define	_LFN_UNICODE	0
+N/* This option switches character encoding on the API. (0:ANSI/OEM or 1:Unicode)
+N/  To use Unicode string for the path name, enable LFN feature and set _LFN_UNICODE
+N/  to 1. This option also affects behavior of string I/O functions. */
+N
+N
+N#define _STRF_ENCODE	3
+N/* When _LFN_UNICODE is 1, this option selects the character encoding on the file to
+N/  be read/written via string I/O functions, f_gets(), f_putc(), f_puts and f_printf().
+N/
+N/  0: ANSI/OEM
+N/  1: UTF-16LE
+N/  2: UTF-16BE
+N/  3: UTF-8
+N/
+N/  When _LFN_UNICODE is 0, this option has no effect. */
+N
+N
+N#define _FS_RPATH	0
+N/* This option configures relative path feature.
+N/
+N/   0: Disable relative path feature and remove related functions.
+N/   1: Enable relative path feature. f_chdir() and f_chdrive() are available.
+N/   2: f_getcwd() function is available in addition to 1.
+N/
+N/  Note that directory items read via f_readdir() are affected by this option. */
+N
+N
+N/*---------------------------------------------------------------------------/
+N/ Drive/Volume Configurations
+N/---------------------------------------------------------------------------*/
+N
+N#define _VOLUMES	2
+N/* Number of volumes (logical drives) to be used. */
+N
+N
+N#define _STR_VOLUME_ID	0
+N#define _VOLUME_STRS	"RAM","NAND","CF","SD1","SD2","USB1","USB2","USB3"
+N/* _STR_VOLUME_ID option switches string volume ID feature.
+N/  When _STR_VOLUME_ID is set to 1, also pre-defined strings can be used as drive
+N/  number in the path name. _VOLUME_STRS defines the drive ID strings for each
+N/  logical drives. Number of items must be equal to _VOLUMES. Valid characters for
+N/  the drive ID strings are: A-Z and 0-9. */
+N
+N
+N#define	_MULTI_PARTITION	0
+N/* This option switches multi-partition feature. By default (0), each logical drive
+N/  number is bound to the same physical drive number and only an FAT volume found on
+N/  the physical drive will be mounted. When multi-partition feature is enabled (1),
+N/  each logical drive number is bound to arbitrary physical drive and partition
+N/  listed in the VolToPart[]. Also f_fdisk() funciton will be available. */
+N
+N
+N#define	_MIN_SS		512
+N#define	_MAX_SS		4096
+N/* These options configure the range of sector size to be supported. (512, 1024,
+N/  2048 or 4096) Always set both 512 for most systems, all type of memory cards and
+N/  harddisk. But a larger value may be required for on-board flash memory and some
+N/  type of optical media. When _MAX_SS is larger than _MIN_SS, FatFs is configured
+N/  to variable sector size and GET_SECTOR_SIZE command must be implemented to the
+N/  disk_ioctl() function. */
+N
+N
+N#define	_USE_TRIM	0
+N/* This option switches ATA-TRIM feature. (0:Disable or 1:Enable)
+N/  To enable Trim feature, also CTRL_TRIM command should be implemented to the
+N/  disk_ioctl() function. */
+N
+N
+N#define _FS_NOFSINFO	0
+N/* If you need to know correct free space on the FAT32 volume, set bit 0 of this
+N/  option, and f_getfree() function at first time after volume mount will force
+N/  a full FAT scan. Bit 1 controls the use of last allocated cluster number.
+N/
+N/  bit0=0: Use free cluster count in the FSINFO if available.
+N/  bit0=1: Do not trust free cluster count in the FSINFO.
+N/  bit1=0: Use last allocated cluster number in the FSINFO if available.
+N/  bit1=1: Do not trust last allocated cluster number in the FSINFO.
+N*/
+N
+N
+N
+N/*---------------------------------------------------------------------------/
+N/ System Configurations
+N/---------------------------------------------------------------------------*/
+N
+N#define	_FS_TINY	0
+N/* This option switches tiny buffer configuration. (0:Normal or 1:Tiny)
+N/  At the tiny configuration, size of the file object (FIL) is reduced _MAX_SS
+N/  bytes. Instead of private sector buffer eliminated from the file object,
+N/  common sector buffer in the file system object (FATFS) is used for the file
+N/  data transfer. */
+N
+N
+N#define _FS_NORTC	0
+N#define _NORTC_MON	1
+N#define _NORTC_MDAY	1
+N#define _NORTC_YEAR	2015
+N/* The _FS_NORTC option switches timestamp feature. If the system does not have
+N/  an RTC function or valid timestamp is not needed, set _FS_NORTC to 1 to disable
+N/  the timestamp feature. All objects modified by FatFs will have a fixed timestamp
+N/  defined by _NORTC_MON, _NORTC_MDAY and _NORTC_YEAR.
+N/  When timestamp feature is enabled (_FS_NORTC == 0), get_fattime() function need
+N/  to be added to the project to read current time form RTC. _NORTC_MON,
+N/  _NORTC_MDAY and _NORTC_YEAR have no effect. 
+N/  These options have no effect at read-only configuration (_FS_READONLY == 1). */
+N
+N
+N#define	_FS_LOCK	0
+N/* The _FS_LOCK option switches file lock feature to control duplicated file open
+N/  and illegal operation to open objects. This option must be 0 when _FS_READONLY
+N/  is 1.
+N/
+N/  0:  Disable file lock feature. To avoid volume corruption, application program
+N/      should avoid illegal open, remove and rename to the open objects.
+N/  >0: Enable file lock feature. The value defines how many files/sub-directories
+N/      can be opened simultaneously under file lock control. Note that the file
+N/      lock feature is independent of re-entrancy. */
+N
+N
+N#define _FS_REENTRANT	0
+N#define _FS_TIMEOUT		1000
+N#define	_SYNC_t			HANDLE
+N/* The _FS_REENTRANT option switches the re-entrancy (thread safe) of the FatFs
+N/  module itself. Note that regardless of this option, file access to different
+N/  volume is always re-entrant and volume control functions, f_mount(), f_mkfs()
+N/  and f_fdisk() function, are always not re-entrant. Only file/directory access
+N/  to the same volume is under control of this feature.
+N/
+N/   0: Disable re-entrancy. _FS_TIMEOUT and _SYNC_t have no effect.
+N/   1: Enable re-entrancy. Also user provided synchronization handlers,
+N/      ff_req_grant(), ff_rel_grant(), ff_del_syncobj() and ff_cre_syncobj()
+N/      function, must be added to the project. Samples are available in
+N/      option/syscall.c.
+N/
+N/  The _FS_TIMEOUT defines timeout period in unit of time tick.
+N/  The _SYNC_t defines O/S dependent sync object type. e.g. HANDLE, ID, OS_EVENT*,
+N/  SemaphoreHandle_t and etc.. A header file for O/S definitions needs to be
+N/  included somewhere in the scope of ff.c. */
+N
+N
+N#define _WORD_ACCESS	0
+N/* The _WORD_ACCESS option is an only platform dependent option. It defines
+N/  which access method is used to the word data on the FAT volume.
+N/
+N/   0: Byte-by-byte access. Always compatible with all platforms.
+N/   1: Word access. Do not choose this unless under both the following conditions.
+N/
+N/  * Address misaligned memory access is always allowed to ALL instructions.
+N/  * Byte order on the memory is little-endian.
+N/
+N/  If it is the case, _WORD_ACCESS can also be set to 1 to reduce code size.
+N/  Following table shows allowable settings of some type of processors.
+N/
+N/  ARM7TDMI   0   *2          ColdFire   0    *1         V850E      0    *2
+N/  Cortex-M3  0   *3          Z80        0/1             V850ES     0/1
+N/  Cortex-M0  0   *2          x86        0/1             TLCS-870   0/1
+N/  AVR        0/1             RX600(LE)  0/1             TLCS-900   0/1
+N/  AVR32      0   *1          RL78       0    *2         R32C       0    *2
+N/  PIC18      0/1             SH-2       0    *1         M16C       0/1
+N/  PIC24      0   *2          H8S        0    *1         MSP430     0    *2
+N/  PIC32      0   *1          H8/300H    0    *1         8051       0/1
+N/
+N/  *1:Big-endian.
+N/  *2:Unaligned memory access is not supported.
+N/  *3:Some compilers generate LDM/STM for mem_cpy function.
+N*/
+N
+L 28 "..\..\User\FATFS\option\../ff.h" 2
+N#if _FATFS != _FFCONF
+X#if 64180 != 64180
+S#error Wrong configuration file (ffconf.h).
+N#endif
+N
+N
+N
+N/* Definitions of volume management */
+N
+N#if _MULTI_PARTITION		/* Multiple partition configuration */
+X#if 0		 
+Stypedef struct {
+S	BYTE pd;	/* Physical drive number */
+S	BYTE pt;	/* Partition: 0:Auto detect, 1-4:Forced partition) */
+S} PARTITION;
+Sextern PARTITION VolToPart[];	/* Volume - Partition resolution table */
+S#define LD2PD(vol) (VolToPart[vol].pd)	/* Get physical drive number */
+S#define LD2PT(vol) (VolToPart[vol].pt)	/* Get partition index */
+S
+N#else							/* Single partition configuration */
+N#define LD2PD(vol) (BYTE)(vol)	/* Each logical drive is bound to the same physical drive number */
+N#define LD2PT(vol) 0			/* Find first valid partition or in SFD */
+N
+N#endif
+N
+N
+N
+N/* Type of path name strings on FatFs API */
+N
+N#if _LFN_UNICODE			/* Unicode string */
+X#if 0			 
+S#if !_USE_LFN
+S#error _LFN_UNICODE must be 0 at non-LFN cfg.
+S#endif
+S#ifndef _INC_TCHAR
+Stypedef WCHAR TCHAR;
+S#define _T(x) L ## x
+S#define _TEXT(x) L ## x
+S#endif
+S
+N#else						/* ANSI/OEM string */
+N#ifndef _INC_TCHAR
+Ntypedef char TCHAR;
+N#define _T(x) x
+N#define _TEXT(x) x
+N#endif
+N
+N#endif
+N
+N
+N
+N/* File system object structure (FATFS) */
+N
+Ntypedef struct {
+N	BYTE	fs_type;		/* FAT sub-type (0:Not mounted) */
+N	BYTE	drv;			/* Physical drive number */
+N	BYTE	csize;			/* Sectors per cluster (1,2,4...128) */
+N	BYTE	n_fats;			/* Number of FAT copies (1 or 2) */
+N	BYTE	wflag;			/* win[] flag (b0:dirty) */
+N	BYTE	fsi_flag;		/* FSINFO flags (b7:disabled, b0:dirty) */
+N	WORD	id;				/* File system mount ID */
+N	WORD	n_rootdir;		/* Number of root directory entries (FAT12/16) */
+N#if _MAX_SS != _MIN_SS
+X#if 4096 != 512
+N	WORD	ssize;			/* Bytes per sector (512, 1024, 2048 or 4096) */
+N#endif
+N#if _FS_REENTRANT
+X#if 0
+S	_SYNC_t	sobj;			/* Identifier of sync object */
+N#endif
+N#if !_FS_READONLY
+X#if !0
+N	DWORD	last_clust;		/* Last allocated cluster */
+N	DWORD	free_clust;		/* Number of free clusters */
+N#endif
+N#if _FS_RPATH
+X#if 0
+S	DWORD	cdir;			/* Current directory start cluster (0:root) */
+N#endif
+N	DWORD	n_fatent;		/* Number of FAT entries, = number of clusters + 2 */
+N	DWORD	fsize;			/* Sectors per FAT */
+N	DWORD	volbase;		/* Volume start sector */
+N	DWORD	fatbase;		/* FAT start sector */
+N	DWORD	dirbase;		/* Root directory start sector (FAT32:Cluster#) */
+N	DWORD	database;		/* Data start sector */
+N	DWORD	winsect;		/* Current sector appearing in the win[] */
+N	BYTE	win[_MAX_SS];	/* Disk access window for Directory, FAT (and file data at tiny cfg) */
+X	BYTE	win[4096];	 
+N} FATFS;
+N
+N
+N
+N/* File object structure (FIL) */
+N
+Ntypedef struct {
+N	FATFS*	fs;				/* Pointer to the related file system object (**do not change order**) */
+N	WORD	id;				/* Owner file system mount ID (**do not change order**) */
+N	BYTE	flag;			/* Status flags */
+N	BYTE	err;			/* Abort flag (error code) */
+N	DWORD	fptr;			/* File read/write pointer (Zeroed on file open) */
+N	DWORD	fsize;			/* File size */
+N	DWORD	sclust;			/* File start cluster (0:no cluster chain, always 0 when fsize is 0) */
+N	DWORD	clust;			/* Current cluster of fpter (not valid when fprt is 0) */
+N	DWORD	dsect;			/* Sector number appearing in buf[] (0:invalid) */
+N#if !_FS_READONLY
+X#if !0
+N	DWORD	dir_sect;		/* Sector number containing the directory entry */
+N	BYTE*	dir_ptr;		/* Pointer to the directory entry in the win[] */
+N#endif
+N#if _USE_FASTSEEK
+X#if 0
+S	DWORD*	cltbl;			/* Pointer to the cluster link map table (Nulled on file open) */
+N#endif
+N#if _FS_LOCK
+X#if 0
+S	UINT	lockid;			/* File lock ID origin from 1 (index of file semaphore table Files[]) */
+N#endif
+N#if !_FS_TINY
+X#if !0
+N	BYTE	buf[_MAX_SS];	/* File private data read/write window */
+X	BYTE	buf[4096];	 
+N#endif
+N} FIL;
+N
+N
+N
+N/* Directory object structure (DIR) */
+N
+Ntypedef struct {
+N	FATFS*	fs;				/* Pointer to the owner file system object (**do not change order**) */
+N	WORD	id;				/* Owner file system mount ID (**do not change order**) */
+N	WORD	index;			/* Current read/write index number */
+N	DWORD	sclust;			/* Table start cluster (0:Root dir) */
+N	DWORD	clust;			/* Current cluster */
+N	DWORD	sect;			/* Current sector */
+N	BYTE*	dir;			/* Pointer to the current SFN entry in the win[] */
+N	BYTE*	fn;				/* Pointer to the SFN (in/out) {file[8],ext[3],status[1]} */
+N#if _FS_LOCK
+X#if 0
+S	UINT	lockid;			/* File lock ID (index of file semaphore table Files[]) */
+N#endif
+N#if _USE_LFN
+X#if 2
+N	WCHAR*	lfn;			/* Pointer to the LFN working buffer */
+N	WORD	lfn_idx;		/* Last matched LFN index number (0xFFFF:No LFN) */
+N#endif
+N#if _USE_FIND
+X#if 0
+S	const TCHAR*	pat;	/* Pointer to the name matching pattern */
+N#endif
+N} DIR;
+N
+N
+N
+N/* File information structure (FILINFO) */
+N
+Ntypedef struct {
+N	DWORD	fsize;			/* File size */
+N	WORD	fdate;			/* Last modified date */
+N	WORD	ftime;			/* Last modified time */
+N	BYTE	fattrib;		/* Attribute */
+N	TCHAR	fname[13];		/* Short file name (8.3 format) */
+N#if _USE_LFN
+X#if 2
+N	TCHAR*	lfname;			/* Pointer to the LFN buffer */
+N	UINT 	lfsize;			/* Size of LFN buffer in TCHAR */
+N#endif
+N} FILINFO;
+N
+N
+N
+N/* File function return code (FRESULT) */
+N
+Ntypedef enum {
+N	FR_OK = 0,				/* (0) Succeeded */
+N	FR_DISK_ERR,			/* (1) A hard error occurred in the low level disk I/O layer */
+N	FR_INT_ERR,				/* (2) Assertion failed */
+N	FR_NOT_READY,			/* (3) The physical drive cannot work */
+N	FR_NO_FILE,				/* (4) Could not find the file */
+N	FR_NO_PATH,				/* (5) Could not find the path */
+N	FR_INVALID_NAME,		/* (6) The path name format is invalid */
+N	FR_DENIED,				/* (7) Access denied due to prohibited access or directory full */
+N	FR_EXIST,				/* (8) Access denied due to prohibited access */
+N	FR_INVALID_OBJECT,		/* (9) The file/directory object is invalid */
+N	FR_WRITE_PROTECTED,		/* (10) The physical drive is write protected */
+N	FR_INVALID_DRIVE,		/* (11) The logical drive number is invalid */
+N	FR_NOT_ENABLED,			/* (12) The volume has no work area */
+N	FR_NO_FILESYSTEM,		/* (13) There is no valid FAT volume */
+N	FR_MKFS_ABORTED,		/* (14) The f_mkfs() aborted due to any parameter error */
+N	FR_TIMEOUT,				/* (15) Could not get a grant to access the volume within defined period */
+N	FR_LOCKED,				/* (16) The operation is rejected according to the file sharing policy */
+N	FR_NOT_ENOUGH_CORE,		/* (17) LFN working buffer could not be allocated */
+N	FR_TOO_MANY_OPEN_FILES,	/* (18) Number of open files > _FS_LOCK */
+N	FR_INVALID_PARAMETER	/* (19) Given parameter is invalid */
+N} FRESULT;
+N
+N
+N
+N/*--------------------------------------------------------------*/
+N/* FatFs module application interface                           */
+N
+NFRESULT f_open (FIL* fp, const TCHAR* path, BYTE mode);				/* Open or create a file */
+NFRESULT f_close (FIL* fp);											/* Close an open file object */
+NFRESULT f_read (FIL* fp, void* buff, UINT btr, UINT* br);			/* Read data from a file */
+NFRESULT f_write (FIL* fp, const void* buff, UINT btw, UINT* bw);	/* Write data to a file */
+NFRESULT f_forward (FIL* fp, UINT(*func)(const BYTE*,UINT), UINT btf, UINT* bf);	/* Forward data to the stream */
+NFRESULT f_lseek (FIL* fp, DWORD ofs);								/* Move file pointer of a file object */
+NFRESULT f_truncate (FIL* fp);										/* Truncate file */
+NFRESULT f_sync (FIL* fp);											/* Flush cached data of a writing file */
+NFRESULT f_opendir (DIR* dp, const TCHAR* path);						/* Open a directory */
+NFRESULT f_closedir (DIR* dp);										/* Close an open directory */
+NFRESULT f_readdir (DIR* dp, FILINFO* fno);							/* Read a directory item */
+NFRESULT f_findfirst (DIR* dp, FILINFO* fno, const TCHAR* path, const TCHAR* pattern);	/* Find first file */
+NFRESULT f_findnext (DIR* dp, FILINFO* fno);							/* Find next file */
+NFRESULT f_mkdir (const TCHAR* path);								/* Create a sub directory */
+NFRESULT f_unlink (const TCHAR* path);								/* Delete an existing file or directory */
+NFRESULT f_rename (const TCHAR* path_old, const TCHAR* path_new);	/* Rename/Move a file or directory */
+NFRESULT f_stat (const TCHAR* path, FILINFO* fno);					/* Get file status */
+NFRESULT f_chmod (const TCHAR* path, BYTE attr, BYTE mask);			/* Change attribute of the file/dir */
+NFRESULT f_utime (const TCHAR* path, const FILINFO* fno);			/* Change times-tamp of the file/dir */
+NFRESULT f_chdir (const TCHAR* path);								/* Change current directory */
+NFRESULT f_chdrive (const TCHAR* path);								/* Change current drive */
+NFRESULT f_getcwd (TCHAR* buff, UINT len);							/* Get current directory */
+NFRESULT f_getfree (const TCHAR* path, DWORD* nclst, FATFS** fatfs);	/* Get number of free clusters on the drive */
+NFRESULT f_getlabel (const TCHAR* path, TCHAR* label, DWORD* vsn);	/* Get volume label */
+NFRESULT f_setlabel (const TCHAR* label);							/* Set volume label */
+NFRESULT f_mount (FATFS* fs, const TCHAR* path, BYTE opt);			/* Mount/Unmount a logical drive */
+NFRESULT f_mkfs (const TCHAR* path, BYTE sfd, UINT au);				/* Create a file system on the volume */
+NFRESULT f_fdisk (BYTE pdrv, const DWORD szt[], void* work);			/* Divide a physical drive into some partitions */
+Nint f_putc (TCHAR c, FIL* fp);										/* Put a character to the file */
+Nint f_puts (const TCHAR* str, FIL* cp);								/* Put a string to the file */
+Nint f_printf (FIL* fp, const TCHAR* str, ...);						/* Put a formatted string to the file */
+NTCHAR* f_gets (TCHAR* buff, int len, FIL* fp);						/* Get a string from the file */
+W "..\..\User\FATFS\option\../ff.h" 244 6 Deprecated declaration Fatfs_Init - give arg types
+Nvoid Fatfs_Init();                                         /*FAtFs¹ÒÔØ*/
+N
+N#define f_eof(fp) ((int)((fp)->fptr == (fp)->fsize))
+N#define f_error(fp) ((fp)->err)
+N#define f_tell(fp) ((fp)->fptr)
+N#define f_size(fp) ((fp)->fsize)
+N#define f_rewind(fp) f_lseek((fp), 0)
+N#define f_rewinddir(dp) f_readdir((dp), 0)
+N
+N#ifndef EOF
+N#define EOF (-1)
+N#endif
+N
+N
+N
+N
+N/*--------------------------------------------------------------*/
+N/* Additional user defined functions                            */
+N
+N/* RTC function */
+N#if !_FS_READONLY && !_FS_NORTC
+X#if !0 && !0
+NDWORD get_fattime (void);
+N#endif
+N
+N/* Unicode support functions */
+N#if _USE_LFN							/* Unicode - OEM code conversion */
+X#if 2							 
+NWCHAR ff_convert (WCHAR chr, UINT dir);	/* OEM-Unicode bidirectional conversion */
+NWCHAR ff_wtoupper (WCHAR chr);			/* Unicode upper-case conversion */
+N#if _USE_LFN == 3						/* Memory functions */
+X#if 2 == 3						 
+Svoid* ff_memalloc (UINT msize);			/* Allocate memory block */
+Svoid ff_memfree (void* mblock);			/* Free memory block */
+N#endif
+N#endif
+N
+N/* Sync functions */
+N#if _FS_REENTRANT
+X#if 0
+Sint ff_cre_syncobj (BYTE vol, _SYNC_t* sobj);	/* Create a sync object */
+Sint ff_req_grant (_SYNC_t sobj);				/* Lock sync object */
+Svoid ff_rel_grant (_SYNC_t sobj);				/* Unlock sync object */
+Sint ff_del_syncobj (_SYNC_t sobj);				/* Delete a sync object */
+N#endif
+N
+N
+N
+N
+N/*--------------------------------------------------------------*/
+N/* Flags and offset address                                     */
+N
+N
+N/* File access control and file status flags (FIL.flag) */
+N
+N#define	FA_READ				0x01
+N#define	FA_OPEN_EXISTING	0x00
+N
+N#if !_FS_READONLY
+X#if !0
+N#define	FA_WRITE			0x02
+N#define	FA_CREATE_NEW		0x04
+N#define	FA_CREATE_ALWAYS	0x08
+N#define	FA_OPEN_ALWAYS		0x10
+N#define FA__WRITTEN			0x20
+N#define FA__DIRTY			0x40
+N#endif
+N
+N
+N/* FAT sub type (FATFS.fs_type) */
+N
+N#define FS_FAT12	1
+N#define FS_FAT16	2
+N#define FS_FAT32	3
+N
+N
+N/* File attribute bits for directory entry */
+N
+N#define	AM_RDO	0x01	/* Read only */
+N#define	AM_HID	0x02	/* Hidden */
+N#define	AM_SYS	0x04	/* System */
+N#define	AM_VOL	0x08	/* Volume label */
+N#define AM_LFN	0x0F	/* LFN entry */
+N#define AM_DIR	0x10	/* Directory */
+N#define AM_ARC	0x20	/* Archive */
+N#define AM_MASK	0x3F	/* Mask of defined bits */
+N
+N
+N/* Fast seek feature */
+N#define CREATE_LINKMAP	0xFFFFFFFF
+N
+N
+N
+N/*--------------------------------*/
+N/* Multi-byte word access macros  */
+N
+N#if _WORD_ACCESS == 1	/* Enable word access to the FAT structure */
+X#if 0 == 1	 
+S#define	LD_WORD(ptr)		(WORD)(*(WORD*)(BYTE*)(ptr))
+S#define	LD_DWORD(ptr)		(DWORD)(*(DWORD*)(BYTE*)(ptr))
+S#define	ST_WORD(ptr,val)	*(WORD*)(BYTE*)(ptr)=(WORD)(val)
+S#define	ST_DWORD(ptr,val)	*(DWORD*)(BYTE*)(ptr)=(DWORD)(val)
+N#else					/* Use byte-by-byte access to the FAT structure */
+N#define	LD_WORD(ptr)		(WORD)(((WORD)*((BYTE*)(ptr)+1)<<8)|(WORD)*(BYTE*)(ptr))
+N#define	LD_DWORD(ptr)		(DWORD)(((DWORD)*((BYTE*)(ptr)+3)<<24)|((DWORD)*((BYTE*)(ptr)+2)<<16)|((WORD)*((BYTE*)(ptr)+1)<<8)|*(BYTE*)(ptr))
+N#define	ST_WORD(ptr,val)	*(BYTE*)(ptr)=(BYTE)(val); *((BYTE*)(ptr)+1)=(BYTE)((WORD)(val)>>8)
+N#define	ST_DWORD(ptr,val)	*(BYTE*)(ptr)=(BYTE)(val); *((BYTE*)(ptr)+1)=(BYTE)((WORD)(val)>>8); *((BYTE*)(ptr)+2)=(BYTE)((DWORD)(val)>>16); *((BYTE*)(ptr)+3)=(BYTE)((DWORD)(val)>>24)
+N#endif
+N
+N#ifdef __cplusplus
+S}
+N#endif
+N
+N#endif /* _FATFS */
+L 8 "..\..\User\FATFS\option\syscall.c" 2
+N
+N
+N#if _FS_REENTRANT
+X#if 0
+S/*------------------------------------------------------------------------*/
+S/* Create a Synchronization Object*/
+S/*------------------------------------------------------------------------*/
+S/* This function is called in f_mount() function to create a new
+S/  synchronization object, such as semaphore and mutex. When a 0 is returned,
+S/  the f_mount() function fails with FR_INT_ERR.
+S*/
+S
+Sint ff_cre_syncobj (	/* !=0:Function succeeded, ==0:Could not create due to any error */
+S	BYTE vol,			/* Corresponding logical drive being processed */
+S	_SYNC_t *sobj		/* Pointer to return the created sync object */
+S)
+S{
+S	int ret;
+S
+S
+S	*sobj = CreateMutex(NULL, FALSE, NULL);		/* Win32 */
+S	ret = (int)(*sobj != INVALID_HANDLE_VALUE);
+S
+S//	*sobj = SyncObjects[vol];			/* uITRON (give a static created sync object) */
+S//	ret = 1;							/* The initial value of the semaphore must be 1. */
+S
+S//	*sobj = OSMutexCreate(0, &err);		/* uC/OS-II */
+S//	ret = (int)(err == OS_NO_ERR);
+S
+S//	*sobj = xSemaphoreCreateMutex();	/* FreeRTOS */
+S//	ret = (int)(*sobj != NULL);
+S
+S	return ret;
+S}
+S
+S
+S
+S/*------------------------------------------------------------------------*/
+S/* Delete a Synchronization Object                                        */
+S/*------------------------------------------------------------------------*/
+S/* This function is called in f_mount() function to delete a synchronization
+S/  object that created with ff_cre_syncobj function. When a 0 is returned,
+S/  the f_mount() function fails with FR_INT_ERR.
+S*/
+S
+Sint ff_del_syncobj (	/* !=0:Function succeeded, ==0:Could not delete due to any error */
+S	_SYNC_t sobj		/* Sync object tied to the logical drive to be deleted */
+S)
+S{
+S	int ret;
+S
+S
+S	ret = CloseHandle(sobj);	/* Win32 */
+S
+S//	ret = 1;					/* uITRON (nothing to do) */
+S
+S//	OSMutexDel(sobj, OS_DEL_ALWAYS, &err);	/* uC/OS-II */
+S//	ret = (int)(err == OS_NO_ERR);
+S
+S//  vSemaphoreDelete(sobj);		/* FreeRTOS */
+S//	ret = 1;
+S
+S	return ret;
+S}
+S
+S
+S
+S/*------------------------------------------------------------------------*/
+S/* Request Grant to Access the Volume                                     */
+S/*------------------------------------------------------------------------*/
+S/* This function is called on entering file functions to lock the volume.
+S/  When a 0 is returned, the file function fails with FR_TIMEOUT.
+S*/
+S
+Sint ff_req_grant (	/* 1:Got a grant to access the volume, 0:Could not get a grant */
+S	_SYNC_t sobj	/* Sync object to wait */
+S)
+S{
+S	int ret;
+S
+S	ret = (int)(WaitForSingleObject(sobj, _FS_TIMEOUT) == WAIT_OBJECT_0);	/* Win32 */
+S
+S//	ret = (int)(wai_sem(sobj) == E_OK);			/* uITRON */
+S
+S//	OSMutexPend(sobj, _FS_TIMEOUT, &err));		/* uC/OS-II */
+S//	ret = (int)(err == OS_NO_ERR);
+S
+S//	ret = (int)(xSemaphoreTake(sobj, _FS_TIMEOUT) == pdTRUE);	/* FreeRTOS */
+S
+S	return ret;
+S}
+S
+S
+S
+S
+S
+S/*------------------------------------------------------------------------*/
+S/* Release Grant to Access the Volume                                     */
+S/*------------------------------------------------------------------------*/
+S/* This function is called on leaving file functions to unlock the volume.
+S*/
+S
+Svoid ff_rel_grant (
+S	_SYNC_t sobj	/* Sync object to be signaled */
+S)
+S{
+S	ReleaseMutex(sobj);		/* Win32 */
+S
+S//	sig_sem(sobj);			/* uITRON */
+S
+S//	OSMutexPost(sobj);		/* uC/OS-II */
+S
+S//	xSemaphoreGive(sobj);	/* FreeRTOS */
+S}
+S
+N#endif
+N
+N
+N
+N
+N#if _USE_LFN == 3	/* LFN with a working buffer on the heap */
+X#if 2 == 3	 
+S/*------------------------------------------------------------------------*/
+S/* Allocate a memory block                                                */
+S/*------------------------------------------------------------------------*/
+S/* If a NULL is returned, the file function fails with FR_NOT_ENOUGH_CORE.
+S*/
+S
+Svoid* ff_memalloc (	/* Returns pointer to the allocated memory block */
+S	UINT msize		/* Number of bytes to allocate */
+S)
+S{
+S	return malloc(msize);	/* Allocate a new memory block with POSIX API */
+S}
+S
+S
+S/*------------------------------------------------------------------------*/
+S/* Free a memory block                                                    */
+S/*------------------------------------------------------------------------*/
+S
+Svoid ff_memfree (
+S	void* mblock	/* Pointer to the memory block to free */
+S)
+S{
+S	free(mblock);	/* Discard the memory block with POSIX API */
+S}
+S
+N#endif

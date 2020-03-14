@@ -19,10 +19,39 @@
 #include "./sccb/bsp_sccb.h"
 #include "./lcd/bsp_ili9341_lcd.h"
 #include "./usart/bsp_usart.h"
+#include "./key/bsp_key.h"  
+
 
 
 //摄像头初始化配置
 //注意：使用这种方式初始化结构体，要在c/c++选项中选择 C99 mode
+
+OV7725_MODE_PARAM cam_mode_test =
+{
+	
+/*以下包含几组摄像头配置，可自行测试，保留一组，把其余配置注释掉即可*/
+/************配置1*********横屏显示*****************************/
+	
+	.QVGA_VGA = 0,	//QVGA模式
+	.cam_sx = 0,
+	.cam_sy = 0,	
+	
+	.cam_width = 320,
+	.cam_height = 240,
+	
+	.lcd_sx = 0,
+	.lcd_sy = 0,
+	.lcd_scan = 3, //LCD扫描模式，本横屏配置可用1、3、5、7模式
+	
+	//以下可根据自己的需要调整，参数范围见结构体类型定义	
+	.light_mode = 0,//自动光照模式
+	.saturation = 0,	
+	.brightness = 0,
+	.contrast = 0,
+	.effect = 0,		//正常模式
+};
+
+
 OV7725_MODE_PARAM cam_mode =
 {
 	
@@ -768,7 +797,7 @@ void ImagDisp(uint16_t sx,uint16_t sy,uint16_t width,uint16_t height)
 
 	for(i = 0; i < width; i++)
 	{
-		for(j = 0; j < height; j++)
+		for(j = 0; j < height-20; j++)
 		{
 			READ_FIFO_PIXEL(Camera_Data);		/* 从FIFO读出一个rgb565像素到Camera_Data变量 */
 			ILI9341_Write_Data(Camera_Data);
@@ -786,7 +815,7 @@ void camera_buff_save(u16 *camera_buf,u16 length, u16 width)
 	}
 	
 }
-
+/*
 void ShanWai_SendCamera(u16 length_w, u16 length_h)
 {
 uint16_t i, j; 
@@ -797,7 +826,7 @@ uint16_t i, j;
 	{
 		for(j = 0; j < camera_WIDTH; j++)
 		{
-			READ_FIFO_PIXEL(Camera_Data);		/* 从FIFO读出一个rgb565像素到Camera_Data变量 */
+			READ_FIFO_PIXEL(Camera_Data);		// 从FIFO读出一个rgb565像素到Camera_Data变量 
 			USART_Send2Byre(USART2,Camera_Data);
 		
 		}
@@ -806,6 +835,84 @@ uint16_t i, j;
 	USART_Send2Byre(USART2, 0x01FE);
 }
 
+
+*/
+void CameraFous()
+{
+	ILI9341_DispStringLine_EN(LINE(14),"Lens focus.Press KEY2 to enter system.");
+	while(1)
+	{
+		if( Ov7725_vsync == 2 )
+		{
+			FIFO_PREPARE;  		//	FIFO准备				
+			ImagDisp(cam_mode_test.lcd_sx,
+								cam_mode_test.lcd_sy,
+								cam_mode_test.cam_width,
+								cam_mode_test.cam_height);			//采集并显示
+			
+			Ov7725_vsync = 0;			
+		}
+				if( Key_Scan(KEY1_GPIO_PORT,KEY1_GPIO_PIN) == KEY_ON  )
+	{	
+			break;
+	}
+	}
+	
+	
+}
+void Camera_Set_Test()
+{
+	/*根据摄像头参数组配置模式*/
+	OV7725_Special_Effect(cam_mode_test.effect);
+	/*光照模式*/
+	OV7725_Light_Mode(cam_mode_test.light_mode);
+	/*饱和度*/
+	OV7725_Color_Saturation(cam_mode_test.saturation);
+	/*光照度*/
+	OV7725_Brightness(cam_mode_test.brightness);
+	/*对比度*/
+	OV7725_Contrast(cam_mode_test.contrast);
+	/*特殊效果*/
+	OV7725_Special_Effect(cam_mode_test.effect);
+	
+	/*设置图像采样及模式大小*/
+	
+	
+	OV7725_Window_Set(cam_mode_test.cam_sx,
+														cam_mode_test.cam_sy,
+														cam_mode_test.cam_width,
+														cam_mode_test.cam_height,
+														cam_mode_test.QVGA_VGA);
+	
+	ILI9341_GramScan( cam_mode_test.lcd_scan );
+	Ov7725_vsync = 0;
+	
+}
+
+void Camera_Init()
+{
+	u8  retry;
+	if(OV7725_Init() != SUCCESS)
+	{
+		retry++;
+		if(retry>5)
+		{
+			printf("\r\n没有检测到OV7725摄像头\r\n");
+		}
+	}
+	printf("\r\nOV7725摄像头初始化完成\r\n");
+	
+}
+
+void Camera_Set()
+{
+	OV7725_Window_Set(cam_mode.cam_sx,
+														cam_mode.cam_sy,
+														cam_mode.cam_width,
+														cam_mode.cam_height,
+														cam_mode.QVGA_VGA);
+	ILI9341_Clear(0,0,LCD_X_LENGTH,LCD_Y_LENGTH);	/* 清屏，显示全黑 */
+}
 
 
 

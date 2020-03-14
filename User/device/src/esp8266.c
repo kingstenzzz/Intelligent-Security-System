@@ -16,9 +16,11 @@
 #include <string.h>
 #include <stdio.h>
 
-
+#ifdef ESP8266
 
 #define ESP8266_ONENET_INFO		"AT+CIPSTART=\"TCP\",\"192.168.1.102\",876\r\n"
+
+
 
 unsigned char esp8266_buf[1024];
 unsigned short esp8266_cnt = 0, esp8266_cntPre = 0;
@@ -356,6 +358,6 @@ void reLink(void )
    OneNet_DevLink();
 }
 
-
+#endif
 
 

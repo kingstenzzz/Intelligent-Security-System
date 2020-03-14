@@ -14,6 +14,8 @@
 #include "onenet.h"
 #include "edpkit.h"
 #include "ff.h"
+#include "encode.h"
+
 
 
 //硬件驱动
@@ -33,7 +35,6 @@
 
 extern unsigned char esp8266_buf[1024];
 _Bool  heart_flag;
-u8 err_count;
 extern enum data_type Data_type;
 _Bool photo=0;
 extern   u16 time_count;
@@ -48,6 +49,8 @@ FRESULT bmpres;
  u8 humi_max=100;
  u8 humi_min=0;
  _Bool fire;
+ extern uint8_t Ov7725_vsync;
+
 
 
 
@@ -123,12 +126,33 @@ unsigned char OneNet_FillBuf(char *buf,data_Stream *data_stream)
 	
 	strcpy(buf, "{");
 	
+	
+		
 	memset(text, 0, sizeof(text));
-	sprintf(text,  "\"time\":%d",time_count);
+	sprintf(text,  "\"Temperature\":%d,",data_stream->temp);
+	strcat(buf, text);
+	
+	memset(text, 0, sizeof(text));
+	sprintf(text,  "\"Humidity\":%d,",data_stream->humidit);
+	strcat(buf, text);
+	
+	
+	memset(text, 0, sizeof(text));
+	sprintf(text,  "\"Temp_Max\":%d,",data_stream->tem_max);
+	strcat(buf, text);
+	
+	memset(text, 0, sizeof(text));
+	sprintf(text,  "\"Temp_Min\":%d,",data_stream->tem_min);
+	strcat(buf, text);
+	
+	memset(text, 0, sizeof(text));
+	sprintf(text,  "\"Hum_Max\":%d,",data_stream->hum_max);
+	strcat(buf, text);
+	
+	memset(text, 0, sizeof(text));
+	sprintf(text,  "\"Hum_Min\":%d",data_stream->hum_min);
 	strcat(buf, text);
 
-	
-	
 	
 	strcat(buf, "}");
 	
@@ -157,7 +181,7 @@ void OneNet_SendData(volatile data_Stream *data_stream)
 		
 	memset(buf, 0, sizeof(buf));
 	
-	body_len = OneNet_FillBuf(buf,data_stream);																	//获取当前需要发送的数据流的总长度
+	body_len = OneNet_FillBuf(buf,data_stream);		//获取当前需要发送的数据流的总长度
 	
 	if(body_len)
 	{
@@ -276,20 +300,33 @@ void OneNet_RevPro(unsigned char *cmd)
 		if(strstr((char *)req, "photo"))				//搜索"Fire"
 		{
 			
-			if(num == 1)								//控制数据如果为1，代表开
-			{
-			photo=1;
-
-			}
-			else if(num == 0)							//控制数据如果为0，代表关
-			{
-			photo=0;
-				
-			}
+			if(num == 1)       photo=1;
+			else             	 photo=0;	
+	
 		}
 				else if(strstr((char *)req, "time"))				//搜索"Fire"
 				{
 					time_count=num;   //赋值
+
+				}
+					else if(strstr((char *)req, "Hum_Max"))				//搜索"Fire"
+				{
+					humi_max=num;   //赋值
+
+				}
+					else if(strstr((char *)req, "Hum_Min"))				//搜索"Fire"
+				{
+					humi_min=num;   //赋值
+
+				}
+						else if(strstr((char *)req, "Temp_Max"))				//搜索"Fire"
+				{
+					temp_max=num;   //赋值
+
+				}
+						else if(strstr((char *)req, "Temp_Min"))				//搜索"Fire"
+				{
+					temp_min=num;   //赋值
 
 				}
 	}
@@ -420,8 +457,29 @@ unsigned char  OneNET_CmdHandle(void)
 			
 		}
 		return 0;
-	
-	
 
+}
+
+
+
+
+ u8 OneNet_SendPhoto()
+{
+		static int name_count=0;
+	  char name[40];
+		name_count++;
+		sprintf(name,"0:photos_%d.jpg",name_count); //字符串格式化
+		printf("\r\n正在拍照...");	
+	  Ov7725_vsync=0;
+		if(JPEG_encode(name)== 0)
+			{
+			//printf("\r\n拍照！发送%s",name);
+			OneNet_SendData_Picture(NULL,name);
+			
+			}
+			else
+			{
+			printf("\r\n拍照失败");
+			}	
 }
 

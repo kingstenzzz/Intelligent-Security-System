@@ -25,6 +25,9 @@
    #define TEST_REMOTE_PORT  	    876						// 80
 	 #define REV_OK		1	//接收完成标志
    #define REV_WAIT	0	//接收未完成标志
+	 
+	 enum net_status{Conneted=0,Closed,Lost,Error};
+
 
 
  

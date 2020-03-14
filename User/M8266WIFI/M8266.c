@@ -23,7 +23,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#define  RECV_DATA_MAX_SIZE  1024
+#define  RECV_DATA_MAX_SIZE  128
 
    u8  M8266buf[RECV_DATA_MAX_SIZE];
    u16 received = 0,pre_received=0;
@@ -178,11 +178,11 @@ u8 M8266_NetCheck()
 	if(status==0) printf("tcp check faild");
 	switch(STA_Status)
 	{
-		case 0:  printf("没有连接"); break;
-		case 2: printf("连接失败，密码错误");break;
-		case 3: printf("连接失败，没有指定ssid");break;
-		case 4: printf("连接失败，其他原因");break;
-		case 5: printf("连接正常");break;
+		case 0:  printf("没有连接\r\n"); break;
+		case 2: printf("连接失败，密码错误\r\n");break;
+		case 3: printf("连接失败，没有指定ssid\r\n");break;
+		case 4: printf("连接失败，其他原因\r\n");break;
+		case 5: printf("连接正常\r\n");break;
 		
 	}
 	if(STA_Status!=5)

@@ -34,3 +34,4 @@
 ..\..\output\bsp_ov7725.o: F:\Keil_v5\ARM\ARMCC\Bin\..\include\stdarg.h
 ..\..\output\bsp_ov7725.o: F:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 ..\..\output\bsp_ov7725.o: F:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+..\..\output\bsp_ov7725.o: ..\..\User\./key/bsp_key.h

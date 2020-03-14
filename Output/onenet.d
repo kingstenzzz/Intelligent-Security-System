@@ -37,6 +37,7 @@
 ..\..\output\onenet.o: ..\..\User\FATFS\ff.h
 ..\..\output\onenet.o: ..\..\User\FATFS\integer.h
 ..\..\output\onenet.o: ..\..\User\FATFS\ffconf.h
+..\..\output\onenet.o: ..\..\User\JPEGENCODE\encode.h
 ..\..\output\onenet.o: ..\..\User\./usart/bsp_usart.h
 ..\..\output\onenet.o: ..\..\User\delay\delay.h
 ..\..\output\onenet.o: F:\Keil_v5\ARM\ARMCC\Bin\..\include\stdarg.h

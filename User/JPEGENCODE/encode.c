@@ -9,6 +9,12 @@
 #include "./usart/bsp_usart.h"
 #include "./ov7725/bsp_ov7725.h"
 #include "./bmp/bsp_bmp.h"
+
+//rtos
+#include "FreeRTOS.h"
+#include "queue.h"
+#include "task.h"
+#include "semphr.h"
 	
 	JQUANT_TBL JQUANT_TBL_2[2];
 	JHUFF_TBL  JHUFF_TBL_4[4];
@@ -35,11 +41,11 @@ _Bool JPEG_encode(char *filename)//编码主函数
 	{
 		printf("malloc cinfo failed");
 	}
-		inbuf_buf=(u8*)malloc(camera_WIDTH*48*sizeof(u8));		//开辟readlen字节的内存区域
-		if(inbuf_buf==NULL)
-		{
-			printf("malloc buf faild");
-		}
+		inbuf_buf=(u8*)malloc(camera_WIDTH*3*16*sizeof(u8));		//开辟readlen字节的内存区域
+	if(inbuf_buf==NULL)
+	{
+		printf("malloc buf faild");
+	}
 	//memset((void*)(inbuf_buf),0,sizeof(inbuf_buf));//所有元素清零
 //	if(inbuf_buf==NULL)return PIC_MEM_ERR;	//内存申请失败.
 	fileW=(FIL *)malloc(sizeof(FIL));	//开辟FIL字节的内存区域 
@@ -51,40 +57,19 @@ _Bool JPEG_encode(char *filename)//编码主函数
 		free(fileW);
 		return 1;
 	} 	 
-
-	
-	//res=f_mount(0, &fatfs);
-	//while(res){;}//LCD_ShowString(20,20,"SD mount failed!");
-	//res=f_open(&fileW,"0:/DCMI/ph1.jpg",FA_WRITE|FA_CREATE_ALWAYS);//创建并打开
-//res=f_open(f_bmp,(const TCHAR*)filename,FA_WRITE|FA_CREATE_NEW);
-	res = f_open( fileW , (char*)filename, FA_CREATE_ALWAYS | FA_WRITE );
-	
+	res = f_open( fileW , (char*)filename, FA_CREATE_ALWAYS | FA_WRITE );	
 	/* 新建文件之后要先关闭再打开才能写入 */
-	f_close(fileW);
-		
+	f_close(fileW);		
 	res = f_open( fileW , (char*)filename,  FA_OPEN_EXISTING | FA_WRITE);
-
-
-	if(res==FR_OK)
-	{
-		
-	
-		
-//	while(res){;}//LCD_ShowString(20,20,"file create failed!");
-  	// printf("	JPEG_encode//创建并打开");///////////////////////////////////////////
+  if(res==FR_OK)
+	{	
 	cinfo->state=JC_CREATING;  
 	memset((void*)(cinfo),0,sizeof(jpeg_compress_info));//所有元素清零
-//	cinfo=jpeg_create_compress();//创建JPEG压缩文件
 	cinfo->image_width=camera_WIDTH;
-  	cinfo->image_height=camera_HEIGHT;
-  	cinfo->output=0;//数据输出到NULL;
-	
+  cinfo->image_height=camera_HEIGHT;
+  cinfo->output=0;//数据输出到NULL;
 	cinfo->fileW=fileW;//文件/////////////文件///////////文件///////////文件/////////////文件///////////文件/////////
-	
-  	jpeg_set_default(cinfo,inbuf_buf);//设置默认参数
-	
-	  	 //printf("	JPEG_encode//设置默认参数");///////////////////////////////////////////
-	
+	jpeg_set_default(cinfo,inbuf_buf);//设置默认参数
 	jpeg_start_compress(cinfo);//开始压缩,写压缩文件头信息
 	
 		  	 //printf("	JPEG_encode//开始压缩,写压缩文件头信息");///////////////////////////////////////////
@@ -123,7 +108,7 @@ _Bool JPEG_encode(char *filename)//编码主函数
 	{
 		printf("open faild");
 		free(cinfo);
-		free(inbuf_buf);
+		vPortFree(inbuf_buf);
 		free(fileW);
 		return 1;
 	}

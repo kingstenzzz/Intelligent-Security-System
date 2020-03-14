@@ -18,6 +18,8 @@
 
 #include "ff.h"			/* Declarations of FatFs API */
 #include "diskio.h"		/* Declarations of disk I/O functions */
+#include <stdio.h>
+
 
 
 /*--------------------------------------------------------------------------
@@ -4672,6 +4674,21 @@ int f_printf (
 		&& (UINT)pb.idx == nw) return pb.nchr;
 	return EOF;
 }
+
+
+void Fatfs_Init()
+{
+	FATFS fs;													/* FatFs文件系统对象 */
+  FRESULT res_sd;                /* 文件操作结果 */
+	res_sd = f_mount(&fs,"0:",1);	
+	while(res_sd != FR_OK)
+	{
+		printf("\r\n请插入SD卡。\r\n");
+	}
+	 
+
+}
+
 
 #endif /* !_FS_READONLY */
 #endif /* _USE_STRFUNC */

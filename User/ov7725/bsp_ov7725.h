@@ -304,6 +304,10 @@ void OV7725_Special_Effect(uint8_t eff);
 void VSYNC_Init(void);				
 void OV7725_Window_Set(uint16_t sx,uint16_t sy,uint16_t width,uint16_t height,uint8_t QVGA_VGA);
 void ShanWai_SendCamera(u16 length_w, u16 length_h);
+void CameraFous();
+void Camera_Set();
+void Camera_Set_Test();
+
 																					
 
 

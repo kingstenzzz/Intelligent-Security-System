@@ -170,9 +170,9 @@
             <AdsLszi>1</AdsLszi>
             <AdsLtoi>1</AdsLtoi>
             <AdsLsun>1</AdsLsun>
-            <AdsLven>1</AdsLven>
+            <AdsLven>0</AdsLven>
             <AdsLsxf>1</AdsLsxf>
-            <RvctClst>0</RvctClst>
+            <RvctClst>1</RvctClst>
             <GenPPlst>0</GenPPlst>
             <AdsCpuType>"Cortex-M3"</AdsCpuType>
             <RvctDeviceName></RvctDeviceName>
@@ -625,6 +625,11 @@
               <FileName>beep.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\beep\beep.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_key.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\Key\bsp_key.c</FilePath>
             </File>
           </Files>
         </Group>
