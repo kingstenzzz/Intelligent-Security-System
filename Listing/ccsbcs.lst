@@ -597,8 +597,7 @@ Nint f_putc (TCHAR c, FIL* fp);										/* Put a character to the file */
 Nint f_puts (const TCHAR* str, FIL* cp);								/* Put a string to the file */
 Nint f_printf (FIL* fp, const TCHAR* str, ...);						/* Put a formatted string to the file */
 NTCHAR* f_gets (TCHAR* buff, int len, FIL* fp);						/* Get a string from the file */
-W "..\..\User\FATFS\option\../ff.h" 244 6 Deprecated declaration Fatfs_Init - give arg types
-Nvoid Fatfs_Init();                                         /*FAtFs¹ÒÔØ*/
+Nvoid Fatfs_Init(void);                                         /*FAtFs¹ÒÔØ*/
 N
 N#define f_eof(fp) ((int)((fp)->fptr == (fp)->fsize))
 N#define f_error(fp) ((fp)->err)

@@ -134,9 +134,9 @@ void Check_sensor(volatile data_Stream *data_stram)
 {
 	Fire_Check(&fire);
 	DHT11_Data_TypeDef DH11_data;
-	DHT11_Read_TempAndHumidity(&DH11_data);
-	DHT11_Check(&DH11_data,temp_max,temp_min,humi_max,humi_min);
-	
+	if(DHT11_Read_TempAndHumidity(&DH11_data))
+	{
+		DHT11_Check(&DH11_data,temp_max,temp_min,humi_max,humi_min);
 			UsartPrintf(USART_DEBUG, "--------------监测数据--------------\r\n");			
 			UsartPrintf(USART_DEBUG, "温度：%d ℃\r\n", DH11_data.temp_int);
 			UsartPrintf(USART_DEBUG, "湿度：%d ％RH\r\n", DH11_data.humi_int);
@@ -144,11 +144,12 @@ void Check_sensor(volatile data_Stream *data_stram)
 			UsartPrintf(USART_DEBUG, "最低温度：%d\r\n", temp_min);
 			UsartPrintf(USART_DEBUG, "最大湿度：%d\r\n", humi_max);
 			UsartPrintf(USART_DEBUG, "最小湿度：%d\r\n", humi_min);	
-	
+		  data_stram->humidit=DH11_data.humi_int;
+	    data_stram->temp=DH11_data.temp_int;
+	}
 			printf("火情%d",fire);
 			data_stram->fire=fire;
-	    data_stram->humidit=DH11_data.humi_int;
-	    data_stram->temp=DH11_data.temp_int;
+	    
 			if(data_stram->tem_max!=temp_max)
 			{
 					data_stram->tem_max=temp_max;

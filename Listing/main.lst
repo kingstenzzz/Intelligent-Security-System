@@ -27648,12 +27648,9 @@ Nvoid OV7725_Special_Effect(uint8_t eff);
 Nvoid VSYNC_Init(void);				
 Nvoid OV7725_Window_Set(uint16_t sx,uint16_t sy,uint16_t width,uint16_t height,uint8_t QVGA_VGA);
 Nvoid ShanWai_SendCamera(u16 length_w, u16 length_h);
-W "..\..\User\./ov7725/bsp_ov7725.h" 307 6 Deprecated declaration CameraFous - give arg types
-Nvoid CameraFous();
-W "..\..\User\./ov7725/bsp_ov7725.h" 308 6 Deprecated declaration Camera_Set - give arg types
-Nvoid Camera_Set();
-W "..\..\User\./ov7725/bsp_ov7725.h" 309 6 Deprecated declaration Camera_Set_Test - give arg types
-Nvoid Camera_Set_Test();
+Nvoid CameraFous(void);
+Nvoid Camera_Set(void);
+Nvoid Camera_Set_Test(void);
 N
 N																					
 N
@@ -30608,8 +30605,7 @@ Nint f_putc (TCHAR c, FIL* fp);										/* Put a character to the file */
 Nint f_puts (const TCHAR* str, FIL* cp);								/* Put a string to the file */
 Nint f_printf (FIL* fp, const TCHAR* str, ...);						/* Put a formatted string to the file */
 NTCHAR* f_gets (TCHAR* buff, int len, FIL* fp);						/* Get a string from the file */
-W "..\..\User\FATFS\ff.h" 244 6 Deprecated declaration Fatfs_Init - give arg types
-Nvoid Fatfs_Init();                                         /*FAtFs挂载*/
+Nvoid Fatfs_Init(void);                                         /*FAtFs挂载*/
 N
 N#define f_eof(fp) ((int)((fp)->fptr == (fp)->fsize))
 N#define f_error(fp) ((fp)->err)
@@ -30733,6 +30729,7 @@ N#include "ff.h"
 N//////////////////////////////////////////用户配置区//////////////////////////////////
 N#define JPG_USE_MALLOC		1 	//定义是否使用malloc,这里我们选择使用malloc	    
 N//////////////////////////////////////////////END/////////////////////////////////////
+N#define JPEG_QUALITY 0.8f
 N#define DCTSIZE   8
 N#define DCTSIZE2 64
 N#define MAX_COMPONENT  4
@@ -30866,7 +30863,7 @@ N	18,  22,  37,  56,  68, 109, 103,  77,
 N	24,  35,  55,  64,  81, 104, 113,  92,
 N	49,  64,  78,  87, 103, 121, 120, 101,
 N	72,  92,  95,  98, 112, 100, 103,  99
-N};
+N};///////标准亮度量化表
 Nstatic const u16 std_chrominance_quant_tbl[DCTSIZE2]=
 Xstatic const u16 std_chrominance_quant_tbl[64]=
 N{
@@ -30878,7 +30875,7 @@ N	99,  99,  99,  99,  99,  99,  99,  99,
 N	99,  99,  99,  99,  99,  99,  99,  99,
 N	99,  99,  99,  99,  99,  99,  99,  99,
 N	99,  99,  99,  99,  99,  99,  99,  99
-N};
+N};//标准色差量化表
 Nstatic const char zz_order[DCTSIZE2]= 
 Xstatic const char zz_order[64]= 
 N{
@@ -30890,7 +30887,7 @@ N	10, 19, 23, 32, 39, 45, 52, 54,
 N	20, 22, 33, 38, 46, 51, 55, 60,
 N	21, 34, 37, 47, 50, 56, 59, 61,
 N	35, 36, 48, 49, 57, 58, 62, 63
-N};
+N};///////z形表
 Nstatic const u8 bits_dc_luminance[17]={ 0, 0, 1, 5, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 };
 Nstatic const u8 val_dc_luminance[]={ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 }; 
 Nstatic const u8 bits_dc_chrominance[17]={ 0, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 };
@@ -31146,8 +31143,7 @@ N//unsigned char EDP_UnPacketRecv(unsigned char *cmd);
 Nvoid OneNet_SendData_Picture(char *devid,  char * pic_name);
 Nvoid OneNet_Send_heart(void);
 Nunsigned char OneNET_CmdHandle(void);
-W "..\..\User\onenet\inc\onenet.h" 76 15 Deprecated declaration OneNet_SendPhoto - give arg types
-Nunsigned char OneNet_SendPhoto();
+Nunsigned char OneNet_SendPhoto(void);
 N
 N
 N#endif
@@ -34047,17 +34043,14 @@ Nvoid M8266HostIf_usart_txd_string(char* str);
 Nvoid M8266HostIf_USART_Reset_RX_BUFFER(void);
 Nu16 M8266HostIf_USART_RX_BUFFER_Data_count(void);
 Nu16 M8266HostIf_USART_get_data(u8* data, u16 len);
-W "..\..\User\M8266WIFI\M8266HostIf.h" 43 6 Deprecated declaration M8266_init - give arg types
-Nvoid M8266_init();
+Nvoid M8266_init(void);
 N
 N
 N
 Nunsigned char *M8266_GetIPD(unsigned short timeOut);
-W "..\..\User\M8266WIFI\M8266HostIf.h" 48 4 Deprecated declaration M8266_WaitRecive - give arg types
-Nu8 M8266_WaitRecive();
+Nu8 M8266_WaitRecive(void);
 Nvoid M8266_Clear(void);
-W "..\..\User\M8266WIFI\M8266HostIf.h" 50 15 Deprecated declaration M8266_NetCheck - give arg types
-Nunsigned char M8266_NetCheck();
+Nunsigned char M8266_NetCheck(void);
 Nvoid M8266_ReLink(u8 status );
 N
 N
@@ -34738,6 +34731,21 @@ N
 N#endif
 N
 L 32 "..\..\User\main.c" 2
+N#include "timer.h"
+L 1 "..\..\User\TIMER\timer.h" 1
+N#ifndef __TIMER_H
+N#define __TIMER_H
+N#include "stm32f10x.h"
+N
+N
+W "..\..\User\TIMER\timer.h" 6 6 Deprecated declaration TIM4_PWM_Init - give arg types
+Nvoid TIM4_PWM_Init();
+Nvoid GPIO(void);
+Nvoid Set_angle(_Bool dir,u8 angle);
+N
+W "..\..\User\TIMER\timer.h" 10 7 last line of file ends without a newline
+N#endif
+L 33 "..\..\User\main.c" 2
 N
 N//rtos
 N#include "FreeRTOS.h"
@@ -37329,7 +37337,7 @@ N#endif
 N
 N#endif /* INC_FREERTOS_H */
 N
-L 35 "..\..\User\main.c" 2
+L 36 "..\..\User\main.c" 2
 N#include "queue.h"
 L 1 "..\..\Freee-RTOS\include\queue.h" 1
 N/*
@@ -39167,7 +39175,7 @@ N#endif
 N
 N#endif /* QUEUE_H */
 N
-L 36 "..\..\User\main.c" 2
+L 37 "..\..\User\main.c" 2
 N#include "task.h"
 L 1 "..\..\Freee-RTOS\include\task.h" 1
 N/*
@@ -41974,7 +41982,7 @@ N#endif /* INC_TASK_H */
 N
 N
 N
-L 37 "..\..\User\main.c" 2
+L 38 "..\..\User\main.c" 2
 N#include "semphr.h"
 L 1 "..\..\Freee-RTOS\include\semphr.h" 1
 N/*
@@ -43161,7 +43169,7 @@ N
 N#endif /* SEMAPHORE_H */
 N
 N
-L 38 "..\..\User\main.c" 2
+L 39 "..\..\User\main.c" 2
 N//C库
 N#include <string.h>
 N#include <stdio.h>
@@ -43186,7 +43194,7 @@ N/////////////////
 N#define Net_Task_Prioruty 6
 N#define ReceiveCMd_Priority 5
 N#define Display_Prioruty   2
-N#define CheckSensor_Priority     4
+N#define CheckSensor_Priority     5
 N////////////////////////
 Nstatic void ReceiveCmdTask(void *pvParameters);
 Nstatic void CheckSensorTask(void *pvParameters);
@@ -43198,16 +43206,19 @@ N{
 N	
 N	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);	//中断控制器分组设置
 X	NVIC_PriorityGroupConfig(((uint32_t)0x500));	
+N  //TIM4_PWM_Init();
 N  ILI9341_Init();
+N	
 N	USART_Config();  //调试串口
 N	
-N	LED_GPIO_Config();
+N	//LED_GPIO_Config();
 N	OV7725_GPIO_Config();
 N	M8266_init();//SPI-wifi模块
 N	printf("wifi init \r\n");
 N	Fatfs_Init();  
 N	DHT11_Init();
 N	Fire_Init();	/*FAtFs挂载*/
+N	
 N	printf("Hardware init ok\r\n");
 N}
 N
@@ -43220,12 +43231,13 @@ N  */
 Nint main(void) 	
 N{		
 N	Hardware_Init();
+N		
+N	
 N	/* 液晶初始化 */
 N	while(OneNet_DevLink())			//接入OneNET
 N	mDelay(500);
 N	Net_status=Conneted;
-N	LED_BLUE;  
-X	{((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0C00))->BSRR=((uint16_t)0x0020);}; {((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0C00))->BSRR=((uint16_t)0x0001);} {((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0C00))->BRR=((uint16_t)0x0002);};  
+N	//LED_BLUE;  
 N  Camera_Set_Test();
 N	CameraFous();	
 N	Camera_Set();
@@ -43237,7 +43249,7 @@ X	xTaskCreate((TaskFunction_t)ReceiveCmdTask,"ReceiveCmdTask",256,"ReceiveCmdTas
 N	xTaskCreate((TaskFunction_t)Net_Task,"Net_Task",Net_Task_Stack,"Net_Task",Net_Task_Prioruty,&NetTask_Handler);
 X	xTaskCreate((TaskFunction_t)Net_Task,"Net_Task",1024,"Net_Task",6,&NetTask_Handler);
 N	xTaskCreate((TaskFunction_t)CheckSensorTask,"Check_Task",CheckSensor_Stack,"Check_Task",CheckSensor_Priority,&CheckSensor_Handler);
-X	xTaskCreate((TaskFunction_t)CheckSensorTask,"Check_Task",512,"Check_Task",4,&CheckSensor_Handler);
+X	xTaskCreate((TaskFunction_t)CheckSensorTask,"Check_Task",512,"Check_Task",5,&CheckSensor_Handler);
 N
 N	//xTaskCreate((TaskFunction_t)DisplayTask,"Display",Display_Stack,"Display",Display_Prioruty,&Display_Handler);
 N	vTaskStartScheduler();
@@ -43288,8 +43300,8 @@ N		taskENTER_CRITICAL(); //禁止中断
 X		vPortEnterCritical(); 
 N		time_secend++;		
 N		Check_sensor(&data_value);
-N			taskEXIT_CRITICAL();	
-X			vPortExitCritical();	
+N		taskEXIT_CRITICAL();	
+X		vPortExitCritical();	
 N		
 N		if(Net_status==Conneted)
 N		ILI9341_DispStringLine_EN(LINE(3),"Online!");
@@ -43396,4 +43408,4 @@ N
 N
 N/*********************************************END OF FILE**********************/
 N
-W "..\..\User\main.c" 185 13 function "DisplayTask"  was declared but never referenced
+W "..\..\User\main.c" 191 13 function "DisplayTask"  was declared but never referenced

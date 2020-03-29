@@ -43,4 +43,4 @@
 ..\..\output\onenet.o: F:\Keil_v5\ARM\ARMCC\Bin\..\include\stdarg.h
 ..\..\output\onenet.o: ..\..\User\IIC\iic.h
 ..\..\output\onenet.o: F:\Keil_v5\ARM\ARMCC\Bin\..\include\inttypes.h
-..\..\output\onenet.o: ..\..\User\light_moto\light_moto.h
+..\..\output\onenet.o: ..\..\User\TIMER\timer.h

@@ -60,6 +60,7 @@
 ..\..\output\main.o: F:\Keil_v5\ARM\ARMCC\Bin\..\include\inttypes.h
 ..\..\output\main.o: ..\..\User\IWDG\iwdg.h
 ..\..\output\main.o: ..\..\User\light_moto\light_moto.h
+..\..\output\main.o: ..\..\User\TIMER\timer.h
 ..\..\output\main.o: ..\..\Freee-RTOS\include\FreeRTOS.h
 ..\..\output\main.o: F:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 ..\..\output\main.o: ..\..\Freee-RTOS\include\FreeRTOSConfig.h

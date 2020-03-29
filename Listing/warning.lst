@@ -29564,8 +29564,7 @@ N//unsigned char EDP_UnPacketRecv(unsigned char *cmd);
 Nvoid OneNet_SendData_Picture(char *devid,  char * pic_name);
 Nvoid OneNet_Send_heart(void);
 Nunsigned char OneNET_CmdHandle(void);
-W "..\..\User\onenet\inc\onenet.h" 76 15 Deprecated declaration OneNet_SendPhoto - give arg types
-Nunsigned char OneNet_SendPhoto();
+Nunsigned char OneNet_SendPhoto(void);
 N
 N
 N#endif
@@ -31115,9 +31114,9 @@ N{
 W "..\..\User\warning\warning.c" 135 13 argument of type "_Bool *" is incompatible with parameter of type "u8 *"
 N	Fire_Check(&fire);
 N	DHT11_Data_TypeDef DH11_data;
-N	DHT11_Read_TempAndHumidity(&DH11_data);
-N	DHT11_Check(&DH11_data,temp_max,temp_min,humi_max,humi_min);
-N	
+N	if(DHT11_Read_TempAndHumidity(&DH11_data))
+N	{
+N		DHT11_Check(&DH11_data,temp_max,temp_min,humi_max,humi_min);
 N			UsartPrintf(USART_DEBUG, "--------------监测数据--------------\r\n");			
 X			UsartPrintf(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "--------------监测数据--------------\r\n");			
 N			UsartPrintf(USART_DEBUG, "温度：%d ℃\r\n", DH11_data.temp_int);
@@ -31132,11 +31131,12 @@ N			UsartPrintf(USART_DEBUG, "最大湿度：%d\r\n", humi_max);
 X			UsartPrintf(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "最大湿度：%d\r\n", humi_max);
 N			UsartPrintf(USART_DEBUG, "最小湿度：%d\r\n", humi_min);	
 X			UsartPrintf(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "最小湿度：%d\r\n", humi_min);	
-N	
+N		  data_stram->humidit=DH11_data.humi_int;
+N	    data_stram->temp=DH11_data.temp_int;
+N	}
 N			printf("火情%d",fire);
 N			data_stram->fire=fire;
-N	    data_stram->humidit=DH11_data.humi_int;
-N	    data_stram->temp=DH11_data.temp_int;
+N	    
 N			if(data_stram->tem_max!=temp_max)
 N			{
 N					data_stram->tem_max=temp_max;

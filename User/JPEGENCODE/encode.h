@@ -5,6 +5,7 @@
 //////////////////////////////////////////用户配置区//////////////////////////////////
 #define JPG_USE_MALLOC		1 	//定义是否使用malloc,这里我们选择使用malloc	    
 //////////////////////////////////////////////END/////////////////////////////////////
+#define JPEG_QUALITY 0.8f
 #define DCTSIZE   8
 #define DCTSIZE2 64
 #define MAX_COMPONENT  4
@@ -131,7 +132,7 @@ static const u16 std_luminance_quant_tbl[DCTSIZE2]=
 	24,  35,  55,  64,  81, 104, 113,  92,
 	49,  64,  78,  87, 103, 121, 120, 101,
 	72,  92,  95,  98, 112, 100, 103,  99
-};
+};///////标准亮度量化表
 static const u16 std_chrominance_quant_tbl[DCTSIZE2]=
 {
 	17,  18,  24,  47,  99,  99,  99,  99,
@@ -142,7 +143,7 @@ static const u16 std_chrominance_quant_tbl[DCTSIZE2]=
 	99,  99,  99,  99,  99,  99,  99,  99,
 	99,  99,  99,  99,  99,  99,  99,  99,
 	99,  99,  99,  99,  99,  99,  99,  99
-};
+};//标准色差量化表
 static const char zz_order[DCTSIZE2]= 
 {
 	 0,  1,  5,  6, 14, 15, 27, 28,
@@ -153,7 +154,7 @@ static const char zz_order[DCTSIZE2]=
 	20, 22, 33, 38, 46, 51, 55, 60,
 	21, 34, 37, 47, 50, 56, 59, 61,
 	35, 36, 48, 49, 57, 58, 62, 63
-};
+};///////z形表
 static const u8 bits_dc_luminance[17]={ 0, 0, 1, 5, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 };
 static const u8 val_dc_luminance[]={ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 }; 
 static const u8 bits_dc_chrominance[17]={ 0, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 };

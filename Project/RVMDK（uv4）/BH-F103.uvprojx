@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_HD, USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\Libraries\CMSIS;..\..\User;..\..\Libraries\FWlib\inc;..\..\User\FATFS\option;..\..\User\FATFS;..\..\User\delay;..\..\User\onenet\inc;..\..\User\device\inc;..\..\User\EDP;..\..\User\onenet\inc;..\..\User\hwtimer;..\..\User\JPEGENCODE;..\..\User\MALLOC;..\..\User\dht11;..\..\User\flame;..\..\User\warning;..\..\User\beep;..\..\User\adc;..\..\User\IIC;..\..\Freee-RTOS\include;..\..\Freee-RTOS\portable\RVDS\ARM_CM3;..\..\User\IWDG;..\..\User\light_moto;..\..\User\M8266WIFI</IncludePath>
+              <IncludePath>..\..\Libraries\CMSIS;..\..\User;..\..\Libraries\FWlib\inc;..\..\User\FATFS\option;..\..\User\FATFS;..\..\User\delay;..\..\User\onenet\inc;..\..\User\device\inc;..\..\User\EDP;..\..\User\onenet\inc;..\..\User\hwtimer;..\..\User\JPEGENCODE;..\..\User\MALLOC;..\..\User\dht11;..\..\User\flame;..\..\User\warning;..\..\User\beep;..\..\User\adc;..\..\User\IIC;..\..\Freee-RTOS\include;..\..\Freee-RTOS\portable\RVDS\ARM_CM3;..\..\User\IWDG;..\..\User\light_moto;..\..\User\M8266WIFI;..\..\User\TIMER</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -630,6 +630,11 @@
               <FileName>bsp_key.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\Key\bsp_key.c</FilePath>
+            </File>
+            <File>
+              <FileName>timer_BG90.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\User\TIMER\timer_BG90.c</FilePath>
             </File>
           </Files>
         </Group>

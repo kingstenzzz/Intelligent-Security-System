@@ -29103,17 +29103,14 @@ Nvoid M8266HostIf_usart_txd_string(char* str);
 Nvoid M8266HostIf_USART_Reset_RX_BUFFER(void);
 Nu16 M8266HostIf_USART_RX_BUFFER_Data_count(void);
 Nu16 M8266HostIf_USART_get_data(u8* data, u16 len);
-W "..\..\User\M8266WIFI\M8266HostIf.h" 43 6 Deprecated declaration M8266_init - give arg types
-Nvoid M8266_init();
+Nvoid M8266_init(void);
 N
 N
 N
 Nunsigned char *M8266_GetIPD(unsigned short timeOut);
-W "..\..\User\M8266WIFI\M8266HostIf.h" 48 4 Deprecated declaration M8266_WaitRecive - give arg types
-Nu8 M8266_WaitRecive();
+Nu8 M8266_WaitRecive(void);
 Nvoid M8266_Clear(void);
-W "..\..\User\M8266WIFI\M8266HostIf.h" 50 15 Deprecated declaration M8266_NetCheck - give arg types
-Nunsigned char M8266_NetCheck();
+Nunsigned char M8266_NetCheck(void);
 Nvoid M8266_ReLink(u8 status );
 N
 N
@@ -29251,8 +29248,7 @@ N//unsigned char EDP_UnPacketRecv(unsigned char *cmd);
 Nvoid OneNet_SendData_Picture(char *devid,  char * pic_name);
 Nvoid OneNet_Send_heart(void);
 Nunsigned char OneNET_CmdHandle(void);
-W "..\..\User\onenet\inc\onenet.h" 76 15 Deprecated declaration OneNet_SendPhoto - give arg types
-Nunsigned char OneNet_SendPhoto();
+Nunsigned char OneNet_SendPhoto(void);
 N
 N
 N#endif
@@ -32626,8 +32622,7 @@ Nint f_putc (TCHAR c, FIL* fp);										/* Put a character to the file */
 Nint f_puts (const TCHAR* str, FIL* cp);								/* Put a string to the file */
 Nint f_printf (FIL* fp, const TCHAR* str, ...);						/* Put a formatted string to the file */
 NTCHAR* f_gets (TCHAR* buff, int len, FIL* fp);						/* Get a string from the file */
-W "..\..\User\FATFS\ff.h" 244 6 Deprecated declaration Fatfs_Init - give arg types
-Nvoid Fatfs_Init();                                         /*FAtFs挂载*/
+Nvoid Fatfs_Init(void);                                         /*FAtFs挂载*/
 N
 N#define f_eof(fp) ((int)((fp)->fptr == (fp)->fsize))
 N#define f_error(fp) ((fp)->err)
@@ -32751,6 +32746,7 @@ N#include "ff.h"
 N//////////////////////////////////////////用户配置区//////////////////////////////////
 N#define JPG_USE_MALLOC		1 	//定义是否使用malloc,这里我们选择使用malloc	    
 N//////////////////////////////////////////////END/////////////////////////////////////
+N#define JPEG_QUALITY 0.8f
 N#define DCTSIZE   8
 N#define DCTSIZE2 64
 N#define MAX_COMPONENT  4
@@ -32884,7 +32880,7 @@ N	18,  22,  37,  56,  68, 109, 103,  77,
 N	24,  35,  55,  64,  81, 104, 113,  92,
 N	49,  64,  78,  87, 103, 121, 120, 101,
 N	72,  92,  95,  98, 112, 100, 103,  99
-N};
+N};///////标准亮度量化表
 Nstatic const u16 std_chrominance_quant_tbl[DCTSIZE2]=
 Xstatic const u16 std_chrominance_quant_tbl[64]=
 N{
@@ -32896,7 +32892,7 @@ N	99,  99,  99,  99,  99,  99,  99,  99,
 N	99,  99,  99,  99,  99,  99,  99,  99,
 N	99,  99,  99,  99,  99,  99,  99,  99,
 N	99,  99,  99,  99,  99,  99,  99,  99
-N};
+N};//标准色差量化表
 Nstatic const char zz_order[DCTSIZE2]= 
 Xstatic const char zz_order[64]= 
 N{
@@ -32908,7 +32904,7 @@ N	10, 19, 23, 32, 39, 45, 52, 54,
 N	20, 22, 33, 38, 46, 51, 55, 60,
 N	21, 34, 37, 47, 50, 56, 59, 61,
 N	35, 36, 48, 49, 57, 58, 62, 63
-N};
+N};///////z形表
 Nstatic const u8 bits_dc_luminance[17]={ 0, 0, 1, 5, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0 };
 Nstatic const u8 val_dc_luminance[]={ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 }; 
 Nstatic const u8 bits_dc_chrominance[17]={ 0, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0 };
@@ -33573,36 +33569,22 @@ N
 N
 N#endif /* __I2C_EE_H */
 L 25 "..\..\User\onenet\src\onenet.c" 2
-N#include "light_moto.h"
-L 1 "..\..\User\light_moto\light_moto.h" 1
-N#ifndef _LIGT_MOTO_H_
-N#define _LIGT_MOTO_H_
-N#include "stm32f10x_gpio.h"
+N#include "timer.h"
+L 1 "..\..\User\TIMER\timer.h" 1
+N#ifndef __TIMER_H
+N#define __TIMER_H
 N#include "stm32f10x.h"
-N#include "delay.h"
 N
 N
-N#define dir_S 0
-N#define dir_N 1
+W "..\..\User\TIMER\timer.h" 6 6 Deprecated declaration TIM4_PWM_Init - give arg types
+Nvoid TIM4_PWM_Init();
+Nvoid GPIO(void);
+Nvoid Set_angle(_Bool dir,u8 angle);
 N
-N#define Pin_1 GPIO_Pin_7
-N#define Pin_2 GPIO_Pin_8
-N#define Pin_3 GPIO_Pin_9
-N#define Pin_4 GPIO_Pin_10
-N
-N
-Nvoid Shadding(void);
-Nvoid  Shelter_GPIOEonfig(void);
-Nvoid  UnShadding(void);
-Nvoid Rotating(u16 angle,u8 dir);
-N
-N
-N
-N
-N
+W "..\..\User\TIMER\timer.h" 10 7 last line of file ends without a newline
 N#endif
-N
 L 26 "..\..\User\onenet\src\onenet.c" 2
+N
 N
 N//C库
 N#include <string.h>
@@ -33780,7 +33762,7 @@ N	short int body_len = 0, i = 0;
 N		
 N	memset(buf, 0, sizeof(buf));
 N	
-W "..\..\User\onenet\src\onenet.c" 184 32 argument of type "volatile data_Stream *" is incompatible with parameter of type "data_Stream *"
+W "..\..\User\onenet\src\onenet.c" 185 32 argument of type "volatile data_Stream *" is incompatible with parameter of type "data_Stream *"
 N	body_len = OneNet_FillBuf(buf,data_stream);		//获取当前需要发送的数据流的总长度
 N	
 N	if(body_len)
@@ -33912,9 +33894,6 @@ N			numBuf[num++] = *dataPtr++;
 N		}
 N		
 N		num = atoi((const char *)numBuf);				//转为数值形式
-N			UsartPrintf(USART_DEBUG, " %d Bytes\r\n", num);
-X			UsartPrintf(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), " %d Bytes\r\n", num);
-N
 N		if(strstr((char *)req, "photo"))				//搜索"Fire"
 N		{
 N			
@@ -34081,8 +34060,7 @@ N{
 N	
 N	unsigned char *dataPtr = NULL;		//数据指针
 X	unsigned char *dataPtr = 0;		
-N	unsigned char *cmd=NULL;
-X	unsigned char *cmd=0;
+N	
 N	dataPtr = M8266_GetIPD(5);		//检查是否是平台数据
 N		if(dataPtr != NULL)
 X		if(dataPtr != 0)
@@ -34093,13 +34071,12 @@ N
 N		}
 N		return 0;
 N
-W "..\..\User\onenet\src\onenet.c" 451 17 variable "cmd"  was declared but never referenced
 N}
 N
 N
 N
 N
-N u8 OneNet_SendPhoto()
+N u8 OneNet_SendPhoto(void)
 N{
 N		static int name_count=0;
 N	  char name[40];
@@ -34109,15 +34086,16 @@ N		printf("\r\n正在拍照...");
 N	  Ov7725_vsync=0;
 N		if(JPEG_encode(name)== 0)
 N			{
-N			//printf("\r\n拍照！发送%s",name);
-N			OneNet_SendData_Picture(NULL,name);
-X			OneNet_SendData_Picture(0,name);
-N			
+N			  OneNet_SendData_Picture(NULL,name);
+X			  OneNet_SendData_Picture(0,name);
+N				return 1;	
 N			}
 N			else
 N			{
-N			printf("\r\n拍照失败");
+N			  printf("\r\n拍照失败");
+N				return 0;
+N				
+N				
 N			}	
-W "..\..\User\onenet\src\onenet.c" 484 1 missing return statement at end of non-void function "OneNet_SendPhoto" 
 N}
 N

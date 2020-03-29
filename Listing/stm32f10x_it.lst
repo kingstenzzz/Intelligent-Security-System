@@ -27728,12 +27728,9 @@ Nvoid OV7725_Special_Effect(uint8_t eff);
 Nvoid VSYNC_Init(void);				
 Nvoid OV7725_Window_Set(uint16_t sx,uint16_t sy,uint16_t width,uint16_t height,uint8_t QVGA_VGA);
 Nvoid ShanWai_SendCamera(u16 length_w, u16 length_h);
-W "..\..\User\./ov7725/bsp_ov7725.h" 307 6 Deprecated declaration CameraFous - give arg types
-Nvoid CameraFous();
-W "..\..\User\./ov7725/bsp_ov7725.h" 308 6 Deprecated declaration Camera_Set - give arg types
-Nvoid Camera_Set();
-W "..\..\User\./ov7725/bsp_ov7725.h" 309 6 Deprecated declaration Camera_Set_Test - give arg types
-Nvoid Camera_Set_Test();
+Nvoid CameraFous(void);
+Nvoid Camera_Set(void);
+Nvoid Camera_Set_Test(void);
 N
 N																					
 N

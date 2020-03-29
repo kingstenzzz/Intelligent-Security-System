@@ -29,6 +29,7 @@
 #include "iic.h"
 #include "iwdg.h"
 #include "light_moto.h"
+#include "timer.h"
 
 //rtos
 #include "FreeRTOS.h"
@@ -59,7 +60,7 @@ TaskHandle_t CheckSensor_Handler;
 #define Net_Task_Prioruty 6
 #define ReceiveCMd_Priority 5
 #define Display_Prioruty   2
-#define CheckSensor_Priority     4
+#define CheckSensor_Priority     5
 ////////////////////////
 static void ReceiveCmdTask(void *pvParameters);
 static void CheckSensorTask(void *pvParameters);
@@ -70,16 +71,19 @@ void Hardware_Init()
 {
 	
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);	//中断控制器分组设置
+  //TIM4_PWM_Init();
   ILI9341_Init();
+	
 	USART_Config();  //调试串口
 	
-	LED_GPIO_Config();
+	//LED_GPIO_Config();
 	OV7725_GPIO_Config();
 	M8266_init();//SPI-wifi模块
 	printf("wifi init \r\n");
 	Fatfs_Init();  
 	DHT11_Init();
 	Fire_Init();	/*FAtFs挂载*/
+	
 	printf("Hardware init ok\r\n");
 }
 
@@ -92,11 +96,13 @@ void Hardware_Init()
 int main(void) 	
 {		
 	Hardware_Init();
+		
+	
 	/* 液晶初始化 */
 	while(OneNet_DevLink())			//接入OneNET
 	mDelay(500);
 	Net_status=Conneted;
-	LED_BLUE;  
+	//LED_BLUE;  
   Camera_Set_Test();
 	CameraFous();	
 	Camera_Set();
@@ -153,7 +159,7 @@ static void CheckSensorTask(void *pvParameters)
 		taskENTER_CRITICAL(); //禁止中断
 		time_secend++;		
 		Check_sensor(&data_value);
-			taskEXIT_CRITICAL();	
+		taskEXIT_CRITICAL();	
 		
 		if(Net_status==Conneted)
 		ILI9341_DispStringLine_EN(LINE(3),"Online!");

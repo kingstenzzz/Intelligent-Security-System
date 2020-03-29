@@ -31347,17 +31347,14 @@ Nvoid M8266HostIf_usart_txd_string(char* str);
 Nvoid M8266HostIf_USART_Reset_RX_BUFFER(void);
 Nu16 M8266HostIf_USART_RX_BUFFER_Data_count(void);
 Nu16 M8266HostIf_USART_get_data(u8* data, u16 len);
-W "..\..\User\M8266WIFI\M8266HostIf.h" 43 6 Deprecated declaration M8266_init - give arg types
-Nvoid M8266_init();
+Nvoid M8266_init(void);
 N
 N
 N
 Nunsigned char *M8266_GetIPD(unsigned short timeOut);
-W "..\..\User\M8266WIFI\M8266HostIf.h" 48 4 Deprecated declaration M8266_WaitRecive - give arg types
-Nu8 M8266_WaitRecive();
+Nu8 M8266_WaitRecive(void);
 Nvoid M8266_Clear(void);
-W "..\..\User\M8266WIFI\M8266HostIf.h" 50 15 Deprecated declaration M8266_NetCheck - give arg types
-Nunsigned char M8266_NetCheck();
+Nunsigned char M8266_NetCheck(void);
 Nvoid M8266_ReLink(u8 status );
 N
 N

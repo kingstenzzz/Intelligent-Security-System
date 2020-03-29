@@ -40,14 +40,14 @@ void M8266HostIf_usart_txd_string(char* str);
 void M8266HostIf_USART_Reset_RX_BUFFER(void);
 u16 M8266HostIf_USART_RX_BUFFER_Data_count(void);
 u16 M8266HostIf_USART_get_data(u8* data, u16 len);
-void M8266_init();
+void M8266_init(void);
 
 
 
 unsigned char *M8266_GetIPD(unsigned short timeOut);
-u8 M8266_WaitRecive();
+u8 M8266_WaitRecive(void);
 void M8266_Clear(void);
-unsigned char M8266_NetCheck();
+unsigned char M8266_NetCheck(void);
 void M8266_ReLink(u8 status );
 
 

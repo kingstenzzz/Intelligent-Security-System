@@ -29456,8 +29456,7 @@ N//unsigned char EDP_UnPacketRecv(unsigned char *cmd);
 Nvoid OneNet_SendData_Picture(char *devid,  char * pic_name);
 Nvoid OneNet_Send_heart(void);
 Nunsigned char OneNET_CmdHandle(void);
-W "..\..\User\onenet\inc\onenet.h" 76 15 Deprecated declaration OneNet_SendPhoto - give arg types
-Nunsigned char OneNet_SendPhoto();
+Nunsigned char OneNet_SendPhoto(void);
 N
 N
 N#endif

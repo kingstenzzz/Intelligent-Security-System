@@ -73,7 +73,7 @@ void OneNet_RevPro(unsigned char *cmd);
 void OneNet_SendData_Picture(char *devid,  char * pic_name);
 void OneNet_Send_heart(void);
 unsigned char OneNET_CmdHandle(void);
-unsigned char OneNet_SendPhoto();
+unsigned char OneNet_SendPhoto(void);
 
 
 #endif

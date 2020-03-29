@@ -22,7 +22,8 @@
 #include "./usart/bsp_usart.h"
 #include "delay.h"
 #include "iic.h"
-#include "light_moto.h"
+#include "timer.h"
+
 
 //C库
 #include <string.h>
@@ -295,8 +296,6 @@ void OneNet_RevPro(unsigned char *cmd)
 		}
 		
 		num = atoi((const char *)numBuf);				//转为数值形式
-			UsartPrintf(USART_DEBUG, " %d Bytes\r\n", num);
-
 		if(strstr((char *)req, "photo"))				//搜索"Fire"
 		{
 			
@@ -448,7 +447,7 @@ unsigned char  OneNET_CmdHandle(void)
 {
 	
 	unsigned char *dataPtr = NULL;		//数据指针
-	unsigned char *cmd=NULL;
+	
 	dataPtr = M8266_GetIPD(5);		//检查是否是平台数据
 		if(dataPtr != NULL)
 		{	
@@ -463,7 +462,7 @@ unsigned char  OneNET_CmdHandle(void)
 
 
 
- u8 OneNet_SendPhoto()
+ u8 OneNet_SendPhoto(void)
 {
 		static int name_count=0;
 	  char name[40];
@@ -473,13 +472,15 @@ unsigned char  OneNET_CmdHandle(void)
 	  Ov7725_vsync=0;
 		if(JPEG_encode(name)== 0)
 			{
-			//printf("\r\n拍照！发送%s",name);
-			OneNet_SendData_Picture(NULL,name);
-			
+			  OneNet_SendData_Picture(NULL,name);
+				return 1;	
 			}
 			else
 			{
-			printf("\r\n拍照失败");
+			  printf("\r\n拍照失败");
+				return 0;
+				
+				
 			}	
 }
 

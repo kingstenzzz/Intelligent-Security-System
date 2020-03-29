@@ -1,20 +1,13 @@
 #include <stdlib.h >
 #include "encode.h"
 #include "delay.h"
-//#include "led.h"
-#include "./led/bsp_led.h"   
 //#include "sd.h"
 //#include "bsp_sdio_sdcard.h"
 //#include "fatfs.h"
 #include "./usart/bsp_usart.h"
 #include "./ov7725/bsp_ov7725.h"
-#include "./bmp/bsp_bmp.h"
 
-//rtos
-#include "FreeRTOS.h"
-#include "queue.h"
-#include "task.h"
-#include "semphr.h"
+
 	
 	JQUANT_TBL JQUANT_TBL_2[2];
 	JHUFF_TBL  JHUFF_TBL_4[4];
@@ -32,9 +25,6 @@ _Bool JPEG_encode(char *filename)//编码主函数
 	u16 count,i,color;
 	jpeg_compress_info* cinfo;
 	JSAMPLE *inbuf_buf;
-
-	
-	
 //	#if JPG_USE_MALLOC == 1	//使用malloc	
 	cinfo=(jpeg_compress_info*)malloc(sizeof(jpeg_compress_info));	
 	if(cinfo==NULL)
@@ -71,9 +61,6 @@ _Bool JPEG_encode(char *filename)//编码主函数
 	cinfo->fileW=fileW;//文件/////////////文件///////////文件///////////文件/////////////文件///////////文件/////////
 	jpeg_set_default(cinfo,inbuf_buf);//设置默认参数
 	jpeg_start_compress(cinfo);//开始压缩,写压缩文件头信息
-	
-		  	 //printf("	JPEG_encode//开始压缩,写压缩文件头信息");///////////////////////////////////////////
-	
 	FIFO_PREPARE;  			/*FIFO准备*/					
   count=0;
 	while(cinfo->next_line<cinfo->image_height)
@@ -81,18 +68,18 @@ _Bool JPEG_encode(char *filename)//编码主函数
 		for(i=0;i<camera_WIDTH;i++)//读取一行
 		{
 			READ_FIFO_PIXEL(color);
-		 cinfo->inbuf[count++]=(u8)((color&0xf800)>>8);
+		  cinfo->inbuf[count++]=(u8)((color&0xf800)>>8);
 			cinfo->inbuf[count++]=(u8)((color&0x07e0)>>3);
 			cinfo->inbuf[count++]=(u8)((color&0x001f)<<3);						
 		}
 		
-		cinfo->next_line++; 
+		  cinfo->next_line++; 
 	  	//当数据填满时压缩并输出数据(填满16行)
-	  	if(cinfo->next_line%cinfo->inbuf_height==0)
+	  if(cinfo->next_line%cinfo->inbuf_height==0)
 		{
 			count=0;
-	    	jint_process_rows(cinfo);//在这里压缩
-      	memset((void*)(cinfo->inbuf),0,cinfo->inbuf_size);//清空输入缓冲区
+	    jint_process_rows(cinfo);//在这里压缩
+      memset((void*)(cinfo->inbuf),0,cinfo->inbuf_size);//清空输入缓冲区
 			
 	  	}
 	}	
@@ -108,7 +95,7 @@ _Bool JPEG_encode(char *filename)//编码主函数
 	{
 		printf("open faild");
 		free(cinfo);
-		vPortFree(inbuf_buf);
+		free(inbuf_buf);
 		free(fileW);
 		return 1;
 	}
@@ -127,13 +114,10 @@ void jpeg_set_default(jpeg_compress_info *cinfo,u8 *inbuf_buf)
 {
   	cinfo->precision=8;//采样精度8  
   	cinfo->in_color_space=JCS_RGB;//色彩空间
-  	//cinfo->quality=0.2f;//图像质量,值越小质量越好 
-	
-	cinfo->quality=1.1f;//图像质量,值越小质量越好 
-	
+	  cinfo->quality=JPEG_QUALITY;//图像质量,值越小质量越好 
   	//初始化元件颜色为YCbCr彩色  
-  	cinfo->num_comp=3;//元件数量为3
-  	SET_COMP(cinfo->comp[0],1,2,2,0,0,0);//
+  	cinfo->num_comp=3;//像素组成字节数
+  	SET_COMP(cinfo->comp[0],1,2,2,0,0,0);////图像采样率，YUV422
   	SET_COMP(cinfo->comp[1],2,1,1,1,1,1);//
   	SET_COMP(cinfo->comp[2],3,1,1,1,1,1);//  	
   	jint_std_quant_tables(cinfo);//设置标准量化表  	
@@ -183,10 +167,10 @@ void jint_add_huff_table(jpeg_compress_info *cinfo,u16 which_tbl,int what_tbl,co
     hpp=cinfo->dc_huff_table;
   	else if(what_tbl==1)hpp=cinfo->ac_huff_table;//交流分量表
   	else return ;
-	hpp[which_tbl]=&JHUFF_TBL_4[which_tbl*2+what_tbl];
-	memcpy(hpp[which_tbl]->bits,bits,sizeof(hpp[which_tbl]->bits));	  
+	  hpp[which_tbl]=&JHUFF_TBL_4[which_tbl*2+what_tbl];
+	  memcpy(hpp[which_tbl]->bits,bits,sizeof(hpp[which_tbl]->bits));	  
   	nsymbols=0;//计算huffval中标志的数量
-	for(len=1;len<=16;len++)nsymbols+=bits[len];
+	  for(len=1;len<=16;len++)nsymbols+=bits[len];
   	memcpy(hpp[which_tbl]->huffval,value,nsymbols*sizeof(u8));//set huffval  
   	//计算并设置huffman表&表长
   	memset(hpp[which_tbl]->ecode,0,sizeof(hpp[which_tbl]->ecode));
@@ -457,21 +441,21 @@ void jmkr_write_end(jpeg_compress_info *cinfo)
 //cinfo->inbuf填满有效数据 ,否则将不能得到正确的压缩数据
 void jint_process_rows(jpeg_compress_info *cinfo) 
 {  
-  	int mn; //当前缓冲里的MCU
-  	JSAMPLE *mcu_start;  
+  int mn; //当前缓冲里的MCU
+  JSAMPLE *mcu_start;  
 	int mcu_delta; 
-  	JSAMPLE *pdata; 
+  JSAMPLE *pdata; 
 	//颜色转换选择调用(这里只做RGB到YCrCb的转换)
 	if(cinfo->in_color_space==JCS_RGB)
 	jutl_cc_rgb2ycc(cinfo->inbuf,cinfo->inbuf_width*cinfo->inbuf_height);	
-	//处理每个MCU数据,分割inbuf的数据到每个元件的dct表中,并降低每个元件的采样率
+	//处理每个像素数据,分割inbuf的数据到每个元件的dct表中,并降低每个元件的采样率
 	mcu_start=&cinfo->inbuf[0];
-	mcu_delta=cinfo->mcu_width*cinfo->num_comp*sizeof(JSAMPLE);
+	mcu_delta=cinfo->mcu_width*cinfo->num_comp*sizeof(JSAMPLE); //mcu
 	for(mn=0;mn<cinfo->mcu_per_row;mn++)
 	{
 		//对于每个元件,降低采样率并保存到各个元件中
 		int cn;//元件计数器
-		for(cn=0;cn<cinfo->num_comp;cn++)
+		for(cn=0;cn<cinfo->num_comp;cn++)//YUC轮流来
 		{
 			JSAMPLE *comp_start=(JSAMPLE*)(mcu_start+cn);
 			//初始化采样间隔(sampledelta)数据指针
@@ -500,18 +484,18 @@ void jint_process_rows(jpeg_compress_info *cinfo)
 //RGB转YUV
 void jutl_cc_rgb2ycc(JSAMPLE *data,int num) 
 {
-  	int i;
-  	float a,b,c;
-  	struct three_component_color{
-		JSAMPLE a,b,c;
-  	} *pcolor;
-	pcolor=(struct three_component_color*)data;
+ int i;
+ float a,b,c;
+ struct three_component_color{
+ JSAMPLE a,b,c;
+  } *pcolor;
+ pcolor=(struct three_component_color*)data;
 	for(i=0;i<num;i++)
 	{
 		a=pcolor[i].a;
 		b=pcolor[i].b;
 		c=pcolor[i].c;
-		pcolor[i].a=(0.29900f*a+0.58700f*b+0.11400f*c);//Y color
+		pcolor[i].a=(0.29900f*a+0.58700f*b+0.11400f*c);//Y color  转换公式
 		pcolor[i].b=(-0.16874f*a-0.33126f*b+0.50000f*c+128);//Cb color
 		pcolor[i].c=(0.50000f*a-0.41869f*b-0.08131f*c+128);//Cr color 
   	}
