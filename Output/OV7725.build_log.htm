@@ -22,31 +22,21 @@ Dialog DLL:      TCM.DLL V1.35.1.0
  
 <h2>Project:</h2>
 F:\智能安防\Intelligent-Security-System -+lcd\Project\RVMDK（uv4）\BH-F103.uvprojx
-Project File Date:  03/27/2020
+Project File Date:  03/31/2020
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 6 (build 750)', folder: 'F:\Keil_v5\ARM\ARMCC\Bin'
 Build target '拍照'
-compiling main.c...
-..\..\User\M8266WIFI\M8266HostIf.h(26): warning:  #47-D: incompatible redefinition of macro "REV_OK"  (declared at line 57 of "..\..\User\device\inc\esp8266.h")
-  	 #define REV_OK		1	//接收完成标志
-..\..\User\M8266WIFI\M8266HostIf.h(27): warning:  #47-D: incompatible redefinition of macro "REV_WAIT"  (declared at line 58 of "..\..\User\device\inc\esp8266.h")
-     #define REV_WAIT	0	//接收未完成标志
-..\..\User\IWDG\iwdg.h(6): warning:  #1295-D: Deprecated declaration Feed - give arg types
-  void Feed();
-..\..\User\IWDG\iwdg.h(14): warning:  #1-D: last line of file ends without a newline
-  #endif
-..\..\User\TIMER\timer.h(6): warning:  #1295-D: Deprecated declaration TIM4_PWM_Init - give arg types
-  void TIM4_PWM_Init();
-..\..\User\TIMER\timer.h(10): warning:  #1-D: last line of file ends without a newline
-  #endif
-..\..\User\main.c(191): warning:  #177-D: function "DisplayTask"  was declared but never referenced
-  static void DisplayTask(void *pvParameters) 
-..\..\User\main.c: 7 warnings, 0 errors
+compiling bsp_ov7725.c...
+..\..\User\./ov7725/bsp_ov7725.h(310): warning:  #1295-D: Deprecated declaration Camera_Init - give arg types
+  void Camera_Init();
+..\..\User\./key/bsp_key.h(30): warning:  #1295-D: Deprecated declaration Door_GPIO_Config - give arg types
+  void Door_GPIO_Config();
+..\..\User\ov7725\bsp_ov7725.c: 2 warnings, 0 errors
 linking...
-Program Size: Code=50664 RO-data=18968 RW-data=500 ZI-data=273100  
+Program Size: Code=51084 RO-data=18968 RW-data=504 ZI-data=273104  
 FromELF: creating hex file...
-"..\..\Output\OV7725.axf" - 0 Error(s), 7 Warning(s).
+"..\..\Output\OV7725.axf" - 0 Error(s), 2 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -60,7 +50,7 @@ Package Vendor: Keil
   F:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include
 
 <h2>Collection of Component Files used:</h2>
-Build Time Elapsed:  00:00:02
+Build Time Elapsed:  00:00:03
 </pre>
 </body>
 </html>

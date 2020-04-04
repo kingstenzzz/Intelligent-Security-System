@@ -5,284 +5,311 @@
                           AREA ||i.JPEG_encode||, CODE, READONLY, ALIGN=2
 
                   JPEG_encode PROC
-;;;20     extern u32 lcdid;
-;;;21     _Bool JPEG_encode(char *filename)//编码主函数
+;;;22     extern u32 lcdid;
+;;;23     _Bool JPEG_encode(char *filename)//编码主函数
 000000  e92d47f0          PUSH     {r4-r10,lr}
-;;;22     {
+;;;24     {
 000004  4680              MOV      r8,r0
-;;;23     
-;;;24     	u8 res;
-;;;25     	u16 count,i,color;
-;;;26     	jpeg_compress_info* cinfo;
-;;;27     	JSAMPLE *inbuf_buf;
-;;;28     //	#if JPG_USE_MALLOC == 1	//使用malloc	
-;;;29     	cinfo=(jpeg_compress_info*)malloc(sizeof(jpeg_compress_info));	
+;;;25     
+;;;26     	u8 res;
+;;;27     	u16 count,i,color;
+;;;28     	jpeg_compress_info* cinfo;
+;;;29     	JSAMPLE *inbuf_buf;
+;;;30     
+;;;31     	
+;;;32     	
+;;;33     //	#if JPG_USE_MALLOC == 1	//使用malloc	
+;;;34     	cinfo=(jpeg_compress_info*)malloc(sizeof(jpeg_compress_info));	
 000006  f44f7084          MOV      r0,#0x108
 00000a  f7fffffe          BL       malloc
 00000e  4604              MOV      r4,r0
-;;;30     	if(cinfo==NULL)
+;;;35     	if(cinfo==NULL)
 000010  b914              CBNZ     r4,|L1.24|
-;;;31     	{
-;;;32     		printf("malloc cinfo failed");
+;;;36     	{
+;;;37     		printf("malloc cinfo failed");
 000012  a071              ADR      r0,|L1.472|
 000014  f7fffffe          BL       __2printf
                   |L1.24|
-;;;33     	}
-;;;34     		inbuf_buf=(u8*)malloc(camera_WIDTH*3*16*sizeof(u8));		//开辟readlen字节的内存区域
+;;;38     	}
+;;;39     		inbuf_buf=(u8*)malloc(camera_WIDTH*48*sizeof(u8));		//开辟readlen字节的内存区域
 000018  f44f40b4          MOV      r0,#0x5a00
 00001c  f7fffffe          BL       malloc
 000020  4605              MOV      r5,r0
-;;;35     	if(inbuf_buf==NULL)
+;;;40     		if(inbuf_buf==NULL)
 000022  b915              CBNZ     r5,|L1.42|
-;;;36     	{
-;;;37     		printf("malloc buf faild");
+;;;41     		{
+;;;42     			printf("malloc buf faild");
 000024  a071              ADR      r0,|L1.492|
 000026  f7fffffe          BL       __2printf
                   |L1.42|
-;;;38     	}
-;;;39     	//memset((void*)(inbuf_buf),0,sizeof(inbuf_buf));//所有元素清零
-;;;40     //	if(inbuf_buf==NULL)return PIC_MEM_ERR;	//内存申请失败.
-;;;41     	fileW=(FIL *)malloc(sizeof(FIL));	//开辟FIL字节的内存区域 
+;;;43     		}
+;;;44     	//memset((void*)(inbuf_buf),0,sizeof(inbuf_buf));//所有元素清零
+;;;45     //	if(inbuf_buf==NULL)return PIC_MEM_ERR;	//内存申请失败.
+;;;46     	fileW=(FIL *)malloc(sizeof(FIL));	//开辟FIL字节的内存区域 
 00002a  f2410024          MOV      r0,#0x1024
 00002e  f7fffffe          BL       malloc
 000032  4973              LDR      r1,|L1.512|
 000034  6008              STR      r0,[r1,#0]  ; fileW
-;;;42     	if(fileW==NULL||cinfo==NULL||inbuf_buf==NULL)							//内存申请失败.
+;;;47     	if(fileW==NULL||cinfo==NULL||inbuf_buf==NULL)							//内存申请失败.
 000036  4608              MOV      r0,r1
 000038  6800              LDR      r0,[r0,#0]  ; fileW
 00003a  b108              CBZ      r0,|L1.64|
 00003c  b104              CBZ      r4,|L1.64|
 00003e  b97d              CBNZ     r5,|L1.96|
                   |L1.64|
-;;;43     	{
-;;;44     		printf("	JPEG_encode//内存申请失败.");///////////////////////////////////////////
+;;;48     	{
+;;;49     		printf("	JPEG_encode//内存申请失败.");///////////////////////////////////////////
 000040  a070              ADR      r0,|L1.516|
 000042  f7fffffe          BL       __2printf
-;;;45     		free(cinfo);
+;;;50     		free(cinfo);
 000046  4620              MOV      r0,r4
 000048  f7fffffe          BL       free
-;;;46     		free(inbuf_buf);
+;;;51     		free(inbuf_buf);
 00004c  4628              MOV      r0,r5
 00004e  f7fffffe          BL       free
-;;;47     		free(fileW);
+;;;52     		free(fileW);
 000052  486b              LDR      r0,|L1.512|
 000054  6800              LDR      r0,[r0,#0]  ; fileW
 000056  f7fffffe          BL       free
-;;;48     		return 1;
+;;;53     		return 1;
 00005a  2001              MOVS     r0,#1
                   |L1.92|
-;;;49     	} 	 
-;;;50     	res = f_open( fileW , (char*)filename, FA_CREATE_ALWAYS | FA_WRITE );	
-;;;51     	/* 新建文件之后要先关闭再打开才能写入 */
-;;;52     	f_close(fileW);		
-;;;53     	res = f_open( fileW , (char*)filename,  FA_OPEN_EXISTING | FA_WRITE);
-;;;54       if(res==FR_OK)
-;;;55     	{	
-;;;56     	cinfo->state=JC_CREATING;  
-;;;57     	memset((void*)(cinfo),0,sizeof(jpeg_compress_info));//所有元素清零
-;;;58     	cinfo->image_width=camera_WIDTH;
-;;;59       cinfo->image_height=camera_HEIGHT;
-;;;60       cinfo->output=0;//数据输出到NULL;
-;;;61     	cinfo->fileW=fileW;//文件/////////////文件///////////文件///////////文件/////////////文件///////////文件/////////
-;;;62     	jpeg_set_default(cinfo,inbuf_buf);//设置默认参数
-;;;63     	jpeg_start_compress(cinfo);//开始压缩,写压缩文件头信息
-;;;64     	FIFO_PREPARE;  			/*FIFO准备*/					
-;;;65       count=0;
-;;;66     	while(cinfo->next_line<cinfo->image_height)
-;;;67     	{
-;;;68     		for(i=0;i<camera_WIDTH;i++)//读取一行
-;;;69     		{
-;;;70     			READ_FIFO_PIXEL(color);
-;;;71     		  cinfo->inbuf[count++]=(u8)((color&0xf800)>>8);
-;;;72     			cinfo->inbuf[count++]=(u8)((color&0x07e0)>>3);
-;;;73     			cinfo->inbuf[count++]=(u8)((color&0x001f)<<3);						
-;;;74     		}
-;;;75     		
-;;;76     		  cinfo->next_line++; 
-;;;77     	  	//当数据填满时压缩并输出数据(填满16行)
-;;;78     	  if(cinfo->next_line%cinfo->inbuf_height==0)
-;;;79     		{
-;;;80     			count=0;
-;;;81     	    jint_process_rows(cinfo);//在这里压缩
-;;;82           memset((void*)(cinfo->inbuf),0,cinfo->inbuf_size);//清空输入缓冲区
-;;;83     			
-;;;84     	  	}
-;;;85     	}	
-;;;86     	jpeg_finish_compress(cinfo);
-;;;87     	printf("	JPEG_encode//jpeg_finish_compress(cinfo)");///////////////////////////////////////////
-;;;88     	f_close(fileW);
-;;;89     	free(cinfo);
-;;;90     	free(inbuf_buf);
-;;;91     	free(fileW);
-;;;92     	return 0;
-;;;93     }
-;;;94     	else
-;;;95     	{
-;;;96     		printf("open faild");
-;;;97     		free(cinfo);
-;;;98     		free(inbuf_buf);
-;;;99     		free(fileW);
-;;;100    		return 1;
-;;;101    	}
-;;;102    }
+;;;54     	} 	 
+;;;55     
+;;;56     	
+;;;57     	//res=f_mount(0, &fatfs);
+;;;58     	//while(res){;}//LCD_ShowString(20,20,"SD mount failed!");
+;;;59     	//res=f_open(&fileW,"0:/DCMI/ph1.jpg",FA_WRITE|FA_CREATE_ALWAYS);//创建并打开
+;;;60     //res=f_open(f_bmp,(const TCHAR*)filename,FA_WRITE|FA_CREATE_NEW);
+;;;61     	res = f_open( fileW , (char*)filename, FA_CREATE_ALWAYS | FA_WRITE );
+;;;62     	
+;;;63     	/* 新建文件之后要先关闭再打开才能写入 */
+;;;64     	f_close(fileW);
+;;;65     		
+;;;66     	res = f_open( fileW , (char*)filename,  FA_OPEN_EXISTING | FA_WRITE);
+;;;67     
+;;;68     
+;;;69     	if(res==FR_OK)
+;;;70     	{
+;;;71     		
+;;;72     	
+;;;73     		
+;;;74     //	while(res){;}//LCD_ShowString(20,20,"file create failed!");
+;;;75       	// printf("	JPEG_encode//创建并打开");///////////////////////////////////////////
+;;;76     	cinfo->state=JC_CREATING;  
+;;;77     	memset((void*)(cinfo),0,sizeof(jpeg_compress_info));//所有元素清零
+;;;78     //	cinfo=jpeg_create_compress();//创建JPEG压缩文件
+;;;79     	cinfo->image_width=camera_WIDTH;
+;;;80       	cinfo->image_height=camera_HEIGHT;
+;;;81       	cinfo->output=0;//数据输出到NULL;
+;;;82     	
+;;;83     	cinfo->fileW=fileW;//文件/////////////文件///////////文件///////////文件/////////////文件///////////文件/////////
+;;;84     	
+;;;85       	jpeg_set_default(cinfo,inbuf_buf);//设置默认参数
+;;;86     	
+;;;87     	  	 //printf("	JPEG_encode//设置默认参数");///////////////////////////////////////////
+;;;88     	
+;;;89     	jpeg_start_compress(cinfo);//开始压缩,写压缩文件头信息
+;;;90     	
+;;;91     		  	 //printf("	JPEG_encode//开始压缩,写压缩文件头信息");///////////////////////////////////////////
+;;;92     	
+;;;93     	FIFO_PREPARE;  			/*FIFO准备*/					
+;;;94       count=0;
+;;;95     	while(cinfo->next_line<cinfo->image_height)
+;;;96     	{
+;;;97     		for(i=0;i<camera_WIDTH;i++)//读取一行
+;;;98     		{
+;;;99     			READ_FIFO_PIXEL(color);
+;;;100    		 cinfo->inbuf[count++]=(u8)((color&0xf800)>>8);
+;;;101    			cinfo->inbuf[count++]=(u8)((color&0x07e0)>>3);
+;;;102    			cinfo->inbuf[count++]=(u8)((color&0x001f)<<3);						
+;;;103    		}
+;;;104    		
+;;;105    		cinfo->next_line++; 
+;;;106    	  	//当数据填满时压缩并输出数据(填满16行)
+;;;107    	  	if(cinfo->next_line%cinfo->inbuf_height==0)
+;;;108    		{
+;;;109    			count=0;
+;;;110    	    	jint_process_rows(cinfo);//在这里压缩
+;;;111          	memset((void*)(cinfo->inbuf),0,cinfo->inbuf_size);//清空输入缓冲区
+;;;112    			
+;;;113    	  	}
+;;;114    	}	
+;;;115    	jpeg_finish_compress(cinfo);
+;;;116    	printf("	JPEG_encode//jpeg_finish_compress(cinfo)");///////////////////////////////////////////
+;;;117    	f_close(fileW);
+;;;118    	free(cinfo);
+;;;119    	free(inbuf_buf);
+;;;120    	free(fileW);
+;;;121    	return 0;
+;;;122    }
+;;;123    	else
+;;;124    	{
+;;;125    		printf("open faild");
+;;;126    		free(cinfo);
+;;;127    		free(inbuf_buf);
+;;;128    		free(fileW);
+;;;129    		return 1;
+;;;130    	}
+;;;131    }
 00005c  e8bd87f0          POP      {r4-r10,pc}
                   |L1.96|
-000060  220a              MOVS     r2,#0xa               ;50
-000062  4641              MOV      r1,r8                 ;50
+000060  220a              MOVS     r2,#0xa               ;61
+000062  4641              MOV      r1,r8                 ;61
 000064  4866              LDR      r0,|L1.512|
-000066  6800              LDR      r0,[r0,#0]            ;50  ; fileW
+000066  6800              LDR      r0,[r0,#0]            ;61  ; fileW
 000068  f7fffffe          BL       f_open
-00006c  4682              MOV      r10,r0                ;50
+00006c  4682              MOV      r10,r0                ;61
 00006e  4864              LDR      r0,|L1.512|
-000070  6800              LDR      r0,[r0,#0]            ;52  ; fileW
+000070  6800              LDR      r0,[r0,#0]            ;64  ; fileW
 000072  f7fffffe          BL       f_close
-000076  2202              MOVS     r2,#2                 ;53
-000078  4641              MOV      r1,r8                 ;53
+000076  2202              MOVS     r2,#2                 ;66
+000078  4641              MOV      r1,r8                 ;66
 00007a  4861              LDR      r0,|L1.512|
-00007c  6800              LDR      r0,[r0,#0]            ;53  ; fileW
+00007c  6800              LDR      r0,[r0,#0]            ;66  ; fileW
 00007e  f7fffffe          BL       f_open
-000082  4682              MOV      r10,r0                ;53
-000084  f1ba0f00          CMP      r10,#0                ;54
+000082  4682              MOV      r10,r0                ;66
+000084  f1ba0f00          CMP      r10,#0                ;69
 000088  d17e              BNE      |L1.392|
-00008a  2000              MOVS     r0,#0                 ;56
-00008c  f88400fc          STRB     r0,[r4,#0xfc]         ;56
-000090  f44f7184          MOV      r1,#0x108             ;57
-000094  4620              MOV      r0,r4                 ;57
+00008a  2000              MOVS     r0,#0                 ;76
+00008c  f88400fc          STRB     r0,[r4,#0xfc]         ;76
+000090  f44f7184          MOV      r1,#0x108             ;77
+000094  4620              MOV      r0,r4                 ;77
 000096  f7fffffe          BL       __aeabi_memclr4
-00009a  f44f70f0          MOV      r0,#0x1e0             ;58
-00009e  6020              STR      r0,[r4,#0]            ;58
-0000a0  f44f7088          MOV      r0,#0x110             ;59
-0000a4  6060              STR      r0,[r4,#4]            ;59
-0000a6  2000              MOVS     r0,#0                 ;60
-0000a8  60a0              STR      r0,[r4,#8]            ;60
+00009a  f44f70f0          MOV      r0,#0x1e0             ;79
+00009e  6020              STR      r0,[r4,#0]            ;79
+0000a0  f44f7088          MOV      r0,#0x110             ;80
+0000a4  6060              STR      r0,[r4,#4]            ;80
+0000a6  2000              MOVS     r0,#0                 ;81
+0000a8  60a0              STR      r0,[r4,#8]            ;81
 0000aa  4855              LDR      r0,|L1.512|
-0000ac  6800              LDR      r0,[r0,#0]            ;61  ; fileW
-0000ae  f8c40104          STR      r0,[r4,#0x104]        ;61
-0000b2  4629              MOV      r1,r5                 ;62
-0000b4  4620              MOV      r0,r4                 ;62
+0000ac  6800              LDR      r0,[r0,#0]            ;83  ; fileW
+0000ae  f8c40104          STR      r0,[r4,#0x104]        ;83
+0000b2  4629              MOV      r1,r5                 ;85
+0000b4  4620              MOV      r0,r4                 ;85
 0000b6  f7fffffe          BL       jpeg_set_default
-0000ba  4620              MOV      r0,r4                 ;63
+0000ba  4620              MOV      r0,r4                 ;89
 0000bc  f7fffffe          BL       jpeg_start_compress
-0000c0  bf00              NOP                            ;64
-0000c2  2004              MOVS     r0,#4                 ;64
+0000c0  bf00              NOP                            ;93
+0000c2  2004              MOVS     r0,#4                 ;93
 0000c4  4956              LDR      r1,|L1.544|
-0000c6  6008              STR      r0,[r1,#0]            ;64
-0000c8  2020              MOVS     r0,#0x20              ;64
+0000c6  6008              STR      r0,[r1,#0]            ;93
+0000c8  2020              MOVS     r0,#0x20              ;93
 0000ca  4956              LDR      r1,|L1.548|
-0000cc  6148              STR      r0,[r1,#0x14]         ;64
-0000ce  6108              STR      r0,[r1,#0x10]         ;64
-0000d0  2004              MOVS     r0,#4                 ;64
+0000cc  6148              STR      r0,[r1,#0x14]         ;93
+0000ce  6108              STR      r0,[r1,#0x10]         ;93
+0000d0  2004              MOVS     r0,#4                 ;93
 0000d2  4953              LDR      r1,|L1.544|
-0000d4  1f09              SUBS     r1,r1,#4              ;64
-0000d6  6008              STR      r0,[r1,#0]            ;64
-0000d8  2020              MOVS     r0,#0x20              ;64
+0000d4  1f09              SUBS     r1,r1,#4              ;93
+0000d6  6008              STR      r0,[r1,#0]            ;93
+0000d8  2020              MOVS     r0,#0x20              ;93
 0000da  4952              LDR      r1,|L1.548|
-0000dc  6148              STR      r0,[r1,#0x14]         ;64
-0000de  6108              STR      r0,[r1,#0x10]         ;64
-0000e0  bf00              NOP                            ;64
-0000e2  2600              MOVS     r6,#0                 ;65
+0000dc  6148              STR      r0,[r1,#0x14]         ;93
+0000de  6108              STR      r0,[r1,#0x10]         ;93
+0000e0  bf00              NOP                            ;93
+0000e2  2600              MOVS     r6,#0                 ;94
 0000e4  e04c              B        |L1.384|
                   |L1.230|
-0000e6  f04f0900          MOV      r9,#0                 ;68
+0000e6  f04f0900          MOV      r9,#0                 ;97
 0000ea  e030              B        |L1.334|
                   |L1.236|
-0000ec  bf00              NOP                            ;70
-0000ee  2700              MOVS     r7,#0                 ;70
-0000f0  2020              MOVS     r0,#0x20              ;70
+0000ec  bf00              NOP                            ;99
+0000ee  2700              MOVS     r7,#0                 ;99
+0000f0  2020              MOVS     r0,#0x20              ;99
 0000f2  494c              LDR      r1,|L1.548|
-0000f4  6148              STR      r0,[r1,#0x14]         ;70
+0000f4  6148              STR      r0,[r1,#0x14]         ;99
 0000f6  484c              LDR      r0,|L1.552|
-0000f8  6800              LDR      r0,[r0,#0]            ;70
-0000fa  f400477f          AND      r7,r0,#0xff00         ;70
-0000fe  2020              MOVS     r0,#0x20              ;70
-000100  6108              STR      r0,[r1,#0x10]         ;70
-000102  6148              STR      r0,[r1,#0x14]         ;70
+0000f8  6800              LDR      r0,[r0,#0]            ;99
+0000fa  f400477f          AND      r7,r0,#0xff00         ;99
+0000fe  2020              MOVS     r0,#0x20              ;99
+000100  6108              STR      r0,[r1,#0x10]         ;99
+000102  6148              STR      r0,[r1,#0x14]         ;99
 000104  4848              LDR      r0,|L1.552|
-000106  6800              LDR      r0,[r0,#0]            ;70
-000108  f3c02007          UBFX     r0,r0,#8,#8           ;70
-00010c  4307              ORRS     r7,r7,r0              ;70
-00010e  2020              MOVS     r0,#0x20              ;70
-000110  6108              STR      r0,[r1,#0x10]         ;70
-000112  bf00              NOP                            ;70
-000114  f4074078          AND      r0,r7,#0xf800         ;71
-000118  1202              ASRS     r2,r0,#8              ;71
-00011a  f8543fec          LDR      r3,[r4,#0xec]!        ;71
-00011e  4630              MOV      r0,r6                 ;71
-000120  1c71              ADDS     r1,r6,#1              ;71
-000122  b28e              UXTH     r6,r1                 ;71
-000124  541a              STRB     r2,[r3,r0]            ;71
-000126  f40760fc          AND      r0,r7,#0x7e0          ;72
-00012a  10c2              ASRS     r2,r0,#3              ;72
-00012c  4630              MOV      r0,r6                 ;72
-00012e  1c71              ADDS     r1,r6,#1              ;72
-000130  b28e              UXTH     r6,r1                 ;72
-000132  6823              LDR      r3,[r4,#0]            ;72
-000134  541a              STRB     r2,[r3,r0]            ;72
-000136  06f8              LSLS     r0,r7,#27             ;73
-000138  0e02              LSRS     r2,r0,#24             ;73
-00013a  f85439ec          LDR      r3,[r4],#-0xec        ;73
-00013e  4630              MOV      r0,r6                 ;73
-000140  1c71              ADDS     r1,r6,#1              ;73
-000142  b28e              UXTH     r6,r1                 ;73
-000144  541a              STRB     r2,[r3,r0]            ;73
-000146  f1090001          ADD      r0,r9,#1              ;68
-00014a  fa1ff980          UXTH     r9,r0                 ;68
+000106  6800              LDR      r0,[r0,#0]            ;99
+000108  f3c02007          UBFX     r0,r0,#8,#8           ;99
+00010c  4307              ORRS     r7,r7,r0              ;99
+00010e  2020              MOVS     r0,#0x20              ;99
+000110  6108              STR      r0,[r1,#0x10]         ;99
+000112  bf00              NOP                            ;99
+000114  f4074078          AND      r0,r7,#0xf800         ;100
+000118  1202              ASRS     r2,r0,#8              ;100
+00011a  f8543fec          LDR      r3,[r4,#0xec]!        ;100
+00011e  4630              MOV      r0,r6                 ;100
+000120  1c71              ADDS     r1,r6,#1              ;100
+000122  b28e              UXTH     r6,r1                 ;100
+000124  541a              STRB     r2,[r3,r0]            ;100
+000126  f40760fc          AND      r0,r7,#0x7e0          ;101
+00012a  10c2              ASRS     r2,r0,#3              ;101
+00012c  4630              MOV      r0,r6                 ;101
+00012e  1c71              ADDS     r1,r6,#1              ;101
+000130  b28e              UXTH     r6,r1                 ;101
+000132  6823              LDR      r3,[r4,#0]            ;101
+000134  541a              STRB     r2,[r3,r0]            ;101
+000136  06f8              LSLS     r0,r7,#27             ;102
+000138  0e02              LSRS     r2,r0,#24             ;102
+00013a  f85439ec          LDR      r3,[r4],#-0xec        ;102
+00013e  4630              MOV      r0,r6                 ;102
+000140  1c71              ADDS     r1,r6,#1              ;102
+000142  b28e              UXTH     r6,r1                 ;102
+000144  541a              STRB     r2,[r3,r0]            ;102
+000146  f1090001          ADD      r0,r9,#1              ;97
+00014a  fa1ff980          UXTH     r9,r0                 ;97
                   |L1.334|
-00014e  f5b97ff0          CMP      r9,#0x1e0             ;68
+00014e  f5b97ff0          CMP      r9,#0x1e0             ;97
 000152  dbcb              BLT      |L1.236|
-000154  34f4              ADDS     r4,r4,#0xf4           ;76
-000156  68e0              LDR      r0,[r4,#0xc]          ;76
-000158  1c40              ADDS     r0,r0,#1              ;76
-00015a  60e0              STR      r0,[r4,#0xc]          ;76
-00015c  68e0              LDR      r0,[r4,#0xc]          ;78
-00015e  f85419f4          LDR      r1,[r4],#-0xf4        ;78
-000162  fb90f2f1          SDIV     r2,r0,r1              ;78
-000166  fb010012          MLS      r0,r1,r2,r0           ;78
+000154  34f4              ADDS     r4,r4,#0xf4           ;105
+000156  68e0              LDR      r0,[r4,#0xc]          ;105
+000158  1c40              ADDS     r0,r0,#1              ;105
+00015a  60e0              STR      r0,[r4,#0xc]          ;105
+00015c  68e0              LDR      r0,[r4,#0xc]          ;107
+00015e  f85419f4          LDR      r1,[r4],#-0xf4        ;107
+000162  fb90f2f1          SDIV     r2,r0,r1              ;107
+000166  fb010012          MLS      r0,r1,r2,r0           ;107
 00016a  b948              CBNZ     r0,|L1.384|
-00016c  2600              MOVS     r6,#0                 ;80
-00016e  4620              MOV      r0,r4                 ;81
+00016c  2600              MOVS     r6,#0                 ;109
+00016e  4620              MOV      r0,r4                 ;110
 000170  f7fffffe          BL       jint_process_rows
-000174  f8d410f8          LDR      r1,[r4,#0xf8]         ;82
-000178  f8d400ec          LDR      r0,[r4,#0xec]         ;82
+000174  f8d410f8          LDR      r1,[r4,#0xf8]         ;111
+000178  f8d400ec          LDR      r0,[r4,#0xec]         ;111
 00017c  f7fffffe          BL       __aeabi_memclr
                   |L1.384|
-000180  6861              LDR      r1,[r4,#4]            ;66
-000182  f8d40100          LDR      r0,[r4,#0x100]        ;66
+000180  6861              LDR      r1,[r4,#4]            ;95
+000182  f8d40100          LDR      r0,[r4,#0x100]        ;95
 000186  e000              B        |L1.394|
                   |L1.392|
 000188  e017              B        |L1.442|
                   |L1.394|
-00018a  4288              CMP      r0,r1                 ;66
+00018a  4288              CMP      r0,r1                 ;95
 00018c  dbab              BLT      |L1.230|
-00018e  4620              MOV      r0,r4                 ;86
+00018e  4620              MOV      r0,r4                 ;115
 000190  f7fffffe          BL       jpeg_finish_compress
 000194  a025              ADR      r0,|L1.556|
 000196  f7fffffe          BL       __2printf
 00019a  4819              LDR      r0,|L1.512|
-00019c  6800              LDR      r0,[r0,#0]            ;88  ; fileW
+00019c  6800              LDR      r0,[r0,#0]            ;117  ; fileW
 00019e  f7fffffe          BL       f_close
-0001a2  4620              MOV      r0,r4                 ;89
+0001a2  4620              MOV      r0,r4                 ;118
 0001a4  f7fffffe          BL       free
-0001a8  4628              MOV      r0,r5                 ;90
+0001a8  4628              MOV      r0,r5                 ;119
 0001aa  f7fffffe          BL       free
 0001ae  4814              LDR      r0,|L1.512|
-0001b0  6800              LDR      r0,[r0,#0]            ;91  ; fileW
+0001b0  6800              LDR      r0,[r0,#0]            ;120  ; fileW
 0001b2  f7fffffe          BL       free
-0001b6  2000              MOVS     r0,#0                 ;92
+0001b6  2000              MOVS     r0,#0                 ;121
 0001b8  e750              B        |L1.92|
                   |L1.442|
 0001ba  a027              ADR      r0,|L1.600|
 0001bc  f7fffffe          BL       __2printf
-0001c0  4620              MOV      r0,r4                 ;97
+0001c0  4620              MOV      r0,r4                 ;126
 0001c2  f7fffffe          BL       free
-0001c6  4628              MOV      r0,r5                 ;98
+0001c6  4628              MOV      r0,r5                 ;127
 0001c8  f7fffffe          BL       free
 0001cc  480c              LDR      r0,|L1.512|
-0001ce  6800              LDR      r0,[r0,#0]            ;99  ; fileW
+0001ce  6800              LDR      r0,[r0,#0]            ;128  ; fileW
 0001d0  f7fffffe          BL       free
-0001d4  2001              MOVS     r0,#1                 ;100
+0001d4  2001              MOVS     r0,#1                 ;129
 0001d6  e741              B        |L1.92|
-;;;103    ///////////////////////////////////////////////////////////////////////////////////////////
+;;;132    ///////////////////////////////////////////////////////////////////////////////////////////
                           ENDP
 
                   |L1.472|
@@ -339,84 +366,84 @@
                           AREA ||i.bit_num||, CODE, READONLY, ALIGN=1
 
                   bit_num PROC
-;;;846    
-;;;847    int bit_num(int a) 
+;;;878    
+;;;879    int bit_num(int a) 
 000000  4601              MOV      r1,r0
-;;;848    {
-;;;849      	int bit=0;
+;;;880    {
+;;;881      	int bit=0;
 000002  2200              MOVS     r2,#0
-;;;850      	if(a==0)return 0;
+;;;882      	if(a==0)return 0;
 000004  b909              CBNZ     r1,|L2.10|
 000006  2000              MOVS     r0,#0
                   |L2.8|
-;;;851      	a=a>0?a:-a;
-;;;852      	while((1<<bit)<=a)bit++;
-;;;853      	return bit;
-;;;854    }
+;;;883      	a=a>0?a:-a;
+;;;884      	while((1<<bit)<=a)bit++;
+;;;885      	return bit;
+;;;886    }
 000008  4770              BX       lr
                   |L2.10|
-00000a  2900              CMP      r1,#0                 ;851
+00000a  2900              CMP      r1,#0                 ;883
 00000c  dd01              BLE      |L2.18|
-00000e  4608              MOV      r0,r1                 ;851
+00000e  4608              MOV      r0,r1                 ;883
 000010  e000              B        |L2.20|
                   |L2.18|
-000012  4248              RSBS     r0,r1,#0              ;851
+000012  4248              RSBS     r0,r1,#0              ;883
                   |L2.20|
-000014  4601              MOV      r1,r0                 ;851
+000014  4601              MOV      r1,r0                 ;883
 000016  e000              B        |L2.26|
                   |L2.24|
-000018  1c52              ADDS     r2,r2,#1              ;852
+000018  1c52              ADDS     r2,r2,#1              ;884
                   |L2.26|
-00001a  2001              MOVS     r0,#1                 ;852
-00001c  4090              LSLS     r0,r0,r2              ;852
-00001e  4288              CMP      r0,r1                 ;852
+00001a  2001              MOVS     r0,#1                 ;884
+00001c  4090              LSLS     r0,r0,r2              ;884
+00001e  4288              CMP      r0,r1                 ;884
 000020  ddfa              BLE      |L2.24|
-000022  4610              MOV      r0,r2                 ;853
+000022  4610              MOV      r0,r2                 ;885
 000024  e7f0              B        |L2.8|
-;;;855    //写比特
+;;;887    //写比特
                           ENDP
 
 
                           AREA ||i.dsp_fdct_8x8||, CODE, READONLY, ALIGN=2
 
                   dsp_fdct_8x8 PROC
-;;;537    volatile int temp_dct1[64];
-;;;538    void dsp_fdct_8x8(short *dct_data, unsigned num_fdcts)
+;;;569    volatile int temp_dct1[64];
+;;;570    void dsp_fdct_8x8(short *dct_data, unsigned num_fdcts)
 000000  e92d4ff3          PUSH     {r0,r1,r4-r11,lr}
-;;;539    {
+;;;571    {
 000004  b0b1              SUB      sp,sp,#0xc4
-;;;540      	const u16 c1=0x2C62,c3=0x25A0;
+;;;572      	const u16 c1=0x2C62,c3=0x25A0;
 000006  f6424a62          MOV      r10,#0x2c62
 00000a  f8cda0c0          STR      r10,[sp,#0xc0]
 00000e  f2425aa0          MOV      r10,#0x25a0
 000012  f8cda0bc          STR      r10,[sp,#0xbc]
-;;;541      	const u16 c5=0x1924,c7=0x08D4;
+;;;573      	const u16 c5=0x1924,c7=0x08D4;
 000016  f6411a24          MOV      r10,#0x1924
 00001a  f8cda0b8          STR      r10,[sp,#0xb8]
 00001e  f6400ad4          MOV      r10,#0x8d4
 000022  f8cda0b4          STR      r10,[sp,#0xb4]
-;;;542      	const u16 c0=0xB505,c2=0x29CF;
+;;;574      	const u16 c0=0xB505,c2=0x29CF;
 000026  f24b5a05          MOV      r10,#0xb505
 00002a  f8cda0b0          STR      r10,[sp,#0xb0]
 00002e  f6421acf          MOV      r10,#0x29cf
 000032  f8cda0ac          STR      r10,[sp,#0xac]
-;;;543      	const u16 c6=0x1151;
+;;;575      	const u16 c6=0x1151;
 000036  f2411a51          MOV      r10,#0x1151
 00003a  f8cda0a8          STR      r10,[sp,#0xa8]
-;;;544      	short f0,f1,f2,f3,f4,f5,f6,f7;		
-;;;545      	int   g0,g1,h0,h1,p0,p1;
-;;;546      	short r0,r1;
-;;;547      	int P00,P11,R00,R11;
-;;;548      	short g2,g3,h2,h3;
-;;;549      	short q0a,s0a,q0,q1,s0,s1;
-;;;550      	short Q0,Q1,S0,S1;
-;;;551      	int   F0,F1,F2,F3,F4,F5,F6,F7;
-;;;552      	int   F0r,F1r,F2r,F3r,F4r,F5r,F6r,F7r;
-;;;553      	unsigned i,j;
-;;;554      	short *dct_io_ptr;
-;;;555    	dct_io_ptr=dct_data;
+;;;576      	short f0,f1,f2,f3,f4,f5,f6,f7;		
+;;;577      	int   g0,g1,h0,h1,p0,p1;
+;;;578      	short r0,r1;
+;;;579      	int P00,P11,R00,R11;
+;;;580      	short g2,g3,h2,h3;
+;;;581      	short q0a,s0a,q0,q1,s0,s1;
+;;;582      	short Q0,Q1,S0,S1;
+;;;583      	int   F0,F1,F2,F3,F4,F5,F6,F7;
+;;;584      	int   F0r,F1r,F2r,F3r,F4r,F5r,F6r,F7r;
+;;;585      	unsigned i,j;
+;;;586      	short *dct_io_ptr;
+;;;587    	dct_io_ptr=dct_data;
 00003e  9831              LDR      r0,[sp,#0xc4]
-;;;556    	for(i=0;i<64;i++)temp_dct1[i]=dct_data[i];
+;;;588    	for(i=0;i<64;i++)temp_dct1[i]=dct_data[i];
 000040  2100              MOVS     r1,#0
 000042  e008              B        |L3.86|
                   |L3.68|
@@ -428,44 +455,44 @@
                   |L3.86|
 000056  2940              CMP      r1,#0x40
 000058  d3f4              BCC      |L3.68|
-;;;557    	for(i=0;i<num_fdcts;i++)
+;;;589    	for(i=0;i<num_fdcts;i++)
 00005a  2100              MOVS     r1,#0
 00005c  e168              B        |L3.816|
                   |L3.94|
-;;;558    	{
-;;;559    		for(j=0;j<8;j++)
+;;;590    	{
+;;;591    		for(j=0;j<8;j++)
 00005e  f04f0a00          MOV      r10,#0
 000062  f8cda000          STR      r10,[sp,#0]
 000066  e15b              B        |L3.800|
                   |L3.104|
-;;;560    		{
-;;;561    			f0=dct_io_ptr[0];
+;;;592    		{
+;;;593    			f0=dct_io_ptr[0];
 000068  f9b06000          LDRSH    r6,[r0,#0]
-;;;562    			f1=dct_io_ptr[8];
+;;;594    			f1=dct_io_ptr[8];
 00006c  f9b07010          LDRSH    r7,[r0,#0x10]
-;;;563    			f2=dct_io_ptr[16];
+;;;595    			f2=dct_io_ptr[16];
 000070  f9b0c020          LDRSH    r12,[r0,#0x20]
-;;;564    			f3=dct_io_ptr[24];
+;;;596    			f3=dct_io_ptr[24];
 000074  f9b08030          LDRSH    r8,[r0,#0x30]
-;;;565    			f4=dct_io_ptr[32];
+;;;597    			f4=dct_io_ptr[32];
 000078  f9b09040          LDRSH    r9,[r0,#0x40]
-;;;566    			f5=dct_io_ptr[40];
+;;;598    			f5=dct_io_ptr[40];
 00007c  f9b0a050          LDRSH    r10,[r0,#0x50]
 000080  f8cda0a4          STR      r10,[sp,#0xa4]
-;;;567    			f6=dct_io_ptr[48];
+;;;599    			f6=dct_io_ptr[48];
 000084  f9b0a060          LDRSH    r10,[r0,#0x60]
 000088  f8cda0a0          STR      r10,[sp,#0xa0]
-;;;568    			f7=dct_io_ptr[56];
+;;;600    			f7=dct_io_ptr[56];
 00008c  f9b0a070          LDRSH    r10,[r0,#0x70]
 000090  f8cda09c          STR      r10,[sp,#0x9c]
-;;;569    			g0=f0+f7;h2=f0-f7;
+;;;601    			g0=f0+f7;h2=f0-f7;
 000094  f8dda09c          LDR      r10,[sp,#0x9c]
 000098  44b2              ADD      r10,r10,r6
 00009a  f8cda098          STR      r10,[sp,#0x98]
 00009e  f8dda09c          LDR      r10,[sp,#0x9c]
 0000a2  eba60a0a          SUB      r10,r6,r10
 0000a6  fa0ff38a          SXTH     r3,r10
-;;;570    			g1=f1+f6;h3=f1-f6;
+;;;602    			g1=f1+f6;h3=f1-f6;
 0000aa  f8dda0a0          LDR      r10,[sp,#0xa0]
 0000ae  44ba              ADD      r10,r10,r7
 0000b0  f8cda094          STR      r10,[sp,#0x94]
@@ -473,7 +500,7 @@
 0000b8  eba70a0a          SUB      r10,r7,r10
 0000bc  fa0ffa8a          SXTH     r10,r10
 0000c0  f8cda064          STR      r10,[sp,#0x64]
-;;;571    			h1=f2+f5;g3=f2-f5;
+;;;603    			h1=f2+f5;g3=f2-f5;
 0000c4  f8dda0a4          LDR      r10,[sp,#0xa4]
 0000c8  44e2              ADD      r10,r10,r12
 0000ca  f8cda08c          STR      r10,[sp,#0x8c]
@@ -481,12 +508,12 @@
 0000d2  ebac0a0a          SUB      r10,r12,r10
 0000d6  fa0ffa8a          SXTH     r10,r10
 0000da  f8cda068          STR      r10,[sp,#0x68]
-;;;572    			h0=f3+f4;g2=f3-f4;
+;;;604    			h0=f3+f4;g2=f3-f4;
 0000de  eb080a09          ADD      r10,r8,r9
 0000e2  f8cda090          STR      r10,[sp,#0x90]
 0000e6  eba80a09          SUB      r10,r8,r9
 0000ea  fa0ff28a          SXTH     r2,r10
-;;;573    			p0=g0+h0;r0=g0-h0;
+;;;605    			p0=g0+h0;r0=g0-h0;
 0000ee  f8ddb090          LDR      r11,[sp,#0x90]
 0000f2  f8dda098          LDR      r10,[sp,#0x98]
 0000f6  44da              ADD      r10,r10,r11
@@ -496,7 +523,7 @@
 000104  ebaa0a0b          SUB      r10,r10,r11
 000108  fa0ffa8a          SXTH     r10,r10
 00010c  f8cda080          STR      r10,[sp,#0x80]
-;;;574    			p1=g1+h1;r1=g1-h1;
+;;;606    			p1=g1+h1;r1=g1-h1;
 000110  f8ddb08c          LDR      r11,[sp,#0x8c]
 000114  f8dda094          LDR      r10,[sp,#0x94]
 000118  44da              ADD      r10,r10,r11
@@ -506,10 +533,10 @@
 000126  ebaa0a0b          SUB      r10,r10,r11
 00012a  fa0ffa8a          SXTH     r10,r10
 00012e  f8cda07c          STR      r10,[sp,#0x7c]
-;;;575    			q1=g2;s1=h2;
+;;;607    			q1=g2;s1=h2;
 000132  4614              MOV      r4,r2
 000134  461d              MOV      r5,r3
-;;;576    			s0a=h3+g3;q0a=h3-g3;
+;;;608    			s0a=h3+g3;q0a=h3-g3;
 000136  e9ddab19          LDRD     r10,r11,[sp,#0x64]
 00013a  44da              ADD      r10,r10,r11
 00013c  fa0ffa8a          SXTH     r10,r10
@@ -518,7 +545,7 @@
 000148  ebaa0a0b          SUB      r10,r10,r11
 00014c  fa0ffa8a          SXTH     r10,r10
 000150  f8cda060          STR      r10,[sp,#0x60]
-;;;577    			s0=(s0a*c0+0x7FFF)>>16;
+;;;609    			s0=(s0a*c0+0x7FFF)>>16;
 000154  f24b5b05          MOV      r11,#0xb505
 000158  f8dda05c          LDR      r10,[sp,#0x5c]
 00015c  fb0afa0b          MUL      r10,r10,r11
@@ -526,7 +553,7 @@
 000164  44da              ADD      r10,r10,r11
 000166  ea4f4a2a          ASR      r10,r10,#16
 00016a  f8cda054          STR      r10,[sp,#0x54]
-;;;578    			q0=(q0a*c0+0x7FFF)>>16;
+;;;610    			q0=(q0a*c0+0x7FFF)>>16;
 00016e  f24b5b05          MOV      r11,#0xb505
 000172  f8dda060          LDR      r10,[sp,#0x60]
 000176  fb0afa0b          MUL      r10,r10,r11
@@ -534,14 +561,14 @@
 00017e  44da              ADD      r10,r10,r11
 000180  ea4f4a2a          ASR      r10,r10,#16
 000184  f8cda058          STR      r10,[sp,#0x58]
-;;;579    			P00=p0+p1;P11=p0-p1;
+;;;611    			P00=p0+p1;P11=p0-p1;
 000188  e9ddba21          LDRD     r11,r10,[sp,#0x84]
 00018c  44da              ADD      r10,r10,r11
 00018e  f8cda078          STR      r10,[sp,#0x78]
 000192  e9ddba21          LDRD     r11,r10,[sp,#0x84]
 000196  ebaa0a0b          SUB      r10,r10,r11
 00019a  f8cda074          STR      r10,[sp,#0x74]
-;;;580    			R11=c6*r1+c2*r0;R00=c6*r0-c2*r1;
+;;;612    			R11=c6*r1+c2*r0;R00=c6*r0-c2*r1;
 00019e  f2411b51          MOV      r11,#0x1151
 0001a2  f8dda07c          LDR      r10,[sp,#0x7c]
 0001a6  fb0afb0b          MUL      r11,r10,r11
@@ -555,7 +582,7 @@
 0001c6  f8dda07c          LDR      r10,[sp,#0x7c]
 0001ca  fb0eba1a          MLS      r10,lr,r10,r11
 0001ce  f8cda070          STR      r10,[sp,#0x70]
-;;;581    			Q1=q1+q0;Q0=q1-q0;
+;;;613    			Q1=q1+q0;Q0=q1-q0;
 0001d2  4622              MOV      r2,r4
 0001d4  f8dda058          LDR      r10,[sp,#0x58]
 0001d8  44a2              ADD      r10,r10,r4
@@ -565,7 +592,7 @@
 0001e6  eba40a0a          SUB      r10,r4,r10
 0001ea  fa0ffa8a          SXTH     r10,r10
 0001ee  f8cda050          STR      r10,[sp,#0x50]
-;;;582    			S1=s1+s0;S0=s1-s0;
+;;;614    			S1=s1+s0;S0=s1-s0;
 0001f2  462b              MOV      r3,r5
 0001f4  f8dda054          LDR      r10,[sp,#0x54]
 0001f8  44aa              ADD      r10,r10,r5
@@ -575,17 +602,17 @@
 000206  eba50a0a          SUB      r10,r5,r10
 00020a  fa0ffa8a          SXTH     r10,r10
 00020e  f8cda048          STR      r10,[sp,#0x48]
-;;;583    			F0=P00;F4=P11;
+;;;615    			F0=P00;F4=P11;
 000212  f8dda078          LDR      r10,[sp,#0x78]
 000216  f8cda040          STR      r10,[sp,#0x40]
 00021a  f8dda074          LDR      r10,[sp,#0x74]
 00021e  f8cda030          STR      r10,[sp,#0x30]
-;;;584    			F2=R11;F6=R00;
+;;;616    			F2=R11;F6=R00;
 000222  f8dda06c          LDR      r10,[sp,#0x6c]
 000226  f8cda038          STR      r10,[sp,#0x38]
 00022a  f8dda070          LDR      r10,[sp,#0x70]
 00022e  f8cda028          STR      r10,[sp,#0x28]
-;;;585    			F1=c7*Q1+c1*S1;F7=c7*S1-c1*Q1;
+;;;617    			F1=c7*Q1+c1*S1;F7=c7*S1-c1*Q1;
 000232  f6400bd4          MOV      r11,#0x8d4
 000236  f8dda04c          LDR      r10,[sp,#0x4c]
 00023a  fb0afb0b          MUL      r11,r10,r11
@@ -599,7 +626,7 @@
 00025a  f8dda04c          LDR      r10,[sp,#0x4c]
 00025e  fb0eba1a          MLS      r10,lr,r10,r11
 000262  f8cda024          STR      r10,[sp,#0x24]
-;;;586    			F5=c3*Q0+c5*S0;F3=c3*S0-c5*Q0;
+;;;618    			F5=c3*Q0+c5*S0;F3=c3*S0-c5*Q0;
 000266  f2425ba0          MOV      r11,#0x25a0
 00026a  f8dda050          LDR      r10,[sp,#0x50]
 00026e  fb0afb0b          MUL      r11,r10,r11
@@ -613,96 +640,96 @@
 00028e  f8dda050          LDR      r10,[sp,#0x50]
 000292  fb0eba1a          MLS      r10,lr,r10,r11
 000296  f8cda034          STR      r10,[sp,#0x34]
-;;;587    			dct_io_ptr[0]=F0;
+;;;619    			dct_io_ptr[0]=F0;
 00029a  f8dda040          LDR      r10,[sp,#0x40]
 00029e  fa0ffa8a          SXTH     r10,r10
 0002a2  f8a0a000          STRH     r10,[r0,#0]
-;;;588    			dct_io_ptr[8]=F1>>13;
+;;;620    			dct_io_ptr[8]=F1>>13;
 0002a6  f8dda03c          LDR      r10,[sp,#0x3c]
 0002aa  ea4f3a6a          ASR      r10,r10,#13
 0002ae  fa0ffa8a          SXTH     r10,r10
 0002b2  f8a0a010          STRH     r10,[r0,#0x10]
-;;;589    			dct_io_ptr[16]=F2>>13;
+;;;621    			dct_io_ptr[16]=F2>>13;
 0002b6  f8dda038          LDR      r10,[sp,#0x38]
 0002ba  ea4f3a6a          ASR      r10,r10,#13
 0002be  fa0ffa8a          SXTH     r10,r10
 0002c2  f8a0a020          STRH     r10,[r0,#0x20]
-;;;590    			dct_io_ptr[24]=F3>>13;
+;;;622    			dct_io_ptr[24]=F3>>13;
 0002c6  f8dda034          LDR      r10,[sp,#0x34]
 0002ca  ea4f3a6a          ASR      r10,r10,#13
 0002ce  fa0ffa8a          SXTH     r10,r10
 0002d2  f8a0a030          STRH     r10,[r0,#0x30]
-;;;591    			dct_io_ptr[32]=F4;
+;;;623    			dct_io_ptr[32]=F4;
 0002d6  f8dda030          LDR      r10,[sp,#0x30]
 0002da  fa0ffa8a          SXTH     r10,r10
 0002de  f8a0a040          STRH     r10,[r0,#0x40]
-;;;592    			dct_io_ptr[40]=F5>>13;
+;;;624    			dct_io_ptr[40]=F5>>13;
 0002e2  f8dda02c          LDR      r10,[sp,#0x2c]
 0002e6  ea4f3a6a          ASR      r10,r10,#13
 0002ea  fa0ffa8a          SXTH     r10,r10
 0002ee  f8a0a050          STRH     r10,[r0,#0x50]
-;;;593    			dct_io_ptr[48]=F6>>13;
+;;;625    			dct_io_ptr[48]=F6>>13;
 0002f2  f8dda028          LDR      r10,[sp,#0x28]
 0002f6  ea4f3a6a          ASR      r10,r10,#13
 0002fa  fa0ffa8a          SXTH     r10,r10
 0002fe  f8a0a060          STRH     r10,[r0,#0x60]
-;;;594    			dct_io_ptr[56]=F7>>13;
+;;;626    			dct_io_ptr[56]=F7>>13;
 000302  f8dda024          LDR      r10,[sp,#0x24]
 000306  ea4f3a6a          ASR      r10,r10,#13
 00030a  fa0ffa8a          SXTH     r10,r10
 00030e  f8a0a070          STRH     r10,[r0,#0x70]
-;;;595    			dct_io_ptr++;
+;;;627    			dct_io_ptr++;
 000312  1c80              ADDS     r0,r0,#2
-000314  f8dda000          LDR      r10,[sp,#0]           ;559
-000318  f10a0a01          ADD      r10,r10,#1            ;559
-00031c  f8cda000          STR      r10,[sp,#0]           ;559
+000314  f8dda000          LDR      r10,[sp,#0]           ;591
+000318  f10a0a01          ADD      r10,r10,#1            ;591
+00031c  f8cda000          STR      r10,[sp,#0]           ;591
                   |L3.800|
-000320  f8dda000          LDR      r10,[sp,#0]           ;559
-000324  f1ba0f08          CMP      r10,#8                ;559
+000320  f8dda000          LDR      r10,[sp,#0]           ;591
+000324  f1ba0f08          CMP      r10,#8                ;591
 000328  f4ffae9e          BCC      |L3.104|
-;;;596    		}
-;;;597    		dct_io_ptr+=56;
+;;;628    		}
+;;;629    		dct_io_ptr+=56;
 00032c  3070              ADDS     r0,r0,#0x70
-00032e  1c49              ADDS     r1,r1,#1              ;557
+00032e  1c49              ADDS     r1,r1,#1              ;589
                   |L3.816|
-000330  f8dda0c8          LDR      r10,[sp,#0xc8]        ;557
-000334  4551              CMP      r1,r10                ;557
+000330  f8dda0c8          LDR      r10,[sp,#0xc8]        ;589
+000334  4551              CMP      r1,r10                ;589
 000336  f4ffae92          BCC      |L3.94|
-;;;598    	}
-;;;599    	dct_io_ptr=dct_data;
+;;;630    	}
+;;;631    	dct_io_ptr=dct_data;
 00033a  9831              LDR      r0,[sp,#0xc4]
-;;;600    	for(i=0;i<8*num_fdcts;i++)
+;;;632    	for(i=0;i<8*num_fdcts;i++)
 00033c  2100              MOVS     r1,#0
 00033e  e17a              B        |L3.1590|
                   |L3.832|
-;;;601    	{
-;;;602    		f0=dct_io_ptr[0];
+;;;633    	{
+;;;634    		f0=dct_io_ptr[0];
 000340  f9b06000          LDRSH    r6,[r0,#0]
-;;;603    		f1=dct_io_ptr[1];
+;;;635    		f1=dct_io_ptr[1];
 000344  f9b07002          LDRSH    r7,[r0,#2]
-;;;604    		f2=dct_io_ptr[2];
+;;;636    		f2=dct_io_ptr[2];
 000348  f9b0c004          LDRSH    r12,[r0,#4]
-;;;605    		f3=dct_io_ptr[3];
+;;;637    		f3=dct_io_ptr[3];
 00034c  f9b08006          LDRSH    r8,[r0,#6]
-;;;606    		f4=dct_io_ptr[4];
+;;;638    		f4=dct_io_ptr[4];
 000350  f9b09008          LDRSH    r9,[r0,#8]
-;;;607    		f5=dct_io_ptr[5];
+;;;639    		f5=dct_io_ptr[5];
 000354  f9b0a00a          LDRSH    r10,[r0,#0xa]
 000358  f8cda0a4          STR      r10,[sp,#0xa4]
-;;;608    		f6=dct_io_ptr[6];
+;;;640    		f6=dct_io_ptr[6];
 00035c  f9b0a00c          LDRSH    r10,[r0,#0xc]
 000360  f8cda0a0          STR      r10,[sp,#0xa0]
-;;;609    		f7=dct_io_ptr[7];
+;;;641    		f7=dct_io_ptr[7];
 000364  f9b0a00e          LDRSH    r10,[r0,#0xe]
 000368  f8cda09c          STR      r10,[sp,#0x9c]
-;;;610    		g0=f0+f7;h2=f0-f7;
+;;;642    		g0=f0+f7;h2=f0-f7;
 00036c  f8dda09c          LDR      r10,[sp,#0x9c]
 000370  44b2              ADD      r10,r10,r6
 000372  f8cda098          STR      r10,[sp,#0x98]
 000376  f8dda09c          LDR      r10,[sp,#0x9c]
 00037a  eba60a0a          SUB      r10,r6,r10
 00037e  fa0ff38a          SXTH     r3,r10
-;;;611    		g1=f1+f6;h3=f1-f6;
+;;;643    		g1=f1+f6;h3=f1-f6;
 000382  f8dda0a0          LDR      r10,[sp,#0xa0]
 000386  44ba              ADD      r10,r10,r7
 000388  f8cda094          STR      r10,[sp,#0x94]
@@ -710,7 +737,7 @@
 000390  eba70a0a          SUB      r10,r7,r10
 000394  fa0ffa8a          SXTH     r10,r10
 000398  f8cda064          STR      r10,[sp,#0x64]
-;;;612    		h1=f2+f5;g3=f2-f5;
+;;;644    		h1=f2+f5;g3=f2-f5;
 00039c  f8dda0a4          LDR      r10,[sp,#0xa4]
 0003a0  44e2              ADD      r10,r10,r12
 0003a2  f8cda08c          STR      r10,[sp,#0x8c]
@@ -718,12 +745,12 @@
 0003aa  ebac0a0a          SUB      r10,r12,r10
 0003ae  fa0ffa8a          SXTH     r10,r10
 0003b2  f8cda068          STR      r10,[sp,#0x68]
-;;;613    		h0=f3+f4;g2=f3-f4;
+;;;645    		h0=f3+f4;g2=f3-f4;
 0003b6  eb080a09          ADD      r10,r8,r9
 0003ba  f8cda090          STR      r10,[sp,#0x90]
 0003be  eba80a09          SUB      r10,r8,r9
 0003c2  fa0ff28a          SXTH     r2,r10
-;;;614    		p0=g0+h0;r0=g0-h0;
+;;;646    		p0=g0+h0;r0=g0-h0;
 0003c6  f8ddb090          LDR      r11,[sp,#0x90]
 0003ca  f8dda098          LDR      r10,[sp,#0x98]
 0003ce  44da              ADD      r10,r10,r11
@@ -733,7 +760,7 @@
 0003dc  ebaa0a0b          SUB      r10,r10,r11
 0003e0  fa0ffa8a          SXTH     r10,r10
 0003e4  f8cda080          STR      r10,[sp,#0x80]
-;;;615    		p1=g1+h1;r1=g1-h1;
+;;;647    		p1=g1+h1;r1=g1-h1;
 0003e8  f8ddb08c          LDR      r11,[sp,#0x8c]
 0003ec  f8dda094          LDR      r10,[sp,#0x94]
 0003f0  44da              ADD      r10,r10,r11
@@ -743,10 +770,10 @@
 0003fe  ebaa0a0b          SUB      r10,r10,r11
 000402  fa0ffa8a          SXTH     r10,r10
 000406  f8cda07c          STR      r10,[sp,#0x7c]
-;;;616    		q1=g2;s1=h2;
+;;;648    		q1=g2;s1=h2;
 00040a  4614              MOV      r4,r2
 00040c  461d              MOV      r5,r3
-;;;617    		s0a=h3+g3;q0a=h3-g3;
+;;;649    		s0a=h3+g3;q0a=h3-g3;
 00040e  e9ddab19          LDRD     r10,r11,[sp,#0x64]
 000412  44da              ADD      r10,r10,r11
 000414  fa0ffa8a          SXTH     r10,r10
@@ -755,7 +782,7 @@
 000420  ebaa0a0b          SUB      r10,r10,r11
 000424  fa0ffa8a          SXTH     r10,r10
 000428  f8cda060          STR      r10,[sp,#0x60]
-;;;618    		q0=(q0a*c0+0x7FFF)>>16;
+;;;650    		q0=(q0a*c0+0x7FFF)>>16;
 00042c  f24b5b05          MOV      r11,#0xb505
 000430  f8dda060          LDR      r10,[sp,#0x60]
 000434  fb0afa0b          MUL      r10,r10,r11
@@ -763,7 +790,7 @@
 00043c  44da              ADD      r10,r10,r11
 00043e  ea4f4a2a          ASR      r10,r10,#16
 000442  f8cda058          STR      r10,[sp,#0x58]
-;;;619    		s0=(s0a*c0+0x7FFF)>>16;
+;;;651    		s0=(s0a*c0+0x7FFF)>>16;
 000446  f24b5b05          MOV      r11,#0xb505
 00044a  f8dda05c          LDR      r10,[sp,#0x5c]
 00044e  fb0afa0b          MUL      r10,r10,r11
@@ -771,14 +798,14 @@
 000456  44da              ADD      r10,r10,r11
 000458  ea4f4a2a          ASR      r10,r10,#16
 00045c  f8cda054          STR      r10,[sp,#0x54]
-;;;620    		P00=p0+p1;P11=p0-p1;
+;;;652    		P00=p0+p1;P11=p0-p1;
 000460  e9ddba21          LDRD     r11,r10,[sp,#0x84]
 000464  44da              ADD      r10,r10,r11
 000466  f8cda078          STR      r10,[sp,#0x78]
 00046a  e9ddba21          LDRD     r11,r10,[sp,#0x84]
 00046e  ebaa0a0b          SUB      r10,r10,r11
 000472  f8cda074          STR      r10,[sp,#0x74]
-;;;621    		R11=c6*r1+c2*r0;R00=c6*r0-c2*r1;
+;;;653    		R11=c6*r1+c2*r0;R00=c6*r0-c2*r1;
 000476  f2411b51          MOV      r11,#0x1151
 00047a  f8dda07c          LDR      r10,[sp,#0x7c]
 00047e  fb0afb0b          MUL      r11,r10,r11
@@ -792,7 +819,7 @@
 00049e  f8dda07c          LDR      r10,[sp,#0x7c]
 0004a2  fb0eba1a          MLS      r10,lr,r10,r11
 0004a6  f8cda070          STR      r10,[sp,#0x70]
-;;;622    		Q1=q1+q0;Q0=q1-q0;
+;;;654    		Q1=q1+q0;Q0=q1-q0;
 0004aa  4622              MOV      r2,r4
 0004ac  f8dda058          LDR      r10,[sp,#0x58]
 0004b0  44a2              ADD      r10,r10,r4
@@ -802,7 +829,7 @@
 0004be  eba40a0a          SUB      r10,r4,r10
 0004c2  fa0ffa8a          SXTH     r10,r10
 0004c6  f8cda050          STR      r10,[sp,#0x50]
-;;;623    		S1=s1+s0;S0=s1-s0;
+;;;655    		S1=s1+s0;S0=s1-s0;
 0004ca  462b              MOV      r3,r5
 0004cc  f8dda054          LDR      r10,[sp,#0x54]
 0004d0  44aa              ADD      r10,r10,r5
@@ -812,17 +839,17 @@
 0004de  eba50a0a          SUB      r10,r5,r10
 0004e2  fa0ffa8a          SXTH     r10,r10
 0004e6  f8cda048          STR      r10,[sp,#0x48]
-;;;624    		F0=P00;F4=P11;
+;;;656    		F0=P00;F4=P11;
 0004ea  f8dda078          LDR      r10,[sp,#0x78]
 0004ee  f8cda040          STR      r10,[sp,#0x40]
 0004f2  f8dda074          LDR      r10,[sp,#0x74]
 0004f6  f8cda030          STR      r10,[sp,#0x30]
-;;;625    		F2=R11;F6=R00;
+;;;657    		F2=R11;F6=R00;
 0004fa  f8dda06c          LDR      r10,[sp,#0x6c]
 0004fe  f8cda038          STR      r10,[sp,#0x38]
 000502  f8dda070          LDR      r10,[sp,#0x70]
 000506  f8cda028          STR      r10,[sp,#0x28]
-;;;626    		F1=c7*Q1+c1*S1;F7=c7*S1-c1*Q1;
+;;;658    		F1=c7*Q1+c1*S1;F7=c7*S1-c1*Q1;
 00050a  f6400bd4          MOV      r11,#0x8d4
 00050e  f8dda04c          LDR      r10,[sp,#0x4c]
 000512  fb0afb0b          MUL      r11,r10,r11
@@ -836,7 +863,7 @@
 000532  f8dda04c          LDR      r10,[sp,#0x4c]
 000536  fb0eba1a          MLS      r10,lr,r10,r11
 00053a  f8cda024          STR      r10,[sp,#0x24]
-;;;627    		F5=c3*Q0+c5*S0;F3=c3*S0-c5*Q0;
+;;;659    		F5=c3*Q0+c5*S0;F3=c3*S0-c5*Q0;
 00053e  f2425ba0          MOV      r11,#0x25a0
 000542  f8dda050          LDR      r10,[sp,#0x50]
 000546  fb0afb0b          MUL      r11,r10,r11
@@ -850,83 +877,83 @@
 000566  f8dda050          LDR      r10,[sp,#0x50]
 00056a  fb0eba1a          MLS      r10,lr,r10,r11
 00056e  f8cda034          STR      r10,[sp,#0x34]
-;;;628    		F0r=(F0+0x0006)>>3;
+;;;660    		F0r=(F0+0x0006)>>3;
 000572  f8dda040          LDR      r10,[sp,#0x40]
 000576  f10a0a06          ADD      r10,r10,#6
 00057a  ea4f0aea          ASR      r10,r10,#3
 00057e  f8cda020          STR      r10,[sp,#0x20]
-;;;629    		F1r=(F1+0x7FFF)>>16;
+;;;661    		F1r=(F1+0x7FFF)>>16;
 000582  f6477bff          MOV      r11,#0x7fff
 000586  f8dda03c          LDR      r10,[sp,#0x3c]
 00058a  44da              ADD      r10,r10,r11
 00058c  ea4f4a2a          ASR      r10,r10,#16
 000590  f8cda01c          STR      r10,[sp,#0x1c]
-;;;630    		F2r=(F2+0x7FFF)>>16;
+;;;662    		F2r=(F2+0x7FFF)>>16;
 000594  f8dda038          LDR      r10,[sp,#0x38]
 000598  44da              ADD      r10,r10,r11
 00059a  ea4f4a2a          ASR      r10,r10,#16
 00059e  f8cda018          STR      r10,[sp,#0x18]
-;;;631    		F3r=(F3+0x7FFF)>>16;
+;;;663    		F3r=(F3+0x7FFF)>>16;
 0005a2  f8dda034          LDR      r10,[sp,#0x34]
 0005a6  44da              ADD      r10,r10,r11
 0005a8  ea4f4a2a          ASR      r10,r10,#16
 0005ac  f8cda014          STR      r10,[sp,#0x14]
-;;;632    		F4r=(F4+0x0004)>>3;
+;;;664    		F4r=(F4+0x0004)>>3;
 0005b0  f8dda030          LDR      r10,[sp,#0x30]
 0005b4  f10a0a04          ADD      r10,r10,#4
 0005b8  ea4f0aea          ASR      r10,r10,#3
 0005bc  f8cda010          STR      r10,[sp,#0x10]
-;;;633    		F5r=(F5+0x7FFF)>>16;
+;;;665    		F5r=(F5+0x7FFF)>>16;
 0005c0  f8dda02c          LDR      r10,[sp,#0x2c]
 0005c4  44da              ADD      r10,r10,r11
 0005c6  ea4f4a2a          ASR      r10,r10,#16
 0005ca  f8cda00c          STR      r10,[sp,#0xc]
-;;;634    		F6r=(F6+0x7FFF)>>16;
+;;;666    		F6r=(F6+0x7FFF)>>16;
 0005ce  f8dda028          LDR      r10,[sp,#0x28]
 0005d2  44da              ADD      r10,r10,r11
 0005d4  ea4f4a2a          ASR      r10,r10,#16
 0005d8  f8cda008          STR      r10,[sp,#8]
-;;;635    		F7r=(F7+0x7FFF)>>16;
+;;;667    		F7r=(F7+0x7FFF)>>16;
 0005dc  f8dda024          LDR      r10,[sp,#0x24]
 0005e0  44da              ADD      r10,r10,r11
 0005e2  ea4f4a2a          ASR      r10,r10,#16
 0005e6  f8cda004          STR      r10,[sp,#4]
-;;;636    		dct_io_ptr[0]=F0r;
+;;;668    		dct_io_ptr[0]=F0r;
 0005ea  f8dda020          LDR      r10,[sp,#0x20]
 0005ee  fa0ffa8a          SXTH     r10,r10
 0005f2  f8a0a000          STRH     r10,[r0,#0]
-;;;637    		dct_io_ptr[1]=F1r;
+;;;669    		dct_io_ptr[1]=F1r;
 0005f6  f8dda01c          LDR      r10,[sp,#0x1c]
 0005fa  f8a0a002          STRH     r10,[r0,#2]
-;;;638    		dct_io_ptr[2]=F2r;
+;;;670    		dct_io_ptr[2]=F2r;
 0005fe  f8dda018          LDR      r10,[sp,#0x18]
 000602  f8a0a004          STRH     r10,[r0,#4]
-;;;639    		dct_io_ptr[3]=F3r;
+;;;671    		dct_io_ptr[3]=F3r;
 000606  f8dda014          LDR      r10,[sp,#0x14]
 00060a  f8a0a006          STRH     r10,[r0,#6]
-;;;640    		dct_io_ptr[4]=F4r;
+;;;672    		dct_io_ptr[4]=F4r;
 00060e  f8dda010          LDR      r10,[sp,#0x10]
 000612  fa0ffa8a          SXTH     r10,r10
 000616  f8a0a008          STRH     r10,[r0,#8]
-;;;641    		dct_io_ptr[5]=F5r;
+;;;673    		dct_io_ptr[5]=F5r;
 00061a  f8dda00c          LDR      r10,[sp,#0xc]
 00061e  f8a0a00a          STRH     r10,[r0,#0xa]
-;;;642    		dct_io_ptr[6]=F6r;
+;;;674    		dct_io_ptr[6]=F6r;
 000622  f8dda008          LDR      r10,[sp,#8]
 000626  f8a0a00c          STRH     r10,[r0,#0xc]
-;;;643    		dct_io_ptr[7]=F7r;
+;;;675    		dct_io_ptr[7]=F7r;
 00062a  f8dda004          LDR      r10,[sp,#4]
 00062e  f8a0a00e          STRH     r10,[r0,#0xe]
-;;;644    		dct_io_ptr+=8;
+;;;676    		dct_io_ptr+=8;
 000632  3010              ADDS     r0,r0,#0x10
-000634  1c49              ADDS     r1,r1,#1              ;600
+000634  1c49              ADDS     r1,r1,#1              ;632
                   |L3.1590|
-000636  f8dda0c8          LDR      r10,[sp,#0xc8]        ;600
-00063a  ea4f0aca          LSL      r10,r10,#3            ;600
-00063e  458a              CMP      r10,r1                ;600
+000636  f8dda0c8          LDR      r10,[sp,#0xc8]        ;632
+00063a  ea4f0aca          LSL      r10,r10,#3            ;632
+00063e  458a              CMP      r10,r1                ;632
 000640  f63fae7e          BHI      |L3.832|
-;;;645    	}
-;;;646    	for(i=0;i<64;i++)temp_dct1[i]=dct_data[i];
+;;;677    	}
+;;;678    	for(i=0;i<64;i++)temp_dct1[i]=dct_data[i];
 000644  2100              MOVS     r1,#0
 000646  e008              B        |L3.1626|
                   |L3.1608|
@@ -938,11 +965,11 @@
                   |L3.1626|
 00065a  2940              CMP      r1,#0x40
 00065c  d3f4              BCC      |L3.1608|
-;;;647    	return;
-;;;648    }
+;;;679    	return;
+;;;680    }
 00065e  b033              ADD      sp,sp,#0xcc
 000660  e8bd8ff0          POP      {r4-r11,pc}
-;;;649    
+;;;681    
                           ENDP
 
                   |L3.1636|
@@ -951,92 +978,92 @@
                           AREA ||i.jhuff_encode_one_block||, CODE, READONLY, ALIGN=1
 
                   jhuff_encode_one_block PROC
-;;;768    //huffman编码
-;;;769    void jhuff_encode_one_block(jpeg_compress_info *cinfo,DCTBLOCK src,JHUFF_TBL *dc_tbl,JHUFF_TBL *ac_tbl) 
+;;;800    //huffman编码
+;;;801    void jhuff_encode_one_block(jpeg_compress_info *cinfo,DCTBLOCK src,JHUFF_TBL *dc_tbl,JHUFF_TBL *ac_tbl) 
 000000  e92d4fff          PUSH     {r0-r11,lr}
-;;;770    {
+;;;802    {
 000004  b081              SUB      sp,sp,#4
 000006  460f              MOV      r7,r1
 000008  4692              MOV      r10,r2
 00000a  461c              MOV      r4,r3
-;;;771      	int diff,ssss,rrrr,code;
-;;;772      	int rs,k;  
-;;;773      	//直流分量编码
-;;;774      	diff=src[0];
+;;;803      	int diff,ssss,rrrr,code;
+;;;804      	int rs,k;  
+;;;805      	//直流分量编码
+;;;806      	diff=src[0];
 00000c  f9b78000          LDRSH    r8,[r7,#0]
-;;;775      	ssss=bit_num(diff);
+;;;807      	ssss=bit_num(diff);
 000010  4640              MOV      r0,r8
 000012  f7fffffe          BL       bit_num
 000016  4681              MOV      r9,r0
-;;;776      	jhuff_write_bits(cinfo,dc_tbl->ecode[ssss],dc_tbl->esize[ssss]);
+;;;808      	jhuff_write_bits(cinfo,dc_tbl->ecode[ssss],dc_tbl->esize[ssss]);
 000018  f50a7089          ADD      r0,r10,#0x112
 00001c  f8302019          LDRH     r2,[r0,r9,LSL #1]
 000020  f20a3012          ADD      r0,r10,#0x312
 000024  f8301019          LDRH     r1,[r0,r9,LSL #1]
 000028  9801              LDR      r0,[sp,#4]
 00002a  f7fffffe          BL       jhuff_write_bits
-;;;777      	if (diff<0)diff-=1;
+;;;809      	if (diff<0)diff-=1;
 00002e  f1b80f00          CMP      r8,#0
 000032  da01              BGE      |L4.56|
 000034  f1a80801          SUB      r8,r8,#1
                   |L4.56|
-;;;778      	jhuff_write_bits(cinfo,diff,ssss);  
+;;;810      	jhuff_write_bits(cinfo,diff,ssss);  
 000038  464a              MOV      r2,r9
 00003a  4641              MOV      r1,r8
 00003c  9801              LDR      r0,[sp,#4]
 00003e  f7fffffe          BL       jhuff_write_bits
-;;;779      	//交流分量编码
-;;;780      	rrrr=0;
+;;;811      	//交流分量编码
+;;;812      	rrrr=0;
 000042  2500              MOVS     r5,#0
-;;;781      	for(k=1;k<DCTSIZE2;k++)
+;;;813      	for(k=1;k<DCTSIZE2;k++)
 000044  2601              MOVS     r6,#1
 000046  e032              B        |L4.174|
                   |L4.72|
-;;;782      	{
-;;;783        	if(src[k]==0)
+;;;814      	{
+;;;815        	if(src[k]==0)
 000048  f8370016          LDRH     r0,[r7,r6,LSL #1]
 00004c  b908              CBNZ     r0,|L4.82|
-;;;784    		{
-;;;785          		rrrr++;
+;;;816    		{
+;;;817          		rrrr++;
 00004e  1c6d              ADDS     r5,r5,#1
-;;;786          		continue;
+;;;818          		continue;
 000050  e02c              B        |L4.172|
                   |L4.82|
-;;;787        	}
-;;;788    		else
-;;;789    		{
-;;;790          		while(rrrr>15)//write EHUFSI(0xF0) bits of EHUFCO(0xF0)
+;;;819        	}
+;;;820    		else
+;;;821    		{
+;;;822          		while(rrrr>15)//write EHUFSI(0xF0) bits of EHUFCO(0xF0)
 000052  e007              B        |L4.100|
                   |L4.84|
-;;;791    			{        		 
-;;;792            		jhuff_write_bits(cinfo, ac_tbl->ecode[0xF0], ac_tbl->esize[0xF0]);
+;;;823    			{        		 
+;;;824            		jhuff_write_bits(cinfo, ac_tbl->ecode[0xF0], ac_tbl->esize[0xF0]);
 000054  f8b422f2          LDRH     r2,[r4,#0x2f2]
 000058  f8b414f2          LDRH     r1,[r4,#0x4f2]
 00005c  9801              LDR      r0,[sp,#4]
 00005e  f7fffffe          BL       jhuff_write_bits
-;;;793            		rrrr-=16;
+;;;825            		rrrr-=16;
 000062  3d10              SUBS     r5,r5,#0x10
                   |L4.100|
-000064  2d0f              CMP      r5,#0xf               ;790
+000064  2d0f              CMP      r5,#0xf               ;822
 000066  dcf5              BGT      |L4.84|
-;;;794          		}
-;;;795    			ssss=bit_num(src[k]);
+;;;826          		}
+;;;827    			ssss=bit_num(src[k]);
 000068  f9370016          LDRSH    r0,[r7,r6,LSL #1]
 00006c  f7fffffe          BL       bit_num
 000070  4681              MOV      r9,r0
-;;;796    			rs=((rrrr<<4)|ssss);			
+;;;828    			rs=((rrrr<<4)|ssss);			
 000072  ea491b05          ORR      r11,r9,r5,LSL #4
-;;;797    			jhuff_write_bits(cinfo,ac_tbl->ecode[rs],ac_tbl->esize[rs]);//write EHUFSI(rs) bits of EHUFCO(rs)
+;;;829    			jhuff_write_bits(cinfo,ac_tbl->ecode[rs],ac_tbl->esize[rs]);//write EHUFSI(rs) bits of EHUFCO(rs)
 000076  f5047089          ADD      r0,r4,#0x112
 00007a  f830201b          LDRH     r2,[r0,r11,LSL #1]
 00007e  f2043012          ADD      r0,r4,#0x312
 000082  f830101b          LDRH     r1,[r0,r11,LSL #1]
 000086  9801              LDR      r0,[sp,#4]
 000088  f7fffffe          BL       jhuff_write_bits
-;;;798    			code=src[k];
+;;;830    			code=src[k];
 00008c  f9370016          LDRSH    r0,[r7,r6,LSL #1]
 000090  9000              STR      r0,[sp,#0]
-;;;799    			if(code<0)code-=1;			
+;;;831    			if(code<0)code-=1;			
 000092  9800              LDR      r0,[sp,#0]
 000094  2800              CMP      r0,#0
 000096  da02              BGE      |L4.158|
@@ -1044,55 +1071,55 @@
 00009a  1e40              SUBS     r0,r0,#1
 00009c  9000              STR      r0,[sp,#0]
                   |L4.158|
-;;;800    			jhuff_write_bits(cinfo,code,ssss);//write ssss bits of rs
+;;;832    			jhuff_write_bits(cinfo,code,ssss);//write ssss bits of rs
 00009e  464a              MOV      r2,r9
 0000a0  e9dd1000          LDRD     r1,r0,[sp,#0]
 0000a4  f7fffffe          BL       jhuff_write_bits
-;;;801    			rrrr=0;
+;;;833    			rrrr=0;
 0000a8  2500              MOVS     r5,#0
-0000aa  bf00              NOP                            ;786
+0000aa  bf00              NOP                            ;818
                   |L4.172|
-0000ac  1c76              ADDS     r6,r6,#1              ;781
+0000ac  1c76              ADDS     r6,r6,#1              ;813
                   |L4.174|
-0000ae  2e40              CMP      r6,#0x40              ;781
+0000ae  2e40              CMP      r6,#0x40              ;813
 0000b0  dbca              BLT      |L4.72|
-;;;802    		}
-;;;803    	}
-;;;804      	if(rrrr!=0)jhuff_write_bits(cinfo,ac_tbl->ecode[0x00],ac_tbl->esize[0x00]);//write EOB
+;;;834    		}
+;;;835    	}
+;;;836      	if(rrrr!=0)jhuff_write_bits(cinfo,ac_tbl->ecode[0x00],ac_tbl->esize[0x00]);//write EOB
 0000b2  b135              CBZ      r5,|L4.194|
 0000b4  f8b42112          LDRH     r2,[r4,#0x112]
 0000b8  f8b41312          LDRH     r1,[r4,#0x312]
 0000bc  9801              LDR      r0,[sp,#4]
 0000be  f7fffffe          BL       jhuff_write_bits
                   |L4.194|
-;;;805    }
+;;;837    }
 0000c2  b005              ADD      sp,sp,#0x14
 0000c4  e8bd8ff0          POP      {r4-r11,pc}
-;;;806    //完成缓冲区中剩下数据的压缩编码,并写文件尾到输出文件
+;;;838    //完成缓冲区中剩下数据的压缩编码,并写文件尾到输出文件
                           ENDP
 
 
                           AREA ||i.jhuff_flush_buffer||, CODE, READONLY, ALIGN=2
 
                   jhuff_flush_buffer PROC
-;;;826    //清除/释放缓冲区
-;;;827    void jhuff_flush_buffer(jpeg_compress_info *cinfo) 
+;;;858    //清除/释放缓冲区
+;;;859    void jhuff_flush_buffer(jpeg_compress_info *cinfo) 
 000000  b570              PUSH     {r4-r6,lr}
-;;;828    {
+;;;860    {
 000002  4605              MOV      r5,r0
-;;;829      	int i=3;  
+;;;861      	int i=3;  
 000004  2403              MOVS     r4,#3
-;;;830      	while(bits_in_buffer>8)
+;;;862      	while(bits_in_buffer>8)
 000006  e014              B        |L5.50|
                   |L5.8|
-;;;831    	{
-;;;832    		jutl_write_byte(buffer.c[i],cinfo->output,cinfo  );
+;;;863    	{
+;;;864    		jutl_write_byte(buffer.c[i],cinfo->output,cinfo  );
 000008  4a1d              LDR      r2,|L5.128|
 00000a  5d10              LDRB     r0,[r2,r4]
 00000c  462a              MOV      r2,r5
 00000e  68a9              LDR      r1,[r5,#8]
 000010  f7fffffe          BL       jutl_write_byte
-;;;833    		if(buffer.c[i]==0xFF)jutl_write_byte(0x00,cinfo->output,cinfo  );		
+;;;865    		if(buffer.c[i]==0xFF)jutl_write_byte(0x00,cinfo->output,cinfo  );		
 000014  481a              LDR      r0,|L5.128|
 000016  5d00              LDRB     r0,[r0,r4]
 000018  28ff              CMP      r0,#0xff
@@ -1102,9 +1129,9 @@
 000020  68a9              LDR      r1,[r5,#8]
 000022  f7fffffe          BL       jutl_write_byte
                   |L5.38|
-;;;834    		i--;
+;;;866    		i--;
 000026  1e64              SUBS     r4,r4,#1
-;;;835    		bits_in_buffer-=8;
+;;;867    		bits_in_buffer-=8;
 000028  4816              LDR      r0,|L5.132|
 00002a  6800              LDR      r0,[r0,#0]  ; bits_in_buffer
 00002c  3808              SUBS     r0,r0,#8
@@ -1112,17 +1139,17 @@
 000030  6008              STR      r0,[r1,#0]  ; bits_in_buffer
                   |L5.50|
 000032  4814              LDR      r0,|L5.132|
-000034  6800              LDR      r0,[r0,#0]            ;830  ; bits_in_buffer
-000036  2808              CMP      r0,#8                 ;830
+000034  6800              LDR      r0,[r0,#0]            ;862  ; bits_in_buffer
+000036  2808              CMP      r0,#8                 ;862
 000038  dce6              BGT      |L5.8|
-;;;836    	}
-;;;837    	if(bits_in_buffer>0)
+;;;868    	}
+;;;869    	if(bits_in_buffer>0)
 00003a  4812              LDR      r0,|L5.132|
 00003c  6800              LDR      r0,[r0,#0]  ; bits_in_buffer
 00003e  2800              CMP      r0,#0
 000040  dd17              BLE      |L5.114|
-;;;838    	{
-;;;839    		buffer.c[i]|=((u8)(0xFF)>>bits_in_buffer);
+;;;870    	{
+;;;871    		buffer.c[i]|=((u8)(0xFF)>>bits_in_buffer);
 000042  480f              LDR      r0,|L5.128|
 000044  5d00              LDRB     r0,[r0,r4]
 000046  490f              LDR      r1,|L5.132|
@@ -1132,13 +1159,13 @@
 00004e  4308              ORRS     r0,r0,r1
 000050  490b              LDR      r1,|L5.128|
 000052  5508              STRB     r0,[r1,r4]
-;;;840    		jutl_write_byte(buffer.c[i],cinfo->output,cinfo  );
+;;;872    		jutl_write_byte(buffer.c[i],cinfo->output,cinfo  );
 000054  4a0a              LDR      r2,|L5.128|
 000056  5d10              LDRB     r0,[r2,r4]
 000058  462a              MOV      r2,r5
 00005a  68a9              LDR      r1,[r5,#8]
 00005c  f7fffffe          BL       jutl_write_byte
-;;;841    		if(buffer.c[i]==0xFF)jutl_write_byte(0x00,cinfo->output,cinfo  );		
+;;;873    		if(buffer.c[i]==0xFF)jutl_write_byte(0x00,cinfo->output,cinfo  );		
 000060  4807              LDR      r0,|L5.128|
 000062  5d00              LDRB     r0,[r0,r4]
 000064  28ff              CMP      r0,#0xff
@@ -1148,17 +1175,17 @@
 00006c  68a9              LDR      r1,[r5,#8]
 00006e  f7fffffe          BL       jutl_write_byte
                   |L5.114|
-;;;842    	}
-;;;843    	buffer.all=0;
+;;;874    	}
+;;;875    	buffer.all=0;
 000072  2000              MOVS     r0,#0
 000074  4902              LDR      r1,|L5.128|
 000076  6008              STR      r0,[r1,#0]  ; buffer
-;;;844    	bits_in_buffer=0;
+;;;876    	bits_in_buffer=0;
 000078  4902              LDR      r1,|L5.132|
 00007a  6008              STR      r0,[r1,#0]  ; bits_in_buffer
-;;;845    }
+;;;877    }
 00007c  bd70              POP      {r4-r6,pc}
-;;;846    
+;;;878    
                           ENDP
 
 00007e  0000              DCW      0x0000
@@ -1170,22 +1197,22 @@
                           AREA ||i.jhuff_write_bits||, CODE, READONLY, ALIGN=2
 
                   jhuff_write_bits PROC
-;;;855    //写比特
-;;;856    void jhuff_write_bits(jpeg_compress_info *cinfo,u32 data,int len) 
+;;;887    //写比特
+;;;888    void jhuff_write_bits(jpeg_compress_info *cinfo,u32 data,int len) 
 000000  e92d41f0          PUSH     {r4-r8,lr}
-;;;857    {
+;;;889    {
 000004  4604              MOV      r4,r0
 000006  460f              MOV      r7,r1
 000008  4615              MOV      r5,r2
-;;;858      	u32 tdata; 
-;;;859    	while(len>0)
+;;;890      	u32 tdata; 
+;;;891    	while(len>0)
 00000a  e035              B        |L6.120|
                   |L6.12|
-;;;860    	{
-;;;861    		tdata=(data<<(32-len));
+;;;892    	{
+;;;893    		tdata=(data<<(32-len));
 00000c  f1c50020          RSB      r0,r5,#0x20
 000010  fa07f800          LSL      r8,r7,r0
-;;;862    		buffer.all|=((tdata>>bits_in_buffer));
+;;;894    		buffer.all|=((tdata>>bits_in_buffer));
 000014  481a              LDR      r0,|L6.128|
 000016  6800              LDR      r0,[r0,#0]  ; buffer
 000018  491a              LDR      r1,|L6.132|
@@ -1194,70 +1221,70 @@
 000020  4308              ORRS     r0,r0,r1
 000022  4917              LDR      r1,|L6.128|
 000024  6008              STR      r0,[r1,#0]  ; buffer
-;;;863    		bits_in_buffer+=len;		
+;;;895    		bits_in_buffer+=len;		
 000026  4817              LDR      r0,|L6.132|
 000028  6800              LDR      r0,[r0,#0]  ; bits_in_buffer
 00002a  4428              ADD      r0,r0,r5
 00002c  4915              LDR      r1,|L6.132|
 00002e  6008              STR      r0,[r1,#0]  ; bits_in_buffer
-;;;864    		if(bits_in_buffer>=32)//输出缓冲
+;;;896    		if(bits_in_buffer>=32)//输出缓冲
 000030  4608              MOV      r0,r1
 000032  6800              LDR      r0,[r0,#0]  ; bits_in_buffer
 000034  2820              CMP      r0,#0x20
 000036  db1e              BLT      |L6.118|
-;;;865    		{
-;;;866    			int i;			
-;;;867    			for(i=3;i>=0;i--)//必需为大端模式
+;;;897    		{
+;;;898    			int i;			
+;;;899    			for(i=3;i>=0;i--)//必需为大端模式
 000038  2603              MOVS     r6,#3
 00003a  e00f              B        |L6.92|
                   |L6.60|
-;;;868    			{
-;;;869    				jutl_write_byte(buffer.c[i],cinfo->output,cinfo  );
+;;;900    			{
+;;;901    				jutl_write_byte(buffer.c[i],cinfo->output,cinfo  );
 00003c  4a10              LDR      r2,|L6.128|
 00003e  5d90              LDRB     r0,[r2,r6]
 000040  4622              MOV      r2,r4
 000042  68a1              LDR      r1,[r4,#8]
 000044  f7fffffe          BL       jutl_write_byte
-;;;870    				if(buffer.c[i]==0xFF)
+;;;902    				if(buffer.c[i]==0xFF)
 000048  480d              LDR      r0,|L6.128|
 00004a  5d80              LDRB     r0,[r0,r6]
 00004c  28ff              CMP      r0,#0xff
 00004e  d104              BNE      |L6.90|
-;;;871    				jutl_write_byte(0x00,cinfo->output,cinfo  );
+;;;903    				jutl_write_byte(0x00,cinfo->output,cinfo  );
 000050  4622              MOV      r2,r4
 000052  2000              MOVS     r0,#0
 000054  68a1              LDR      r1,[r4,#8]
 000056  f7fffffe          BL       jutl_write_byte
                   |L6.90|
-00005a  1e76              SUBS     r6,r6,#1              ;867
+00005a  1e76              SUBS     r6,r6,#1              ;899
                   |L6.92|
-00005c  2e00              CMP      r6,#0                 ;867
+00005c  2e00              CMP      r6,#0                 ;899
 00005e  daed              BGE      |L6.60|
-;;;872    			}
-;;;873    			buffer.all=0;
+;;;904    			}
+;;;905    			buffer.all=0;
 000060  2000              MOVS     r0,#0
 000062  4907              LDR      r1,|L6.128|
 000064  6008              STR      r0,[r1,#0]  ; buffer
-;;;874    			len=bits_in_buffer-32;
+;;;906    			len=bits_in_buffer-32;
 000066  4807              LDR      r0,|L6.132|
 000068  6800              LDR      r0,[r0,#0]  ; bits_in_buffer
 00006a  f1a00520          SUB      r5,r0,#0x20
-;;;875    			bits_in_buffer=0;
+;;;907    			bits_in_buffer=0;
 00006e  2000              MOVS     r0,#0
 000070  4904              LDR      r1,|L6.132|
 000072  6008              STR      r0,[r1,#0]  ; bits_in_buffer
-;;;876    		}
+;;;908    		}
 000074  e000              B        |L6.120|
                   |L6.118|
-;;;877    		else len=0;
+;;;909    		else len=0;
 000076  2500              MOVS     r5,#0
                   |L6.120|
-000078  2d00              CMP      r5,#0                 ;859
+000078  2d00              CMP      r5,#0                 ;891
 00007a  dcc7              BGT      |L6.12|
-;;;878    	}
-;;;879    }
+;;;910    	}
+;;;911    }
 00007c  e8bd81f0          POP      {r4-r8,pc}
-;;;880    
+;;;912    
                           ENDP
 
                   |L6.128|
@@ -1268,86 +1295,86 @@
                           AREA ||i.jint_add_huff_table||, CODE, READONLY, ALIGN=2
 
                   jint_add_huff_table PROC
-;;;160    //添加huffman表
-;;;161    void jint_add_huff_table(jpeg_compress_info *cinfo,u16 which_tbl,int what_tbl,const u8 *bits,const u8 *value) 
+;;;192    //添加huffman表
+;;;193    void jint_add_huff_table(jpeg_compress_info *cinfo,u16 which_tbl,int what_tbl,const u8 *bits,const u8 *value) 
 000000  e92d5ff0          PUSH     {r4-r12,lr}
-;;;162    {
+;;;194    {
 000004  4681              MOV      r9,r0
 000006  460c              MOV      r4,r1
 000008  4616              MOV      r6,r2
 00000a  469a              MOV      r10,r3
 00000c  f8ddb028          LDR      r11,[sp,#0x28]
-;;;163      	JHUFF_TBL **hpp;
-;;;164      	int nsymbols,len; 
-;;;165      	if(which_tbl>NUM_HUFF_TBLS)return;
+;;;195      	JHUFF_TBL **hpp;
+;;;196      	int nsymbols,len; 
+;;;197      	if(which_tbl>NUM_HUFF_TBLS)return;
 000010  2c02              CMP      r4,#2
 000012  dd01              BLE      |L7.24|
                   |L7.20|
-;;;166      	if(what_tbl==0)//直流分量表
-;;;167        hpp=cinfo->dc_huff_table;
-;;;168      	else if(what_tbl==1)hpp=cinfo->ac_huff_table;//交流分量表
-;;;169      	else return ;
-;;;170    	  hpp[which_tbl]=&JHUFF_TBL_4[which_tbl*2+what_tbl];
-;;;171    	  memcpy(hpp[which_tbl]->bits,bits,sizeof(hpp[which_tbl]->bits));	  
-;;;172      	nsymbols=0;//计算huffval中标志的数量
-;;;173    	  for(len=1;len<=16;len++)nsymbols+=bits[len];
-;;;174      	memcpy(hpp[which_tbl]->huffval,value,nsymbols*sizeof(u8));//set huffval  
-;;;175      	//计算并设置huffman表&表长
-;;;176      	memset(hpp[which_tbl]->ecode,0,sizeof(hpp[which_tbl]->ecode));
-;;;177      	memset(hpp[which_tbl]->esize,0,sizeof(hpp[which_tbl]->esize));
-;;;178      	jint_calc_huff_tbl(hpp[which_tbl]);
-;;;179    }
+;;;198      	if(what_tbl==0)//直流分量表
+;;;199        hpp=cinfo->dc_huff_table;
+;;;200      	else if(what_tbl==1)hpp=cinfo->ac_huff_table;//交流分量表
+;;;201      	else return ;
+;;;202    	hpp[which_tbl]=&JHUFF_TBL_4[which_tbl*2+what_tbl];
+;;;203    	memcpy(hpp[which_tbl]->bits,bits,sizeof(hpp[which_tbl]->bits));	  
+;;;204      	nsymbols=0;//计算huffval中标志的数量
+;;;205    	for(len=1;len<=16;len++)nsymbols+=bits[len];
+;;;206      	memcpy(hpp[which_tbl]->huffval,value,nsymbols*sizeof(u8));//set huffval  
+;;;207      	//计算并设置huffman表&表长
+;;;208      	memset(hpp[which_tbl]->ecode,0,sizeof(hpp[which_tbl]->ecode));
+;;;209      	memset(hpp[which_tbl]->esize,0,sizeof(hpp[which_tbl]->esize));
+;;;210      	jint_calc_huff_tbl(hpp[which_tbl]);
+;;;211    }
 000014  e8bd9ff0          POP      {r4-r12,pc}
                   |L7.24|
 000018  b916              CBNZ     r6,|L7.32|
-00001a  f10905cc          ADD      r5,r9,#0xcc           ;167
+00001a  f10905cc          ADD      r5,r9,#0xcc           ;199
 00001e  e005              B        |L7.44|
                   |L7.32|
-000020  2e01              CMP      r6,#1                 ;168
+000020  2e01              CMP      r6,#1                 ;200
 000022  d102              BNE      |L7.42|
-000024  f10905d4          ADD      r5,r9,#0xd4           ;168
+000024  f10905d4          ADD      r5,r9,#0xd4           ;200
 000028  e000              B        |L7.44|
                   |L7.42|
 00002a  e7f3              B        |L7.20|
                   |L7.44|
-00002c  eb060044          ADD      r0,r6,r4,LSL #1       ;170
-000030  f2402189          MOV      r1,#0x289             ;170
-000034  4348              MULS     r0,r1,r0              ;170
+00002c  eb060044          ADD      r0,r6,r4,LSL #1       ;202
+000030  f2402189          MOV      r1,#0x289             ;202
+000034  4348              MULS     r0,r1,r0              ;202
 000036  491a              LDR      r1,|L7.160|
-000038  eb010040          ADD      r0,r1,r0,LSL #1       ;170
-00003c  f8450024          STR      r0,[r5,r4,LSL #2]     ;170
-000040  f8550024          LDR      r0,[r5,r4,LSL #2]     ;171
-000044  2211              MOVS     r2,#0x11              ;171
-000046  4651              MOV      r1,r10                ;171
+000038  eb010040          ADD      r0,r1,r0,LSL #1       ;202
+00003c  f8450024          STR      r0,[r5,r4,LSL #2]     ;202
+000040  f8550024          LDR      r0,[r5,r4,LSL #2]     ;203
+000044  2211              MOVS     r2,#0x11              ;203
+000046  4651              MOV      r1,r10                ;203
 000048  f7fffffe          BL       __aeabi_memcpy
-00004c  2700              MOVS     r7,#0                 ;172
-00004e  f04f0801          MOV      r8,#1                 ;173
+00004c  2700              MOVS     r7,#0                 ;204
+00004e  f04f0801          MOV      r8,#1                 ;205
 000052  e004              B        |L7.94|
                   |L7.84|
-000054  f81a0008          LDRB     r0,[r10,r8]           ;173
-000058  4407              ADD      r7,r7,r0              ;173
-00005a  f1080801          ADD      r8,r8,#1              ;173
+000054  f81a0008          LDRB     r0,[r10,r8]           ;205
+000058  4407              ADD      r7,r7,r0              ;205
+00005a  f1080801          ADD      r8,r8,#1              ;205
                   |L7.94|
-00005e  f1b80f10          CMP      r8,#0x10              ;173
+00005e  f1b80f10          CMP      r8,#0x10              ;205
 000062  ddf7              BLE      |L7.84|
-000064  463a              MOV      r2,r7                 ;174
-000066  f8551024          LDR      r1,[r5,r4,LSL #2]     ;174
-00006a  f1010011          ADD      r0,r1,#0x11           ;174
-00006e  4659              MOV      r1,r11                ;174
+000064  463a              MOV      r2,r7                 ;206
+000066  f8551024          LDR      r1,[r5,r4,LSL #2]     ;206
+00006a  f1010011          ADD      r0,r1,#0x11           ;206
+00006e  4659              MOV      r1,r11                ;206
 000070  f7fffffe          BL       __aeabi_memcpy
-000074  f8551024          LDR      r1,[r5,r4,LSL #2]     ;176
-000078  f2013012          ADD      r0,r1,#0x312          ;176
-00007c  f44f7100          MOV      r1,#0x200             ;176
+000074  f8551024          LDR      r1,[r5,r4,LSL #2]     ;208
+000078  f2013012          ADD      r0,r1,#0x312          ;208
+00007c  f44f7100          MOV      r1,#0x200             ;208
 000080  f7fffffe          BL       __aeabi_memclr
-000084  f8551024          LDR      r1,[r5,r4,LSL #2]     ;177
-000088  f5017089          ADD      r0,r1,#0x112          ;177
-00008c  f44f7100          MOV      r1,#0x200             ;177
+000084  f8551024          LDR      r1,[r5,r4,LSL #2]     ;209
+000088  f5017089          ADD      r0,r1,#0x112          ;209
+00008c  f44f7100          MOV      r1,#0x200             ;209
 000090  f7fffffe          BL       __aeabi_memclr
-000094  f8550024          LDR      r0,[r5,r4,LSL #2]     ;178
+000094  f8550024          LDR      r0,[r5,r4,LSL #2]     ;210
 000098  f7fffffe          BL       jint_calc_huff_tbl
 00009c  bf00              NOP      
 00009e  e7b9              B        |L7.20|
-;;;180    //生成huffman表
+;;;212    //生成huffman表
                           ENDP
 
                   |L7.160|
@@ -1356,24 +1383,24 @@
                           AREA ||i.jint_add_quant_table||, CODE, READONLY, ALIGN=2
 
                   jint_add_quant_table PROC
-;;;133    //添加量化表
-;;;134    void jint_add_quant_table(jpeg_compress_info *cinfo,u16 which_tbl,const u16 *base_tbl,float quality) 
+;;;165    //添加量化表
+;;;166    void jint_add_quant_table(jpeg_compress_info *cinfo,u16 which_tbl,const u16 *base_tbl,float quality) 
 000000  e92d5fff          PUSH     {r0-r12,lr}
-;;;135    {
+;;;167    {
 000004  4606              MOV      r6,r0
 000006  460c              MOV      r4,r1
 000008  4691              MOV      r9,r2
 00000a  469a              MOV      r10,r3
-;;;136      	int i;
-;;;137      	DCTVAL *qtblptr;
-;;;138      	cinfo->quant_table[which_tbl]=&JQUANT_TBL_2[which_tbl];
+;;;168      	int i;
+;;;169      	DCTVAL *qtblptr;
+;;;170      	cinfo->quant_table[which_tbl]=&JQUANT_TBL_2[which_tbl];
 00000c  4814              LDR      r0,|L8.96|
 00000e  eb0011c4          ADD      r1,r0,r4,LSL #7
 000012  f10600dc          ADD      r0,r6,#0xdc
 000016  f8401024          STR      r1,[r0,r4,LSL #2]
-;;;139      	qtblptr=cinfo->quant_table[which_tbl]->quantval;
+;;;171      	qtblptr=cinfo->quant_table[which_tbl]->quantval;
 00001a  f850b024          LDR      r11,[r0,r4,LSL #2]
-;;;140      	for(i=0;i<DCTSIZE2;i++)qtblptr[i]=(short)(base_tbl[i]*quality+0.5);
+;;;172      	for(i=0;i<DCTSIZE2;i++)qtblptr[i]=(short)(base_tbl[i]*quality+0.5);
 00001e  2500              MOVS     r5,#0
 000020  e017              B        |L8.82|
                   |L8.34|
@@ -1396,12 +1423,12 @@
                   |L8.82|
 000052  2d40              CMP      r5,#0x40
 000054  dbe5              BLT      |L8.34|
-;;;141      	jutl_zigzag_sort(qtblptr);
+;;;173      	jutl_zigzag_sort(qtblptr);
 000056  4658              MOV      r0,r11
 000058  f7fffffe          BL       jutl_zigzag_sort
-;;;142    }
+;;;174    }
 00005c  e8bd9fff          POP      {r0-r12,pc}
-;;;143    //Z形排序
+;;;175    //Z形排序
                           ENDP
 
                   |L8.96|
@@ -1412,101 +1439,101 @@
                           AREA ||i.jint_calc_huff_tbl||, CODE, READONLY, ALIGN=2
 
                   jint_calc_huff_tbl PROC
-;;;182    static u16 gtmp_hcode[256];
-;;;183    void jint_calc_huff_tbl(JHUFF_TBL *htblptr)
+;;;214    static u16 gtmp_hcode[256];
+;;;215    void jint_calc_huff_tbl(JHUFF_TBL *htblptr)
 000000  b5f0              PUSH     {r4-r7,lr}
-;;;184    {
+;;;216    {
 000002  4602              MOV      r2,r0
-;;;185      	int i,j,k,lastk,code,si;    	
-;;;186      	k=0;//生成EHUFFSI表
+;;;217      	int i,j,k,lastk,code,si;    	
+;;;218      	k=0;//生成EHUFFSI表
 000004  2000              MOVS     r0,#0
-;;;187      	for(i=1;i<=16;i++)
+;;;219      	for(i=1;i<=16;i++)
 000006  2101              MOVS     r1,#1
 000008  e00b              B        |L9.34|
                   |L9.10|
-;;;188    	{
-;;;189        	for (j=1; j<=htblptr->bits[i];j++)
+;;;220    	{
+;;;221        	for (j=1; j<=htblptr->bits[i];j++)
 00000a  2601              MOVS     r6,#1
 00000c  e005              B        |L9.26|
                   |L9.14|
-;;;190    		{
-;;;191          		gtmp_hsize[k]=i;
+;;;222    		{
+;;;223          		gtmp_hsize[k]=i;
 00000e  f8dfc09c          LDR      r12,|L9.172|
 000012  f82c1010          STRH     r1,[r12,r0,LSL #1]
-;;;192          		k++;
+;;;224          		k++;
 000016  1c40              ADDS     r0,r0,#1
-000018  1c76              ADDS     r6,r6,#1              ;189
+000018  1c76              ADDS     r6,r6,#1              ;221
                   |L9.26|
-00001a  5c57              LDRB     r7,[r2,r1]            ;189
-00001c  42b7              CMP      r7,r6                 ;189
+00001a  5c57              LDRB     r7,[r2,r1]            ;221
+00001c  42b7              CMP      r7,r6                 ;221
 00001e  daf6              BGE      |L9.14|
-000020  1c49              ADDS     r1,r1,#1              ;187
+000020  1c49              ADDS     r1,r1,#1              ;219
                   |L9.34|
-000022  2910              CMP      r1,#0x10              ;187
+000022  2910              CMP      r1,#0x10              ;219
 000024  ddf1              BLE      |L9.10|
-;;;193        	}
-;;;194      	}
-;;;195      	gtmp_hsize[k]=0;
+;;;225        	}
+;;;226      	}
+;;;227      	gtmp_hsize[k]=0;
 000026  2700              MOVS     r7,#0
 000028  f8dfc080          LDR      r12,|L9.172|
 00002c  f82c7010          STRH     r7,[r12,r0,LSL #1]
-;;;196      	lastk=k;    	
+;;;228      	lastk=k;    	
 000030  4605              MOV      r5,r0
-;;;197      	k=0;//生成EHUFFCO表
+;;;229      	k=0;//生成EHUFFCO表
 000032  2000              MOVS     r0,#0
-;;;198      	code=0;
+;;;230      	code=0;
 000034  2300              MOVS     r3,#0
-;;;199      	si=gtmp_hsize[0];
+;;;231      	si=gtmp_hsize[0];
 000036  4667              MOV      r7,r12
 000038  883c              LDRH     r4,[r7,#0]  ; gtmp_hsize
-;;;200      	while(1)
+;;;232      	while(1)
 00003a  e01e              B        |L9.122|
                   |L9.60|
-;;;201    	{
-;;;202        	while(1)
+;;;233    	{
+;;;234        	while(1)
 00003c  e00b              B        |L9.86|
                   |L9.62|
-;;;203    		{
-;;;204          		gtmp_hcode[k]=code;
+;;;235    		{
+;;;236          		gtmp_hcode[k]=code;
 00003e  f8dfc070          LDR      r12,|L9.176|
 000042  f82c3010          STRH     r3,[r12,r0,LSL #1]
-;;;205          		code++;
+;;;237          		code++;
 000046  1c5b              ADDS     r3,r3,#1
-;;;206          		k++;
+;;;238          		k++;
 000048  1c40              ADDS     r0,r0,#1
-;;;207          		if(gtmp_hsize[k]!=si)
+;;;239          		if(gtmp_hsize[k]!=si)
 00004a  4f18              LDR      r7,|L9.172|
 00004c  f8377010          LDRH     r7,[r7,r0,LSL #1]
 000050  42a7              CMP      r7,r4
 000052  d000              BEQ      |L9.86|
-;;;208            	break;
+;;;240            	break;
 000054  e000              B        |L9.88|
                   |L9.86|
 000056  e7f2              B        |L9.62|
                   |L9.88|
 000058  bf00              NOP      
-;;;209        	}
-;;;210        	if(gtmp_hsize[k]==0)
+;;;241        	}
+;;;242        	if(gtmp_hsize[k]==0)
 00005a  4f14              LDR      r7,|L9.172|
 00005c  f8377010          LDRH     r7,[r7,r0,LSL #1]
 000060  b907              CBNZ     r7,|L9.100|
-;;;211          	break;
+;;;243          	break;
 000062  e00b              B        |L9.124|
                   |L9.100|
-;;;212        	while(1)
+;;;244        	while(1)
 000064  e007              B        |L9.118|
                   |L9.102|
-;;;213    		{
-;;;214          		code=code<<1;
+;;;245    		{
+;;;246          		code=code<<1;
 000066  005b              LSLS     r3,r3,#1
-;;;215          		si++;
+;;;247          		si++;
 000068  1c64              ADDS     r4,r4,#1
-;;;216          		if(gtmp_hsize[k]==si)
+;;;248          		if(gtmp_hsize[k]==si)
 00006a  4f10              LDR      r7,|L9.172|
 00006c  f8377010          LDRH     r7,[r7,r0,LSL #1]
 000070  42a7              CMP      r7,r4
 000072  d100              BNE      |L9.118|
-;;;217            	break;
+;;;249            	break;
 000074  e000              B        |L9.120|
                   |L9.118|
 000076  e7f6              B        |L9.102|
@@ -1515,35 +1542,35 @@
                   |L9.122|
 00007a  e7df              B        |L9.60|
                   |L9.124|
-00007c  bf00              NOP                            ;211
-;;;218        	}
-;;;219      	}
-;;;220       	k=0;//指令代码
+00007c  bf00              NOP                            ;243
+;;;250        	}
+;;;251      	}
+;;;252       	k=0;//指令代码
 00007e  2000              MOVS     r0,#0
-;;;221      	do{
+;;;253      	do{
 000080  bf00              NOP      
                   |L9.130|
-;;;222        	i=htblptr->huffval[k];
+;;;254        	i=htblptr->huffval[k];
 000082  f1020711          ADD      r7,r2,#0x11
 000086  5c39              LDRB     r1,[r7,r0]
-;;;223        	htblptr->ecode[i]=gtmp_hcode[k];
+;;;255        	htblptr->ecode[i]=gtmp_hcode[k];
 000088  4f09              LDR      r7,|L9.176|
 00008a  f837c010          LDRH     r12,[r7,r0,LSL #1]
 00008e  f2023712          ADD      r7,r2,#0x312
 000092  f827c011          STRH     r12,[r7,r1,LSL #1]
-;;;224        	htblptr->esize[i]=gtmp_hsize[k];
+;;;256        	htblptr->esize[i]=gtmp_hsize[k];
 000096  4f05              LDR      r7,|L9.172|
 000098  f837c010          LDRH     r12,[r7,r0,LSL #1]
 00009c  f5027789          ADD      r7,r2,#0x112
 0000a0  f827c011          STRH     r12,[r7,r1,LSL #1]
-;;;225        	k++;
+;;;257        	k++;
 0000a4  1c40              ADDS     r0,r0,#1
-;;;226      	}while(k<lastk);
+;;;258      	}while(k<lastk);
 0000a6  42a8              CMP      r0,r5
 0000a8  dbeb              BLT      |L9.130|
-;;;227    }
+;;;259    }
 0000aa  bdf0              POP      {r4-r7,pc}
-;;;228    //计算出一些有用的值并分配到缓冲区中
+;;;260    //计算出一些有用的值并分配到缓冲区中
                           ENDP
 
                   |L9.172|
@@ -1554,34 +1581,34 @@
                           AREA ||i.jint_process_mcu||, CODE, READONLY, ALIGN=2
 
                   jint_process_mcu PROC
-;;;504    extern volatile int temp_dct1[64];
-;;;505    void jint_process_mcu(jpeg_compress_info *cinfo) 
+;;;536    extern volatile int temp_dct1[64];
+;;;537    void jint_process_mcu(jpeg_compress_info *cinfo) 
 000000  e92d4ff0          PUSH     {r4-r11,lr}
-;;;506    {
+;;;538    {
 000004  b08b              SUB      sp,sp,#0x2c
 000006  4605              MOV      r5,r0
-;;;507      //处理每个颜色元件
-;;;508      	int cn,tn;
-;;;509      	for(cn=0;cn<cinfo->num_comp;cn++) 
+;;;539      //处理每个颜色元件
+;;;540      	int cn,tn;
+;;;541      	for(cn=0;cn<cinfo->num_comp;cn++) 
 000008  f04f0900          MOV      r9,#0
 00000c  e097              B        |L10.318|
                   |L10.14|
-;;;510      	{
-;;;511        //元件中使用到的变量
-;;;512        	DCTBLOCK   *dct_table=cinfo->comp[cn].dct_table;
+;;;542      	{
+;;;543        //元件中使用到的变量
+;;;544        	DCTBLOCK   *dct_table=cinfo->comp[cn].dct_table;
 00000e  eb0901c9          ADD      r1,r9,r9,LSL #3
 000012  f105001c          ADD      r0,r5,#0x1c
 000016  eb000081          ADD      r0,r0,r1,LSL #2
 00001a  69c0              LDR      r0,[r0,#0x1c]
 00001c  9009              STR      r0,[sp,#0x24]
-;;;513        	JQUANT_TBL *quant_table=cinfo->quant_table[cinfo->comp[cn].quant_tbl_no];
+;;;545        	JQUANT_TBL *quant_table=cinfo->quant_table[cinfo->comp[cn].quant_tbl_no];
 00001e  eb0901c9          ADD      r1,r9,r9,LSL #3
 000022  f105001c          ADD      r0,r5,#0x1c
 000026  eb000081          ADD      r0,r0,r1,LSL #2
 00002a  68c1              LDR      r1,[r0,#0xc]
 00002c  f10500dc          ADD      r0,r5,#0xdc
 000030  f850b021          LDR      r11,[r0,r1,LSL #2]
-;;;514        	JHUFF_TBL  *dc_table=cinfo->dc_huff_table[cinfo->comp[cn].dc_tbl_no];
+;;;546        	JHUFF_TBL  *dc_table=cinfo->dc_huff_table[cinfo->comp[cn].dc_tbl_no];
 000034  eb0901c9          ADD      r1,r9,r9,LSL #3
 000038  38c0              SUBS     r0,r0,#0xc0
 00003a  eb000081          ADD      r0,r0,r1,LSL #2
@@ -1589,7 +1616,7 @@
 000040  f10500cc          ADD      r0,r5,#0xcc
 000044  f8500021          LDR      r0,[r0,r1,LSL #2]
 000048  9008              STR      r0,[sp,#0x20]
-;;;515        	JHUFF_TBL  *ac_table=cinfo->ac_huff_table[cinfo->comp[cn].ac_tbl_no];    
+;;;547        	JHUFF_TBL  *ac_table=cinfo->ac_huff_table[cinfo->comp[cn].ac_tbl_no];    
 00004a  eb0901c9          ADD      r1,r9,r9,LSL #3
 00004e  f105001c          ADD      r0,r5,#0x1c
 000052  eb000081          ADD      r0,r0,r1,LSL #2
@@ -1597,20 +1624,20 @@
 000058  f10500d4          ADD      r0,r5,#0xd4
 00005c  f8500021          LDR      r0,[r0,r1,LSL #2]
 000060  9007              STR      r0,[sp,#0x1c]
-;;;516        	//处理每个DCT表--'Block'    
-;;;517        	for(tn=0;tn<cinfo->comp[cn].num_dct_table;tn++) 
+;;;548        	//处理每个DCT表--'Block'    
+;;;549        	for(tn=0;tn<cinfo->comp[cn].num_dct_table;tn++) 
 000062  f04f0a00          MOV      r10,#0
 000066  e05f              B        |L10.296|
                   |L10.104|
-;;;518        	{
-;;;519          		DCTVAL tmp=0;
+;;;550        	{
+;;;551          		DCTVAL tmp=0;
 000068  2000              MOVS     r0,#0
 00006a  9006              STR      r0,[sp,#0x18]
-;;;520          		DCTVAL *val=dct_table[tn];
+;;;552          		DCTVAL *val=dct_table[tn];
 00006c  9809              LDR      r0,[sp,#0x24]
 00006e  eb0016ca          ADD      r6,r0,r10,LSL #7
-;;;521          		int i;         		
-;;;522          		for(i=0;i<DCTSIZE2;i++)val[i]-=128;//Forward-DCT的数据偏移       	      
+;;;553          		int i;         		
+;;;554          		for(i=0;i<DCTSIZE2;i++)val[i]-=128;//Forward-DCT的数据偏移       	      
 000072  2400              MOVS     r4,#0
 000074  e006              B        |L10.132|
                   |L10.118|
@@ -1622,7 +1649,7 @@
                   |L10.132|
 000084  2c40              CMP      r4,#0x40
 000086  dbf6              BLT      |L10.118|
-;;;523          		for(i=0;i<64;i++)temp_dct1[i]=val[i];//Forward-DCT计算     
+;;;555          		for(i=0;i<64;i++)temp_dct1[i]=val[i];//Forward-DCT计算     
 000088  2400              MOVS     r4,#0
 00008a  e005              B        |L10.152|
                   |L10.140|
@@ -1633,15 +1660,15 @@
                   |L10.152|
 000098  2c40              CMP      r4,#0x40
 00009a  dbf7              BLT      |L10.140|
-;;;524          		dsp_fdct_8x8((short *)val,1);     		
+;;;556          		dsp_fdct_8x8((short *)val,1);     		
 00009c  2101              MOVS     r1,#1
 00009e  4630              MOV      r0,r6
 0000a0  f7fffffe          BL       dsp_fdct_8x8
-;;;525          		jutl_zigzag_sort((short*)val);//Z变换
+;;;557          		jutl_zigzag_sort((short*)val);//Z变换
 0000a4  4630              MOV      r0,r6
 0000a6  f7fffffe          BL       jutl_zigzag_sort
-;;;526          		//量化表 
-;;;527          		for(i=0;i<DCTSIZE2;i++)val[i]=(DCTVAL)((float)val[i]/(float)quant_table->quantval[i]+0.5);     
+;;;558          		//量化表 
+;;;559          		for(i=0;i<DCTSIZE2;i++)val[i]=(DCTVAL)((float)val[i]/(float)quant_table->quantval[i]+0.5);     
 0000aa  2400              MOVS     r4,#0
 0000ac  e01c              B        |L10.232|
                   |L10.174|
@@ -1667,11 +1694,11 @@
                   |L10.232|
 0000e8  2c40              CMP      r4,#0x40
 0000ea  dbe0              BLT      |L10.174|
-;;;528          		//不同编码的计算
-;;;529          		tmp=val[0];
+;;;560          		//不同编码的计算
+;;;561          		tmp=val[0];
 0000ec  f9b60000          LDRSH    r0,[r6,#0]
 0000f0  9006              STR      r0,[sp,#0x18]
-;;;530          		val[0]-=cinfo->comp[cn].preval;
+;;;562          		val[0]-=cinfo->comp[cn].preval;
 0000f2  8831              LDRH     r1,[r6,#0]
 0000f4  eb0902c9          ADD      r2,r9,r9,LSL #3
 0000f8  f105001c          ADD      r0,r5,#0x1c
@@ -1680,36 +1707,36 @@
 000102  1a08              SUBS     r0,r1,r0
 000104  b200              SXTH     r0,r0
 000106  8030              STRH     r0,[r6,#0]
-;;;531          		cinfo->comp[cn].preval=tmp;           		
+;;;563          		cinfo->comp[cn].preval=tmp;           		
 000108  eb0902c9          ADD      r2,r9,r9,LSL #3
 00010c  f105011c          ADD      r1,r5,#0x1c
 000110  eb010182          ADD      r1,r1,r2,LSL #2
 000114  9806              LDR      r0,[sp,#0x18]
 000116  8408              STRH     r0,[r1,#0x20]
-;;;532          		jhuff_encode_one_block(cinfo, val, dc_table, ac_table);//Huffman
+;;;564          		jhuff_encode_one_block(cinfo, val, dc_table, ac_table);//Huffman
 000118  4631              MOV      r1,r6
 00011a  4628              MOV      r0,r5
 00011c  e9dd3207          LDRD     r3,r2,[sp,#0x1c]
 000120  f7fffffe          BL       jhuff_encode_one_block
-000124  f10a0a01          ADD      r10,r10,#1            ;517
+000124  f10a0a01          ADD      r10,r10,#1            ;549
                   |L10.296|
-000128  eb0901c9          ADD      r1,r9,r9,LSL #3       ;517
-00012c  f105001c          ADD      r0,r5,#0x1c           ;517
-000130  eb000081          ADD      r0,r0,r1,LSL #2       ;517
-000134  6980              LDR      r0,[r0,#0x18]         ;517
-000136  4550              CMP      r0,r10                ;517
+000128  eb0901c9          ADD      r1,r9,r9,LSL #3       ;549
+00012c  f105001c          ADD      r0,r5,#0x1c           ;549
+000130  eb000081          ADD      r0,r0,r1,LSL #2       ;549
+000134  6980              LDR      r0,[r0,#0x18]         ;549
+000136  4550              CMP      r0,r10                ;549
 000138  dc96              BGT      |L10.104|
-00013a  f1090901          ADD      r9,r9,#1              ;509
+00013a  f1090901          ADD      r9,r9,#1              ;541
                   |L10.318|
-00013e  69a8              LDR      r0,[r5,#0x18]         ;509
-000140  4548              CMP      r0,r9                 ;509
+00013e  69a8              LDR      r0,[r5,#0x18]         ;541
+000140  4548              CMP      r0,r9                 ;541
 000142  f73faf64          BGT      |L10.14|
-;;;533        	}
-;;;534      	}
-;;;535    }
+;;;565        	}
+;;;566      	}
+;;;567    }
 000146  b00b              ADD      sp,sp,#0x2c
 000148  e8bd8ff0          POP      {r4-r11,pc}
-;;;536    //快速离散余弦变换
+;;;568    //快速离散余弦变换
                           ENDP
 
                   |L10.332|
@@ -1720,51 +1747,51 @@
                           AREA ||i.jint_process_rows||, CODE, READONLY, ALIGN=1
 
                   jint_process_rows PROC
-;;;441    //cinfo->inbuf填满有效数据 ,否则将不能得到正确的压缩数据
-;;;442    void jint_process_rows(jpeg_compress_info *cinfo) 
+;;;473    //cinfo->inbuf填满有效数据 ,否则将不能得到正确的压缩数据
+;;;474    void jint_process_rows(jpeg_compress_info *cinfo) 
 000000  e92d5ffc          PUSH     {r2-r12,lr}
-;;;443    {  
+;;;475    {  
 000004  4604              MOV      r4,r0
-;;;444      int mn; //当前缓冲里的MCU
-;;;445      JSAMPLE *mcu_start;  
-;;;446    	int mcu_delta; 
-;;;447      JSAMPLE *pdata; 
-;;;448    	//颜色转换选择调用(这里只做RGB到YCrCb的转换)
-;;;449    	if(cinfo->in_color_space==JCS_RGB)
+;;;476      	int mn; //当前缓冲里的MCU
+;;;477      	JSAMPLE *mcu_start;  
+;;;478    	int mcu_delta; 
+;;;479      	JSAMPLE *pdata; 
+;;;480    	//颜色转换选择调用(这里只做RGB到YCrCb的转换)
+;;;481    	if(cinfo->in_color_space==JCS_RGB)
 000006  7d20              LDRB     r0,[r4,#0x14]
 000008  2802              CMP      r0,#2
 00000a  d108              BNE      |L11.30|
-;;;450    	jutl_cc_rgb2ycc(cinfo->inbuf,cinfo->inbuf_width*cinfo->inbuf_height);	
+;;;482    	jutl_cc_rgb2ycc(cinfo->inbuf,cinfo->inbuf_width*cinfo->inbuf_height);	
 00000c  34ec              ADDS     r4,r4,#0xec
 00000e  e9d42301          LDRD     r2,r3,[r4,#4]
 000012  fb02f103          MUL      r1,r2,r3
 000016  f85409ec          LDR      r0,[r4],#-0xec
 00001a  f7fffffe          BL       jutl_cc_rgb2ycc
                   |L11.30|
-;;;451    	//处理每个像素数据,分割inbuf的数据到每个元件的dct表中,并降低每个元件的采样率
-;;;452    	mcu_start=&cinfo->inbuf[0];
+;;;483    	//处理每个MCU数据,分割inbuf的数据到每个元件的dct表中,并降低每个元件的采样率
+;;;484    	mcu_start=&cinfo->inbuf[0];
 00001e  f8d470ec          LDR      r7,[r4,#0xec]
-;;;453    	mcu_delta=cinfo->mcu_width*cinfo->num_comp*sizeof(JSAMPLE); //mcu
+;;;485    	mcu_delta=cinfo->mcu_width*cinfo->num_comp*sizeof(JSAMPLE);
 000022  69a1              LDR      r1,[r4,#0x18]
 000024  f8d400b8          LDR      r0,[r4,#0xb8]
 000028  fb00f801          MUL      r8,r0,r1
-;;;454    	for(mn=0;mn<cinfo->mcu_per_row;mn++)
+;;;486    	for(mn=0;mn<cinfo->mcu_per_row;mn++)
 00002c  2600              MOVS     r6,#0
 00002e  e080              B        |L11.306|
                   |L11.48|
-;;;455    	{
-;;;456    		//对于每个元件,降低采样率并保存到各个元件中
-;;;457    		int cn;//元件计数器
-;;;458    		for(cn=0;cn<cinfo->num_comp;cn++)//YUC轮流来
+;;;487    	{
+;;;488    		//对于每个元件,降低采样率并保存到各个元件中
+;;;489    		int cn;//元件计数器
+;;;490    		for(cn=0;cn<cinfo->num_comp;cn++)
 000030  2500              MOVS     r5,#0
 000032  e076              B        |L11.290|
                   |L11.52|
-;;;459    		{
-;;;460    			JSAMPLE *comp_start=(JSAMPLE*)(mcu_start+cn);
+;;;491    		{
+;;;492    			JSAMPLE *comp_start=(JSAMPLE*)(mcu_start+cn);
 000034  197a              ADDS     r2,r7,r5
 000036  9201              STR      r2,[sp,#4]
-;;;461    			//初始化采样间隔(sampledelta)数据指针
-;;;462    			int h_samp_delta=cinfo->max_h_factor/cinfo->comp[cn].h_factor*cinfo->num_comp*sizeof(JSAMPLE);
+;;;493    			//初始化采样间隔(sampledelta)数据指针
+;;;494    			int h_samp_delta=cinfo->max_h_factor/cinfo->comp[cn].h_factor*cinfo->num_comp*sizeof(JSAMPLE);
 000038  eb050bc5          ADD      r11,r5,r5,LSL #3
 00003c  f104021c          ADD      r2,r4,#0x1c
 000040  eb02028b          ADD      r2,r2,r11,LSL #2
@@ -1773,7 +1800,7 @@
 00004a  fb9af2f2          SDIV     r2,r10,r2
 00004e  f8d4a018          LDR      r10,[r4,#0x18]
 000052  fb02f30a          MUL      r3,r2,r10
-;;;463    			int v_samp_delta=cinfo->max_v_factor/cinfo->comp[cn].v_factor*cinfo->num_comp*sizeof(JSAMPLE)*cinfo->inbuf_width;			
+;;;495    			int v_samp_delta=cinfo->max_v_factor/cinfo->comp[cn].v_factor*cinfo->num_comp*sizeof(JSAMPLE)*cinfo->inbuf_width;			
 000056  eb050bc5          ADD      r11,r5,r5,LSL #3
 00005a  f104021c          ADD      r2,r4,#0x1c
 00005e  eb02028b          ADD      r2,r2,r11,LSL #2
@@ -1784,16 +1811,16 @@
 000070  fb02f20a          MUL      r2,r2,r10
 000074  f8d4a0f0          LDR      r10,[r4,#0xf0]
 000078  fb02fc0a          MUL      r12,r2,r10
-;;;464    			//对于每个块(block)
-;;;465    			int bn;//块计数器
-;;;466    			int pn;//数据指针
-;;;467    			for(bn=0;bn<cinfo->comp[cn].num_dct_table;bn++)
+;;;496    			//对于每个块(block)
+;;;497    			int bn;//块计数器
+;;;498    			int pn;//数据指针
+;;;499    			for(bn=0;bn<cinfo->comp[cn].num_dct_table;bn++)
 00007c  2100              MOVS     r1,#0
 00007e  e046              B        |L11.270|
                   |L11.128|
-;;;468    			{
-;;;469    				//初始化块开始地址
-;;;470    				JSAMPLE *block_start=(JSAMPLE*)(comp_start+(bn%cinfo->comp[cn].h_factor)*DCTSIZE*h_samp_delta+(bn/cinfo->comp[cn].v_factor)*DCTSIZE*v_samp_delta);				
+;;;500    			{
+;;;501    				//初始化块开始地址
+;;;502    				JSAMPLE *block_start=(JSAMPLE*)(comp_start+(bn%cinfo->comp[cn].h_factor)*DCTSIZE*h_samp_delta+(bn/cinfo->comp[cn].v_factor)*DCTSIZE*v_samp_delta);				
 000080  eb050bc5          ADD      r11,r5,r5,LSL #3
 000084  f104021c          ADD      r2,r4,#0x1c
 000088  eb02028b          ADD      r2,r2,r11,LSL #2
@@ -1810,19 +1837,19 @@
 0000b0  fb91fbfb          SDIV     r11,r1,r11
 0000b4  ea4f0bcb          LSL      r11,r11,#3
 0000b8  fb0b2a0c          MLA      r10,r11,r12,r2
-;;;471    				DCTVAL *dct=(DCTVAL*)&cinfo->comp[cn].dct_table[bn];//dct表元素
+;;;503    				DCTVAL *dct=(DCTVAL*)&cinfo->comp[cn].dct_table[bn];//dct表元素
 0000bc  eb050bc5          ADD      r11,r5,r5,LSL #3
 0000c0  4672              MOV      r2,lr
 0000c2  eb02028b          ADD      r2,r2,r11,LSL #2
 0000c6  69d2              LDR      r2,[r2,#0x1c]
 0000c8  eb0212c1          ADD      r2,r2,r1,LSL #7
 0000cc  9200              STR      r2,[sp,#0]
-;;;472    				for(pn=0;pn<DCTSIZE2;pn++)//对于每个元素
+;;;504    				for(pn=0;pn<DCTSIZE2;pn++)//对于每个元素
 0000ce  2000              MOVS     r0,#0
 0000d0  e01a              B        |L11.264|
                   |L11.210|
-;;;473    				{				
-;;;474    					if(pn%DCTSIZE==0)pdata=(JSAMPLE*)(pn/DCTSIZE*v_samp_delta+block_start);
+;;;505    				{				
+;;;506    					if(pn%DCTSIZE==0)pdata=(JSAMPLE*)(pn/DCTSIZE*v_samp_delta+block_start);
 0000d2  ea4f7be0          ASR      r11,r0,#31
 0000d6  eb007b5b          ADD      r11,r0,r11,LSR #29
 0000da  ea4f0beb          ASR      r11,r11,#3
@@ -1835,58 +1862,58 @@
 0000f2  ea4f0beb          ASR      r11,r11,#3
 0000f6  fb0ba90c          MLA      r9,r11,r12,r10
                   |L11.250|
-;;;475    					dct[pn]=*pdata;
+;;;507    					dct[pn]=*pdata;
 0000fa  f899b000          LDRB     r11,[r9,#0]
 0000fe  9a00              LDR      r2,[sp,#0]
 000100  f822b010          STRH     r11,[r2,r0,LSL #1]
-;;;476    					pdata+=h_samp_delta;
+;;;508    					pdata+=h_samp_delta;
 000104  4499              ADD      r9,r9,r3
-000106  1c40              ADDS     r0,r0,#1              ;472
+000106  1c40              ADDS     r0,r0,#1              ;504
                   |L11.264|
-000108  2840              CMP      r0,#0x40              ;472
+000108  2840              CMP      r0,#0x40              ;504
 00010a  dbe2              BLT      |L11.210|
-00010c  1c49              ADDS     r1,r1,#1              ;467
+00010c  1c49              ADDS     r1,r1,#1              ;499
                   |L11.270|
-00010e  eb050ac5          ADD      r10,r5,r5,LSL #3      ;467
-000112  f104021c          ADD      r2,r4,#0x1c           ;467
-000116  eb02028a          ADD      r2,r2,r10,LSL #2      ;467
-00011a  6992              LDR      r2,[r2,#0x18]         ;467
-00011c  428a              CMP      r2,r1                 ;467
+00010e  eb050ac5          ADD      r10,r5,r5,LSL #3      ;499
+000112  f104021c          ADD      r2,r4,#0x1c           ;499
+000116  eb02028a          ADD      r2,r2,r10,LSL #2      ;499
+00011a  6992              LDR      r2,[r2,#0x18]         ;499
+00011c  428a              CMP      r2,r1                 ;499
 00011e  dcaf              BGT      |L11.128|
-000120  1c6d              ADDS     r5,r5,#1              ;458
+000120  1c6d              ADDS     r5,r5,#1              ;490
                   |L11.290|
-000122  69a0              LDR      r0,[r4,#0x18]         ;458
-000124  42a8              CMP      r0,r5                 ;458
+000122  69a0              LDR      r0,[r4,#0x18]         ;490
+000124  42a8              CMP      r0,r5                 ;490
 000126  dc85              BGT      |L11.52|
-;;;477    				}
-;;;478    			}
-;;;479    		}//颜色元件处理循环结束
-;;;480    		mcu_start+=mcu_delta;		
+;;;509    				}
+;;;510    			}
+;;;511    		}//颜色元件处理循环结束
+;;;512    		mcu_start+=mcu_delta;		
 000128  4447              ADD      r7,r7,r8
-;;;481    		jint_process_mcu(cinfo);//处理当前MCU数据
+;;;513    		jint_process_mcu(cinfo);//处理当前MCU数据
 00012a  4620              MOV      r0,r4
 00012c  f7fffffe          BL       jint_process_mcu
-000130  1c76              ADDS     r6,r6,#1              ;454
+000130  1c76              ADDS     r6,r6,#1              ;486
                   |L11.306|
-000132  f8d400ac          LDR      r0,[r4,#0xac]         ;454
-000136  42b0              CMP      r0,r6                 ;454
+000132  f8d400ac          LDR      r0,[r4,#0xac]         ;486
+000136  42b0              CMP      r0,r6                 ;486
 000138  f73faf7a          BGT      |L11.48|
-;;;482    	}
-;;;483    }
+;;;514    	}
+;;;515    }
 00013c  e8bd9ffc          POP      {r2-r12,pc}
-;;;484    //RGB转YUV
+;;;516    //RGB转YUV
                           ENDP
 
 
                           AREA ||i.jint_std_huff_tables||, CODE, READONLY, ALIGN=2
 
                   jint_std_huff_tables PROC
-;;;152    //设置标准huffman表
-;;;153    void jint_std_huff_tables (jpeg_compress_info *cinfo) 
+;;;184    //设置标准huffman表
+;;;185    void jint_std_huff_tables (jpeg_compress_info *cinfo) 
 000000  b538              PUSH     {r3-r5,lr}
-;;;154    { 
+;;;186    { 
 000002  4604              MOV      r4,r0
-;;;155      	jint_add_huff_table(cinfo,0,DC_HUFF_TBL,bits_dc_luminance,val_dc_luminance);
+;;;187      	jint_add_huff_table(cinfo,0,DC_HUFF_TBL,bits_dc_luminance,val_dc_luminance);
 000004  4810              LDR      r0,|L12.72|
 000006  4b11              LDR      r3,|L12.76|
 000008  2200              MOVS     r2,#0
@@ -1894,7 +1921,7 @@
 00000c  9000              STR      r0,[sp,#0]
 00000e  4620              MOV      r0,r4
 000010  f7fffffe          BL       jint_add_huff_table
-;;;156      	jint_add_huff_table(cinfo,0,AC_HUFF_TBL,bits_ac_luminance,val_ac_luminance);
+;;;188      	jint_add_huff_table(cinfo,0,AC_HUFF_TBL,bits_ac_luminance,val_ac_luminance);
 000014  480e              LDR      r0,|L12.80|
 000016  4b0f              LDR      r3,|L12.84|
 000018  2201              MOVS     r2,#1
@@ -1902,7 +1929,7 @@
 00001c  9000              STR      r0,[sp,#0]
 00001e  4620              MOV      r0,r4
 000020  f7fffffe          BL       jint_add_huff_table
-;;;157      	jint_add_huff_table(cinfo,1,DC_HUFF_TBL,bits_dc_chrominance,val_dc_chrominance);
+;;;189      	jint_add_huff_table(cinfo,1,DC_HUFF_TBL,bits_dc_chrominance,val_dc_chrominance);
 000024  480c              LDR      r0,|L12.88|
 000026  4b0d              LDR      r3,|L12.92|
 000028  2200              MOVS     r2,#0
@@ -1910,7 +1937,7 @@
 00002c  9000              STR      r0,[sp,#0]
 00002e  4620              MOV      r0,r4
 000030  f7fffffe          BL       jint_add_huff_table
-;;;158      	jint_add_huff_table(cinfo,1,AC_HUFF_TBL,bits_ac_chrominance,val_ac_chrominance);
+;;;190      	jint_add_huff_table(cinfo,1,AC_HUFF_TBL,bits_ac_chrominance,val_ac_chrominance);
 000034  480a              LDR      r0,|L12.96|
 000036  4b0b              LDR      r3,|L12.100|
 000038  2201              MOVS     r2,#1
@@ -1918,9 +1945,9 @@
 00003c  9000              STR      r0,[sp,#0]
 00003e  4620              MOV      r0,r4
 000040  f7fffffe          BL       jint_add_huff_table
-;;;159    }
+;;;191    }
 000044  bd38              POP      {r3-r5,pc}
-;;;160    //添加huffman表
+;;;192    //添加huffman表
                           ENDP
 
 000046  0000              DCW      0x0000
@@ -1944,26 +1971,26 @@
                           AREA ||i.jint_std_quant_tables||, CODE, READONLY, ALIGN=2
 
                   jint_std_quant_tables PROC
-;;;127    //设置标准量化表
-;;;128    void jint_std_quant_tables(jpeg_compress_info *cinfo)
+;;;159    //设置标准量化表
+;;;160    void jint_std_quant_tables(jpeg_compress_info *cinfo)
 000000  b510              PUSH     {r4,lr}
-;;;129    {
+;;;161    {
 000002  4604              MOV      r4,r0
-;;;130      	jint_add_quant_table(cinfo,0,std_luminance_quant_tbl,cinfo->quality);
+;;;162      	jint_add_quant_table(cinfo,0,std_luminance_quant_tbl,cinfo->quality);
 000004  4a06              LDR      r2,|L13.32|
 000006  2100              MOVS     r1,#0
 000008  4620              MOV      r0,r4
 00000a  6923              LDR      r3,[r4,#0x10]
 00000c  f7fffffe          BL       jint_add_quant_table
-;;;131      	jint_add_quant_table(cinfo,1,std_chrominance_quant_tbl,cinfo->quality);
+;;;163      	jint_add_quant_table(cinfo,1,std_chrominance_quant_tbl,cinfo->quality);
 000010  4a04              LDR      r2,|L13.36|
 000012  2101              MOVS     r1,#1
 000014  4620              MOV      r0,r4
 000016  6923              LDR      r3,[r4,#0x10]
 000018  f7fffffe          BL       jint_add_quant_table
-;;;132    }
+;;;164    }
 00001c  bd10              POP      {r4,pc}
-;;;133    //添加量化表
+;;;165    //添加量化表
                           ENDP
 
 00001e  0000              DCW      0x0000
@@ -1975,192 +2002,192 @@
                           AREA ||i.jmkr_write_end||, CODE, READONLY, ALIGN=1
 
                   jmkr_write_end PROC
-;;;431    //写文件结束标志
-;;;432    void jmkr_write_end(jpeg_compress_info *cinfo) 
+;;;463    //写文件结束标志
+;;;464    void jmkr_write_end(jpeg_compress_info *cinfo) 
 000000  b510              PUSH     {r4,lr}
-;;;433    {
+;;;465    {
 000002  4604              MOV      r4,r0
-;;;434      	jutl_write_byte(0xFF,cinfo->output,cinfo  );
+;;;466      	jutl_write_byte(0xFF,cinfo->output,cinfo  );
 000004  4622              MOV      r2,r4
 000006  20ff              MOVS     r0,#0xff
 000008  68a1              LDR      r1,[r4,#8]
 00000a  f7fffffe          BL       jutl_write_byte
-;;;435    	cinfo->state =JC_FINISH;//状态为完成
+;;;467    	cinfo->state =JC_FINISH;//状态为完成
 00000e  2003              MOVS     r0,#3
 000010  f88400fc          STRB     r0,[r4,#0xfc]
-;;;436      	jutl_write_byte(EOI,cinfo->output,cinfo  );	
+;;;468      	jutl_write_byte(EOI,cinfo->output,cinfo  );	
 000014  4622              MOV      r2,r4
 000016  20d9              MOVS     r0,#0xd9
 000018  68a1              LDR      r1,[r4,#8]
 00001a  f7fffffe          BL       jutl_write_byte
-;;;437    }
+;;;469    }
 00001e  bd10              POP      {r4,pc}
-;;;438    ///////////////////////////////////////////////////////////////////////////////////////////
+;;;470    ///////////////////////////////////////////////////////////////////////////////////////////
                           ENDP
 
 
                           AREA ||i.jmkr_write_frame_head||, CODE, READONLY, ALIGN=1
 
                   jmkr_write_frame_head PROC
-;;;337    //写入帧头
-;;;338    void jmkr_write_frame_head(jpeg_compress_info *cinfo)
+;;;369    //写入帧头
+;;;370    void jmkr_write_frame_head(jpeg_compress_info *cinfo)
 000000  e92d4ffe          PUSH     {r1-r11,lr}
-;;;339    {
+;;;371    {
 000004  4604              MOV      r4,r0
-;;;340      	int i;
-;;;341      	u16 Lf,X,Y;
-;;;342      	u8  P,Nf,C,H,V,Tq;
-;;;343    	jutl_write_byte(0xFF,cinfo->output,cinfo  );
+;;;372      	int i;
+;;;373      	u16 Lf,X,Y;
+;;;374      	u8  P,Nf,C,H,V,Tq;
+;;;375    	jutl_write_byte(0xFF,cinfo->output,cinfo  );
 000006  4622              MOV      r2,r4
 000008  20ff              MOVS     r0,#0xff
 00000a  68a1              LDR      r1,[r4,#8]
 00000c  f7fffffe          BL       jutl_write_byte
-;;;344    	jutl_write_byte(SOF0,cinfo->output,cinfo  );
+;;;376    	jutl_write_byte(SOF0,cinfo->output,cinfo  );
 000010  4622              MOV      r2,r4
 000012  20c0              MOVS     r0,#0xc0
 000014  68a1              LDR      r1,[r4,#8]
 000016  f7fffffe          BL       jutl_write_byte
-;;;345    	Nf=cinfo->num_comp;
+;;;377    	Nf=cinfo->num_comp;
 00001a  7e26              LDRB     r6,[r4,#0x18]
-;;;346    	P=cinfo->precision;
+;;;378    	P=cinfo->precision;
 00001c  7b20              LDRB     r0,[r4,#0xc]
 00001e  9002              STR      r0,[sp,#8]
-;;;347    	X=cinfo->image_width;
+;;;379    	X=cinfo->image_width;
 000020  8820              LDRH     r0,[r4,#0]
 000022  fa1ff880          UXTH     r8,r0
-;;;348    	Y=cinfo->image_height;
+;;;380    	Y=cinfo->image_height;
 000026  88a0              LDRH     r0,[r4,#4]
 000028  fa1ff980          UXTH     r9,r0
-;;;349    	Lf=8+3*Nf;
+;;;381    	Lf=8+3*Nf;
 00002c  eb060046          ADD      r0,r6,r6,LSL #1
 000030  f1000708          ADD      r7,r0,#8
-;;;350    	jutl_write_byte(Lf>>8,cinfo->output,cinfo  );
+;;;382    	jutl_write_byte(Lf>>8,cinfo->output,cinfo  );
 000034  1238              ASRS     r0,r7,#8
 000036  4622              MOV      r2,r4
 000038  68a1              LDR      r1,[r4,#8]
 00003a  f7fffffe          BL       jutl_write_byte
-;;;351    	jutl_write_byte(Lf&0xFF,cinfo->output,cinfo  );
+;;;383    	jutl_write_byte(Lf&0xFF,cinfo->output,cinfo  );
 00003e  b2f8              UXTB     r0,r7
 000040  4622              MOV      r2,r4
 000042  68a1              LDR      r1,[r4,#8]
 000044  f7fffffe          BL       jutl_write_byte
-;;;352    	jutl_write_byte(P,cinfo->output,cinfo  );
+;;;384    	jutl_write_byte(P,cinfo->output,cinfo  );
 000048  4622              MOV      r2,r4
 00004a  68a1              LDR      r1,[r4,#8]
 00004c  9802              LDR      r0,[sp,#8]
 00004e  f7fffffe          BL       jutl_write_byte
-;;;353    	jutl_write_byte(Y>>8,cinfo->output,cinfo  );
+;;;385    	jutl_write_byte(Y>>8,cinfo->output,cinfo  );
 000052  ea4f2029          ASR      r0,r9,#8
 000056  4622              MOV      r2,r4
 000058  68a1              LDR      r1,[r4,#8]
 00005a  f7fffffe          BL       jutl_write_byte
-;;;354    	jutl_write_byte(Y&0xFF,cinfo->output,cinfo  );
+;;;386    	jutl_write_byte(Y&0xFF,cinfo->output,cinfo  );
 00005e  f00900ff          AND      r0,r9,#0xff
 000062  4622              MOV      r2,r4
 000064  68a1              LDR      r1,[r4,#8]
 000066  f7fffffe          BL       jutl_write_byte
-;;;355    	jutl_write_byte(X>>8,cinfo->output,cinfo  );
+;;;387    	jutl_write_byte(X>>8,cinfo->output,cinfo  );
 00006a  ea4f2028          ASR      r0,r8,#8
 00006e  4622              MOV      r2,r4
 000070  68a1              LDR      r1,[r4,#8]
 000072  f7fffffe          BL       jutl_write_byte
-;;;356    	jutl_write_byte(X&0xFF,cinfo->output,cinfo  );
+;;;388    	jutl_write_byte(X&0xFF,cinfo->output,cinfo  );
 000076  f00800ff          AND      r0,r8,#0xff
 00007a  4622              MOV      r2,r4
 00007c  68a1              LDR      r1,[r4,#8]
 00007e  f7fffffe          BL       jutl_write_byte
-;;;357    	jutl_write_byte(Nf,cinfo->output,cinfo  );
+;;;389    	jutl_write_byte(Nf,cinfo->output,cinfo  );
 000082  4622              MOV      r2,r4
 000084  4630              MOV      r0,r6
 000086  68a1              LDR      r1,[r4,#8]
 000088  f7fffffe          BL       jutl_write_byte
-;;;358    	for(i=0;i<Nf;i++)
+;;;390    	for(i=0;i<Nf;i++)
 00008c  2500              MOVS     r5,#0
 00008e  e02e              B        |L15.238|
                   |L15.144|
-;;;359    	{
-;;;360    		C=cinfo->comp[i].comp_id;
+;;;391    	{
+;;;392    		C=cinfo->comp[i].comp_id;
 000090  eb0501c5          ADD      r1,r5,r5,LSL #3
 000094  f104001c          ADD      r0,r4,#0x1c
 000098  f810a021          LDRB     r10,[r0,r1,LSL #2]
-;;;361    		H=cinfo->comp[i].h_factor;
+;;;393    		H=cinfo->comp[i].h_factor;
 00009c  eb0501c5          ADD      r1,r5,r5,LSL #3
 0000a0  eb000081          ADD      r0,r0,r1,LSL #2
 0000a4  f890b004          LDRB     r11,[r0,#4]
-;;;362    		V=cinfo->comp[i].v_factor;
+;;;394    		V=cinfo->comp[i].v_factor;
 0000a8  eb0501c5          ADD      r1,r5,r5,LSL #3
 0000ac  f104001c          ADD      r0,r4,#0x1c
 0000b0  eb000081          ADD      r0,r0,r1,LSL #2
 0000b4  7a02              LDRB     r2,[r0,#8]
 0000b6  9201              STR      r2,[sp,#4]
-;;;363    		Tq=cinfo->comp[i].quant_tbl_no;
+;;;395    		Tq=cinfo->comp[i].quant_tbl_no;
 0000b8  eb0501c5          ADD      r1,r5,r5,LSL #3
 0000bc  f104001c          ADD      r0,r4,#0x1c
 0000c0  eb000081          ADD      r0,r0,r1,LSL #2
 0000c4  7b00              LDRB     r0,[r0,#0xc]
 0000c6  9000              STR      r0,[sp,#0]
-;;;364    		jutl_write_byte(C,cinfo->output,cinfo  );
+;;;396    		jutl_write_byte(C,cinfo->output,cinfo  );
 0000c8  4622              MOV      r2,r4
 0000ca  4650              MOV      r0,r10
 0000cc  68a1              LDR      r1,[r4,#8]
 0000ce  f7fffffe          BL       jutl_write_byte
-;;;365    		jutl_write_byte(((H<<4)|V),cinfo->output,cinfo  );
+;;;397    		jutl_write_byte(((H<<4)|V),cinfo->output,cinfo  );
 0000d2  68a1              LDR      r1,[r4,#8]
 0000d4  9a01              LDR      r2,[sp,#4]
 0000d6  ea42120b          ORR      r2,r2,r11,LSL #4
 0000da  b2d0              UXTB     r0,r2
 0000dc  4622              MOV      r2,r4
 0000de  f7fffffe          BL       jutl_write_byte
-;;;366    		jutl_write_byte(Tq,cinfo->output,cinfo  );
+;;;398    		jutl_write_byte(Tq,cinfo->output,cinfo  );
 0000e2  4622              MOV      r2,r4
 0000e4  68a1              LDR      r1,[r4,#8]
 0000e6  9800              LDR      r0,[sp,#0]
 0000e8  f7fffffe          BL       jutl_write_byte
-0000ec  1c6d              ADDS     r5,r5,#1              ;358
+0000ec  1c6d              ADDS     r5,r5,#1              ;390
                   |L15.238|
-0000ee  42b5              CMP      r5,r6                 ;358
+0000ee  42b5              CMP      r5,r6                 ;390
 0000f0  dbce              BLT      |L15.144|
-;;;367    	}
-;;;368    }
+;;;399    	}
+;;;400    }
 0000f2  e8bd8ffe          POP      {r1-r11,pc}
-;;;369    //写入哈夫曼表
+;;;401    //写入哈夫曼表
                           ENDP
 
 
                           AREA ||i.jmkr_write_huff_table||, CODE, READONLY, ALIGN=1
 
                   jmkr_write_huff_table PROC
-;;;369    //写入哈夫曼表
-;;;370    void jmkr_write_huff_table(jpeg_compress_info *cinfo)
+;;;401    //写入哈夫曼表
+;;;402    void jmkr_write_huff_table(jpeg_compress_info *cinfo)
 000000  e92d41f0          PUSH     {r4-r8,lr}
-;;;371    {
+;;;403    {
 000004  4604              MOV      r4,r0
-;;;372      	int i,j,num_val;
-;;;373      	u16 Lh;
-;;;374    	for(i=0;i<NUM_HUFF_TBLS;i++)//输出直流HUFFMAN码
+;;;404      	int i,j,num_val;
+;;;405      	u16 Lh;
+;;;406    	for(i=0;i<NUM_HUFF_TBLS;i++)//输出直流HUFFMAN码
 000006  2600              MOVS     r6,#0
 000008  e04f              B        |L16.170|
                   |L16.10|
-;;;375    	{
-;;;376    		num_val=0;
+;;;407    	{
+;;;408    		num_val=0;
 00000a  2700              MOVS     r7,#0
-;;;377    		if(!cinfo->dc_huff_table[i])continue;
+;;;409    		if(!cinfo->dc_huff_table[i])continue;
 00000c  f10400cc          ADD      r0,r4,#0xcc
 000010  f8500026          LDR      r0,[r0,r6,LSL #2]
 000014  b900              CBNZ     r0,|L16.24|
 000016  e047              B        |L16.168|
                   |L16.24|
-;;;378    		jutl_write_byte(0xFF,cinfo->output,cinfo  );
+;;;410    		jutl_write_byte(0xFF,cinfo->output,cinfo  );
 000018  4622              MOV      r2,r4
 00001a  20ff              MOVS     r0,#0xff
 00001c  68a1              LDR      r1,[r4,#8]
 00001e  f7fffffe          BL       jutl_write_byte
-;;;379    		jutl_write_byte(DHT,cinfo->output,cinfo  );
+;;;411    		jutl_write_byte(DHT,cinfo->output,cinfo  );
 000022  4622              MOV      r2,r4
 000024  20c4              MOVS     r0,#0xc4
 000026  68a1              LDR      r1,[r4,#8]
 000028  f7fffffe          BL       jutl_write_byte
-;;;380    		for(j=1;j<=16;j++)num_val+=cinfo->dc_huff_table[i]->bits[j];
+;;;412    		for(j=1;j<=16;j++)num_val+=cinfo->dc_huff_table[i]->bits[j];
 00002c  2501              MOVS     r5,#1
 00002e  e006              B        |L16.62|
                   |L16.48|
@@ -2172,25 +2199,25 @@
                   |L16.62|
 00003e  2d10              CMP      r5,#0x10
 000040  ddf6              BLE      |L16.48|
-;;;381    		Lh=3+16+num_val;//长度,固定为43h
+;;;413    		Lh=3+16+num_val;//长度,固定为43h
 000042  f1070013          ADD      r0,r7,#0x13
 000046  fa1ff880          UXTH     r8,r0
-;;;382    		jutl_write_byte(Lh>>8,cinfo->output,cinfo  );
+;;;414    		jutl_write_byte(Lh>>8,cinfo->output,cinfo  );
 00004a  ea4f2028          ASR      r0,r8,#8
 00004e  4622              MOV      r2,r4
 000050  68a1              LDR      r1,[r4,#8]
 000052  f7fffffe          BL       jutl_write_byte
-;;;383    		jutl_write_byte(Lh&0xFF,cinfo->output,cinfo  );
+;;;415    		jutl_write_byte(Lh&0xFF,cinfo->output,cinfo  );
 000056  f00800ff          AND      r0,r8,#0xff
 00005a  4622              MOV      r2,r4
 00005c  68a1              LDR      r1,[r4,#8]
 00005e  f7fffffe          BL       jutl_write_byte
-;;;384    		jutl_write_byte(i,cinfo->output,cinfo  );//输出ID
+;;;416    		jutl_write_byte(i,cinfo->output,cinfo  );//输出ID
 000062  b2f0              UXTB     r0,r6
 000064  4622              MOV      r2,r4
 000066  68a1              LDR      r1,[r4,#8]
 000068  f7fffffe          BL       jutl_write_byte
-;;;385    		for(j=1;j<=16;j++)jutl_write_byte(cinfo->dc_huff_table[i]->bits[j],cinfo->output,cinfo  );//输出bits
+;;;417    		for(j=1;j<=16;j++)jutl_write_byte(cinfo->dc_huff_table[i]->bits[j],cinfo->output,cinfo  );//输出bits
 00006c  2501              MOVS     r5,#1
 00006e  e009              B        |L16.132|
                   |L16.112|
@@ -2204,7 +2231,7 @@
                   |L16.132|
 000084  2d10              CMP      r5,#0x10
 000086  ddf3              BLE      |L16.112|
-;;;386    		for(j=0;j<num_val;j++)jutl_write_byte(cinfo->dc_huff_table[i]->huffval[j],cinfo->output,cinfo  );
+;;;418    		for(j=0;j<num_val;j++)jutl_write_byte(cinfo->dc_huff_table[i]->huffval[j],cinfo->output,cinfo  );
 000088  2500              MOVS     r5,#0
 00008a  e00a              B        |L16.162|
                   |L16.140|
@@ -2219,37 +2246,37 @@
                   |L16.162|
 0000a2  42bd              CMP      r5,r7
 0000a4  dbf2              BLT      |L16.140|
-0000a6  bf00              NOP                            ;377
+0000a6  bf00              NOP                            ;409
                   |L16.168|
-0000a8  1c76              ADDS     r6,r6,#1              ;374
+0000a8  1c76              ADDS     r6,r6,#1              ;406
                   |L16.170|
-0000aa  2e02              CMP      r6,#2                 ;374
+0000aa  2e02              CMP      r6,#2                 ;406
 0000ac  dbad              BLT      |L16.10|
-;;;387    	}
-;;;388    	for(i=0;i<NUM_HUFF_TBLS;i++)//输出交流HUFFMAN码
+;;;419    	}
+;;;420    	for(i=0;i<NUM_HUFF_TBLS;i++)//输出交流HUFFMAN码
 0000ae  2600              MOVS     r6,#0
 0000b0  e051              B        |L16.342|
                   |L16.178|
-;;;389    	{
-;;;390    		num_val=0;
+;;;421    	{
+;;;422    		num_val=0;
 0000b2  2700              MOVS     r7,#0
-;;;391    		if(!cinfo->ac_huff_table[i])continue;
+;;;423    		if(!cinfo->ac_huff_table[i])continue;
 0000b4  f10400d4          ADD      r0,r4,#0xd4
 0000b8  f8500026          LDR      r0,[r0,r6,LSL #2]
 0000bc  b900              CBNZ     r0,|L16.192|
 0000be  e049              B        |L16.340|
                   |L16.192|
-;;;392    		jutl_write_byte(0xFF,cinfo->output,cinfo  );
+;;;424    		jutl_write_byte(0xFF,cinfo->output,cinfo  );
 0000c0  4622              MOV      r2,r4
 0000c2  20ff              MOVS     r0,#0xff
 0000c4  68a1              LDR      r1,[r4,#8]
 0000c6  f7fffffe          BL       jutl_write_byte
-;;;393    		jutl_write_byte(DHT,cinfo->output,cinfo  );
+;;;425    		jutl_write_byte(DHT,cinfo->output,cinfo  );
 0000ca  4622              MOV      r2,r4
 0000cc  20c4              MOVS     r0,#0xc4
 0000ce  68a1              LDR      r1,[r4,#8]
 0000d0  f7fffffe          BL       jutl_write_byte
-;;;394    		for(j=1;j<=16;j++)num_val+=cinfo->ac_huff_table[i]->bits[j];
+;;;426    		for(j=1;j<=16;j++)num_val+=cinfo->ac_huff_table[i]->bits[j];
 0000d4  2501              MOVS     r5,#1
 0000d6  e006              B        |L16.230|
                   |L16.216|
@@ -2261,26 +2288,26 @@
                   |L16.230|
 0000e6  2d10              CMP      r5,#0x10
 0000e8  ddf6              BLE      |L16.216|
-;;;395    		Lh=3+16+num_val;//长度,固定为43h
+;;;427    		Lh=3+16+num_val;//长度,固定为43h
 0000ea  f1070013          ADD      r0,r7,#0x13
 0000ee  fa1ff880          UXTH     r8,r0
-;;;396    		jutl_write_byte(Lh>>8,cinfo->output,cinfo  );
+;;;428    		jutl_write_byte(Lh>>8,cinfo->output,cinfo  );
 0000f2  ea4f2028          ASR      r0,r8,#8
 0000f6  4622              MOV      r2,r4
 0000f8  68a1              LDR      r1,[r4,#8]
 0000fa  f7fffffe          BL       jutl_write_byte
-;;;397    		jutl_write_byte(Lh&0xFF,cinfo->output,cinfo  );
+;;;429    		jutl_write_byte(Lh&0xFF,cinfo->output,cinfo  );
 0000fe  f00800ff          AND      r0,r8,#0xff
 000102  4622              MOV      r2,r4
 000104  68a1              LDR      r1,[r4,#8]
 000106  f7fffffe          BL       jutl_write_byte
-;;;398    		jutl_write_byte((0x10|i),cinfo->output,cinfo  );//输出ID
+;;;430    		jutl_write_byte((0x10|i),cinfo->output,cinfo  );//输出ID
 00010a  b2f2              UXTB     r2,r6
 00010c  f0420010          ORR      r0,r2,#0x10
 000110  4622              MOV      r2,r4
 000112  68a1              LDR      r1,[r4,#8]
 000114  f7fffffe          BL       jutl_write_byte
-;;;399    		for(j=1;j<=16;j++)jutl_write_byte(cinfo->ac_huff_table[i]->bits[j],cinfo->output,cinfo  );//输出bits
+;;;431    		for(j=1;j<=16;j++)jutl_write_byte(cinfo->ac_huff_table[i]->bits[j],cinfo->output,cinfo  );//输出bits
 000118  2501              MOVS     r5,#1
 00011a  e009              B        |L16.304|
                   |L16.284|
@@ -2294,7 +2321,7 @@
                   |L16.304|
 000130  2d10              CMP      r5,#0x10
 000132  ddf3              BLE      |L16.284|
-;;;400    		for(j=0;j<num_val;j++)jutl_write_byte(cinfo->ac_huff_table[i]->huffval[j],cinfo->output,cinfo  );
+;;;432    		for(j=0;j<num_val;j++)jutl_write_byte(cinfo->ac_huff_table[i]->huffval[j],cinfo->output,cinfo  );
 000134  2500              MOVS     r5,#0
 000136  e00a              B        |L16.334|
                   |L16.312|
@@ -2309,53 +2336,53 @@
                   |L16.334|
 00014e  42bd              CMP      r5,r7
 000150  dbf2              BLT      |L16.312|
-000152  bf00              NOP                            ;391
+000152  bf00              NOP                            ;423
                   |L16.340|
-000154  1c76              ADDS     r6,r6,#1              ;388
+000154  1c76              ADDS     r6,r6,#1              ;420
                   |L16.342|
-000156  2e02              CMP      r6,#2                 ;388
+000156  2e02              CMP      r6,#2                 ;420
 000158  dbab              BLT      |L16.178|
-;;;401    	}
-;;;402    }
+;;;433    	}
+;;;434    }
 00015a  e8bd81f0          POP      {r4-r8,pc}
-;;;403    //写入扫描开始标志
+;;;435    //写入扫描开始标志
                           ENDP
 
 
                           AREA ||i.jmkr_write_image_start||, CODE, READONLY, ALIGN=1
 
                   jmkr_write_image_start PROC
-;;;306    //写入文件开始标志 
-;;;307    void jmkr_write_image_start(jpeg_compress_info *cinfo)
+;;;338    //写入文件开始标志 
+;;;339    void jmkr_write_image_start(jpeg_compress_info *cinfo)
 000000  b510              PUSH     {r4,lr}
-;;;308    {
+;;;340    {
 000002  4604              MOV      r4,r0
-;;;309      	jutl_write_byte(0xFF,cinfo->output,cinfo);
+;;;341      	jutl_write_byte(0xFF,cinfo->output,cinfo);
 000004  4622              MOV      r2,r4
 000006  20ff              MOVS     r0,#0xff
 000008  68a1              LDR      r1,[r4,#8]
 00000a  f7fffffe          BL       jutl_write_byte
-;;;310      	jutl_write_byte(SOI,cinfo->output,cinfo);
+;;;342      	jutl_write_byte(SOI,cinfo->output,cinfo);
 00000e  4622              MOV      r2,r4
 000010  20d8              MOVS     r0,#0xd8
 000012  68a1              LDR      r1,[r4,#8]
 000014  f7fffffe          BL       jutl_write_byte
-;;;311    }
+;;;343    }
 000018  bd10              POP      {r4,pc}
-;;;312    //写入APP0应用数据段
+;;;344    //写入APP0应用数据段
                           ENDP
 
 
                           AREA ||i.jmkr_write_jfif||, CODE, READONLY, ALIGN=2
 
                   jmkr_write_jfif PROC
-;;;312    //写入APP0应用数据段
-;;;313    void jmkr_write_jfif(jpeg_compress_info *cinfo)
+;;;344    //写入APP0应用数据段
+;;;345    void jmkr_write_jfif(jpeg_compress_info *cinfo)
 000000  b570              PUSH     {r4-r6,lr}
-;;;314    {
+;;;346    {
 000002  4604              MOV      r4,r0
-;;;315      	int i;
-;;;316      	for (i=0;i<18;i++)jutl_write_byte(jfcode[i], cinfo->output,cinfo);
+;;;347      	int i;
+;;;348      	for (i=0;i<18;i++)jutl_write_byte(jfcode[i], cinfo->output,cinfo);
 000004  2500              MOVS     r5,#0
 000006  e006              B        |L18.22|
                   |L18.8|
@@ -2368,9 +2395,9 @@
                   |L18.22|
 000016  2d12              CMP      r5,#0x12
 000018  dbf6              BLT      |L18.8|
-;;;317    }
+;;;349    }
 00001a  bd70              POP      {r4-r6,pc}
-;;;318    //写入量化表
+;;;350    //写入量化表
                           ENDP
 
                   |L18.28|
@@ -2379,364 +2406,364 @@
                           AREA ||i.jmkr_write_quant_table||, CODE, READONLY, ALIGN=1
 
                   jmkr_write_quant_table PROC
-;;;318    //写入量化表
-;;;319    void jmkr_write_quant_table(jpeg_compress_info *cinfo)
+;;;350    //写入量化表
+;;;351    void jmkr_write_quant_table(jpeg_compress_info *cinfo)
 000000  e92d41f0          PUSH     {r4-r8,lr}
-;;;320    {
+;;;352    {
 000004  4604              MOV      r4,r0
-;;;321      	int i, j;
-;;;322      	for (i=0;i<NUM_QUANT_TBLS;i++) 
+;;;353      	int i, j;
+;;;354      	for (i=0;i<NUM_QUANT_TBLS;i++) 
 000006  2500              MOVS     r5,#0
 000008  e030              B        |L19.108|
                   |L19.10|
-;;;323      	{
-;;;324    	    if (!cinfo->quant_table[i])continue;	      
+;;;355      	{
+;;;356    	    if (!cinfo->quant_table[i])continue;	      
 00000a  f10400dc          ADD      r0,r4,#0xdc
 00000e  f8500025          LDR      r0,[r0,r5,LSL #2]
 000012  b900              CBNZ     r0,|L19.22|
 000014  e029              B        |L19.106|
                   |L19.22|
-;;;325    	    jutl_write_byte(0xFF,cinfo->output,cinfo);
+;;;357    	    jutl_write_byte(0xFF,cinfo->output,cinfo);
 000016  4622              MOV      r2,r4
 000018  20ff              MOVS     r0,#0xff
 00001a  68a1              LDR      r1,[r4,#8]
 00001c  f7fffffe          BL       jutl_write_byte
-;;;326    	    jutl_write_byte(DQT,cinfo->output,cinfo);
+;;;358    	    jutl_write_byte(DQT,cinfo->output,cinfo);
 000020  4622              MOV      r2,r4
 000022  20db              MOVS     r0,#0xdb
 000024  68a1              LDR      r1,[r4,#8]
 000026  f7fffffe          BL       jutl_write_byte
-;;;327    	    jutl_write_byte(0x00,cinfo->output,cinfo);
+;;;359    	    jutl_write_byte(0x00,cinfo->output,cinfo);
 00002a  4622              MOV      r2,r4
 00002c  2000              MOVS     r0,#0
 00002e  68a1              LDR      r1,[r4,#8]
 000030  f7fffffe          BL       jutl_write_byte
-;;;328    	    jutl_write_byte(0x43,cinfo->output,cinfo );//长度:固定为43h
+;;;360    	    jutl_write_byte(0x43,cinfo->output,cinfo );//长度:固定为43h
 000034  4622              MOV      r2,r4
 000036  2043              MOVS     r0,#0x43
 000038  68a1              LDR      r1,[r4,#8]
 00003a  f7fffffe          BL       jutl_write_byte
-;;;329    	    jutl_write_byte(i&0xFF,cinfo->output,cinfo );//ouput Pq & Tq
+;;;361    	    jutl_write_byte(i&0xFF,cinfo->output,cinfo );//ouput Pq & Tq
 00003e  b2e8              UXTB     r0,r5
 000040  4622              MOV      r2,r4
 000042  68a1              LDR      r1,[r4,#8]
 000044  f7fffffe          BL       jutl_write_byte
-;;;330    	    for (j=0;j<DCTSIZE2;j++) 
+;;;362    	    for (j=0;j<DCTSIZE2;j++) 
 000048  2600              MOVS     r6,#0
 00004a  e00b              B        |L19.100|
                   |L19.76|
-;;;331    	    {
-;;;332    	      	u8 Q=cinfo->quant_table[i]->quantval[j];
+;;;363    	    {
+;;;364    	      	u8 Q=cinfo->quant_table[i]->quantval[j];
 00004c  f10400dc          ADD      r0,r4,#0xdc
 000050  f8500025          LDR      r0,[r0,r5,LSL #2]
 000054  f8107016          LDRB     r7,[r0,r6,LSL #1]
-;;;333    	      	jutl_write_byte(Q,cinfo->output,cinfo  );
+;;;365    	      	jutl_write_byte(Q,cinfo->output,cinfo  );
 000058  4622              MOV      r2,r4
 00005a  4638              MOV      r0,r7
 00005c  68a1              LDR      r1,[r4,#8]
 00005e  f7fffffe          BL       jutl_write_byte
-000062  1c76              ADDS     r6,r6,#1              ;330
+000062  1c76              ADDS     r6,r6,#1              ;362
                   |L19.100|
-000064  2e40              CMP      r6,#0x40              ;330
+000064  2e40              CMP      r6,#0x40              ;362
 000066  dbf1              BLT      |L19.76|
-000068  bf00              NOP                            ;324
+000068  bf00              NOP                            ;356
                   |L19.106|
-00006a  1c6d              ADDS     r5,r5,#1              ;322
+00006a  1c6d              ADDS     r5,r5,#1              ;354
                   |L19.108|
-00006c  2d04              CMP      r5,#4                 ;322
+00006c  2d04              CMP      r5,#4                 ;354
 00006e  dbcc              BLT      |L19.10|
-;;;334    	    }
-;;;335      	}
-;;;336    }
+;;;366    	    }
+;;;367      	}
+;;;368    }
 000070  e8bd81f0          POP      {r4-r8,pc}
-;;;337    //写入帧头
+;;;369    //写入帧头
                           ENDP
 
 
                           AREA ||i.jmkr_write_scan_head||, CODE, READONLY, ALIGN=1
 
                   jmkr_write_scan_head PROC
-;;;403    //写入扫描开始标志
-;;;404    void jmkr_write_scan_head(jpeg_compress_info *cinfo) 
+;;;435    //写入扫描开始标志
+;;;436    void jmkr_write_scan_head(jpeg_compress_info *cinfo) 
 000000  e92d4ffe          PUSH     {r1-r11,lr}
-;;;405    {
+;;;437    {
 000004  4604              MOV      r4,r0
-;;;406      	int i;
-;;;407      	u16 Ls;
-;;;408      	u8 Ns,Ss,Se,Ah,Al,Cs,Td,Ta;
-;;;409    	jutl_write_byte(0xFF,cinfo->output,cinfo  );
+;;;438      	int i;
+;;;439      	u16 Ls;
+;;;440      	u8 Ns,Ss,Se,Ah,Al,Cs,Td,Ta;
+;;;441    	jutl_write_byte(0xFF,cinfo->output,cinfo  );
 000006  4622              MOV      r2,r4
 000008  20ff              MOVS     r0,#0xff
 00000a  68a1              LDR      r1,[r4,#8]
 00000c  f7fffffe          BL       jutl_write_byte
-;;;410    	jutl_write_byte(SOS,cinfo->output,cinfo  );
+;;;442    	jutl_write_byte(SOS,cinfo->output,cinfo  );
 000010  4622              MOV      r2,r4
 000012  20da              MOVS     r0,#0xda
 000014  68a1              LDR      r1,[r4,#8]
 000016  f7fffffe          BL       jutl_write_byte
-;;;411    	Ns=cinfo->num_comp;
+;;;443    	Ns=cinfo->num_comp;
 00001a  7e26              LDRB     r6,[r4,#0x18]
-;;;412    	Ls=6+2*Ns;
+;;;444    	Ls=6+2*Ns;
 00001c  0070              LSLS     r0,r6,#1
 00001e  1d87              ADDS     r7,r0,#6
-;;;413    	Ss=0;//定值!不改变
+;;;445    	Ss=0;//定值!不改变
 000020  2000              MOVS     r0,#0
 000022  9002              STR      r0,[sp,#8]
-;;;414    	Se=63;
+;;;446    	Se=63;
 000024  203f              MOVS     r0,#0x3f
 000026  9001              STR      r0,[sp,#4]
-;;;415    	Ah=Al=0;
+;;;447    	Ah=Al=0;
 000028  2000              MOVS     r0,#0
 00002a  4683              MOV      r11,r0
 00002c  9000              STR      r0,[sp,#0]
-;;;416    	jutl_write_byte(Ls>>8,cinfo->output,cinfo  );
+;;;448    	jutl_write_byte(Ls>>8,cinfo->output,cinfo  );
 00002e  1238              ASRS     r0,r7,#8
 000030  4622              MOV      r2,r4
 000032  68a1              LDR      r1,[r4,#8]
 000034  f7fffffe          BL       jutl_write_byte
-;;;417    	jutl_write_byte(Ls&0xFF,cinfo->output,cinfo  );
+;;;449    	jutl_write_byte(Ls&0xFF,cinfo->output,cinfo  );
 000038  b2f8              UXTB     r0,r7
 00003a  4622              MOV      r2,r4
 00003c  68a1              LDR      r1,[r4,#8]
 00003e  f7fffffe          BL       jutl_write_byte
-;;;418    	jutl_write_byte(Ns,cinfo->output,cinfo  );
+;;;450    	jutl_write_byte(Ns,cinfo->output,cinfo  );
 000042  4622              MOV      r2,r4
 000044  4630              MOV      r0,r6
 000046  68a1              LDR      r1,[r4,#8]
 000048  f7fffffe          BL       jutl_write_byte
-;;;419    	for(i=0;i<Ns;i++)
+;;;451    	for(i=0;i<Ns;i++)
 00004c  2500              MOVS     r5,#0
 00004e  e020              B        |L20.146|
                   |L20.80|
-;;;420    	{
-;;;421    		Cs=cinfo->comp[i].comp_id;
+;;;452    	{
+;;;453    		Cs=cinfo->comp[i].comp_id;
 000050  eb0501c5          ADD      r1,r5,r5,LSL #3
 000054  f104001c          ADD      r0,r4,#0x1c
 000058  f8108021          LDRB     r8,[r0,r1,LSL #2]
-;;;422    		Td=cinfo->comp[i].dc_tbl_no;
+;;;454    		Td=cinfo->comp[i].dc_tbl_no;
 00005c  eb0501c5          ADD      r1,r5,r5,LSL #3
 000060  eb000081          ADD      r0,r0,r1,LSL #2
 000064  f8909010          LDRB     r9,[r0,#0x10]
-;;;423    		Ta=cinfo->comp[i].ac_tbl_no;
+;;;455    		Ta=cinfo->comp[i].ac_tbl_no;
 000068  eb0501c5          ADD      r1,r5,r5,LSL #3
 00006c  f104001c          ADD      r0,r4,#0x1c
 000070  eb000081          ADD      r0,r0,r1,LSL #2
 000074  f890a014          LDRB     r10,[r0,#0x14]
-;;;424    		jutl_write_byte(Cs,cinfo->output,cinfo  );
+;;;456    		jutl_write_byte(Cs,cinfo->output,cinfo  );
 000078  4622              MOV      r2,r4
 00007a  4640              MOV      r0,r8
 00007c  68a1              LDR      r1,[r4,#8]
 00007e  f7fffffe          BL       jutl_write_byte
-;;;425    		jutl_write_byte((Td<<4|Ta),cinfo->output,cinfo  );
+;;;457    		jutl_write_byte((Td<<4|Ta),cinfo->output,cinfo  );
 000082  ea4a1209          ORR      r2,r10,r9,LSL #4
 000086  b2d0              UXTB     r0,r2
 000088  4622              MOV      r2,r4
 00008a  68a1              LDR      r1,[r4,#8]
 00008c  f7fffffe          BL       jutl_write_byte
-000090  1c6d              ADDS     r5,r5,#1              ;419
+000090  1c6d              ADDS     r5,r5,#1              ;451
                   |L20.146|
-000092  42b5              CMP      r5,r6                 ;419
+000092  42b5              CMP      r5,r6                 ;451
 000094  dbdc              BLT      |L20.80|
-;;;426    	}
-;;;427    	jutl_write_byte(Ss,cinfo->output,cinfo  );
+;;;458    	}
+;;;459    	jutl_write_byte(Ss,cinfo->output,cinfo  );
 000096  4622              MOV      r2,r4
 000098  68a1              LDR      r1,[r4,#8]
 00009a  9802              LDR      r0,[sp,#8]
 00009c  f7fffffe          BL       jutl_write_byte
-;;;428    	jutl_write_byte(Se,cinfo->output,cinfo  );
+;;;460    	jutl_write_byte(Se,cinfo->output,cinfo  );
 0000a0  4622              MOV      r2,r4
 0000a2  68a1              LDR      r1,[r4,#8]
 0000a4  9801              LDR      r0,[sp,#4]
 0000a6  f7fffffe          BL       jutl_write_byte
-;;;429    	jutl_write_byte(((Ah<<4)|Al),cinfo->output,cinfo  );
+;;;461    	jutl_write_byte(((Ah<<4)|Al),cinfo->output,cinfo  );
 0000aa  68a1              LDR      r1,[r4,#8]
 0000ac  9a00              LDR      r2,[sp,#0]
 0000ae  ea42120b          ORR      r2,r2,r11,LSL #4
 0000b2  b2d0              UXTB     r0,r2
 0000b4  4622              MOV      r2,r4
 0000b6  f7fffffe          BL       jutl_write_byte
-;;;430    }
+;;;462    }
 0000ba  e8bd8ffe          POP      {r1-r11,pc}
-;;;431    //写文件结束标志
+;;;463    //写文件结束标志
                           ENDP
 
 
                           AREA ||i.jmkr_write_start||, CODE, READONLY, ALIGN=1
 
                   jmkr_write_start PROC
-;;;296    //写头信息
-;;;297    void jmkr_write_start(jpeg_compress_info *cinfo) 
+;;;328    //写头信息
+;;;329    void jmkr_write_start(jpeg_compress_info *cinfo) 
 000000  b510              PUSH     {r4,lr}
-;;;298    {
+;;;330    {
 000002  4604              MOV      r4,r0
-;;;299      	jmkr_write_image_start(cinfo);//文件开始标志
+;;;331      	jmkr_write_image_start(cinfo);//文件开始标志
 000004  4620              MOV      r0,r4
 000006  f7fffffe          BL       jmkr_write_image_start
-;;;300      	jmkr_write_jfif(cinfo);//APP0信息
+;;;332      	jmkr_write_jfif(cinfo);//APP0信息
 00000a  4620              MOV      r0,r4
 00000c  f7fffffe          BL       jmkr_write_jfif
-;;;301      	jmkr_write_quant_table(cinfo);//quant表
+;;;333      	jmkr_write_quant_table(cinfo);//quant表
 000010  4620              MOV      r0,r4
 000012  f7fffffe          BL       jmkr_write_quant_table
-;;;302      	jmkr_write_frame_head(cinfo);//帧头
+;;;334      	jmkr_write_frame_head(cinfo);//帧头
 000016  4620              MOV      r0,r4
 000018  f7fffffe          BL       jmkr_write_frame_head
-;;;303      	jmkr_write_huff_table(cinfo);//哈夫曼表
+;;;335      	jmkr_write_huff_table(cinfo);//哈夫曼表
 00001c  4620              MOV      r0,r4
 00001e  f7fffffe          BL       jmkr_write_huff_table
-;;;304      	jmkr_write_scan_head(cinfo);//扫描开始
+;;;336      	jmkr_write_scan_head(cinfo);//扫描开始
 000022  4620              MOV      r0,r4
 000024  f7fffffe          BL       jmkr_write_scan_head
-;;;305    }
+;;;337    }
 000028  bd10              POP      {r4,pc}
-;;;306    //写入文件开始标志 
+;;;338    //写入文件开始标志 
                           ENDP
 
 
                           AREA ||i.jpeg_calc_value||, CODE, READONLY, ALIGN=2
 
                   jpeg_calc_value PROC
-;;;228    //计算出一些有用的值并分配到缓冲区中
-;;;229    void jpeg_calc_value(jpeg_compress_info *cinfo,u8 *inbuf_buf) 
+;;;260    //计算出一些有用的值并分配到缓冲区中
+;;;261    void jpeg_calc_value(jpeg_compress_info *cinfo,u8 *inbuf_buf) 
 000000  e92d5ff0          PUSH     {r4-r12,lr}
-;;;230    {
+;;;262    {
 000004  4604              MOV      r4,r0
 000006  4689              MOV      r9,r1
-;;;231      	int i,h,v,bn;
-;;;232      	int size;
-;;;233      	jpeg_component_info *pcomp;  
-;;;234    	cinfo->state=JC_SETTING;
+;;;263      	int i,h,v,bn;
+;;;264      	int size;
+;;;265      	jpeg_component_info *pcomp;  
+;;;266    	cinfo->state=JC_SETTING;
 000008  2001              MOVS     r0,#1
 00000a  f88400fc          STRB     r0,[r4,#0xfc]
-;;;235    	bn=0;
+;;;267    	bn=0;
 00000e  f04f0a00          MOV      r10,#0
-;;;236    	cinfo->max_h_factor=0;
+;;;268    	cinfo->max_h_factor=0;
 000012  2000              MOVS     r0,#0
 000014  f8c400c4          STR      r0,[r4,#0xc4]
-;;;237    	cinfo->max_v_factor=0;	
+;;;269    	cinfo->max_v_factor=0;	
 000018  f8c400c8          STR      r0,[r4,#0xc8]
-;;;238    	for(i=0;i<cinfo->num_comp;i++)//循环计算每个元件的信息
+;;;270    	for(i=0;i<cinfo->num_comp;i++)//循环计算每个元件的信息
 00001c  4680              MOV      r8,r0
 00001e  e025              B        |L22.108|
                   |L22.32|
-;;;239    	{
-;;;240    		pcomp=&cinfo->comp[i];
+;;;271    	{
+;;;272    		pcomp=&cinfo->comp[i];
 000020  eb0801c8          ADD      r1,r8,r8,LSL #3
 000024  f104001c          ADD      r0,r4,#0x1c
 000028  eb000581          ADD      r5,r0,r1,LSL #2
-;;;241    		h=pcomp->h_factor;
+;;;273    		h=pcomp->h_factor;
 00002c  686e              LDR      r6,[r5,#4]
-;;;242    		v=pcomp->v_factor;	
+;;;274    		v=pcomp->v_factor;	
 00002e  68af              LDR      r7,[r5,#8]
-;;;243    		if(cinfo->max_h_factor<h)cinfo->max_h_factor=h;
+;;;275    		if(cinfo->max_h_factor<h)cinfo->max_h_factor=h;
 000030  f8d400c4          LDR      r0,[r4,#0xc4]
 000034  42b0              CMP      r0,r6
 000036  da01              BGE      |L22.60|
 000038  f8c460c4          STR      r6,[r4,#0xc4]
                   |L22.60|
-;;;244    		if(cinfo->max_v_factor<v)cinfo->max_v_factor=v;
+;;;276    		if(cinfo->max_v_factor<v)cinfo->max_v_factor=v;
 00003c  f8d400c8          LDR      r0,[r4,#0xc8]
 000040  42b8              CMP      r0,r7
 000042  da01              BGE      |L22.72|
 000044  f8c470c8          STR      r7,[r4,#0xc8]
                   |L22.72|
-;;;245    		bn+=(h*v);	
+;;;277    		bn+=(h*v);	
 000048  fb06aa07          MLA      r10,r6,r7,r10
-;;;246    		//在这里申请内存空间,但要在jpeg_destory_compress()中须释放它,所以用户必须在完成压缩时调用它
-;;;247    		pcomp->num_dct_table=h*v;
+;;;278    		//在这里申请内存空间,但要在jpeg_destory_compress()中须释放它,所以用户必须在完成压缩时调用它
+;;;279    		pcomp->num_dct_table=h*v;
 00004c  fb06f007          MUL      r0,r6,r7
 000050  61a8              STR      r0,[r5,#0x18]
-;;;248    		size=sizeof(DCTBLOCK)*pcomp->num_dct_table;
+;;;280    		size=sizeof(DCTBLOCK)*pcomp->num_dct_table;
 000052  69a8              LDR      r0,[r5,#0x18]
 000054  ea4f1bc0          LSL      r11,r0,#7
-;;;249    		pcomp->dct_table=(DCTBLOCK*)(dcttab[i]);//malloc(size);
+;;;281    		pcomp->dct_table=(DCTBLOCK*)(dcttab[i]);//malloc(size);
 000058  482b              LDR      r0,|L22.264|
 00005a  eb002048          ADD      r0,r0,r8,LSL #9
 00005e  61e8              STR      r0,[r5,#0x1c]
-;;;250    		memset((void*)(pcomp->dct_table),0,size);
+;;;282    		memset((void*)(pcomp->dct_table),0,size);
 000060  4659              MOV      r1,r11
 000062  69e8              LDR      r0,[r5,#0x1c]
 000064  f7fffffe          BL       __aeabi_memclr
-000068  f1080801          ADD      r8,r8,#1              ;238
+000068  f1080801          ADD      r8,r8,#1              ;270
                   |L22.108|
-00006c  69a0              LDR      r0,[r4,#0x18]         ;238
-00006e  4540              CMP      r0,r8                 ;238
+00006c  69a0              LDR      r0,[r4,#0x18]         ;270
+00006e  4540              CMP      r0,r8                 ;270
 000070  dcd6              BGT      |L22.32|
-;;;251    	}	
-;;;252    	//if(bn>MAX_BLOCK_IN_MCU)exit(1);	
-;;;253    	cinfo->block_in_mcu=bn;
+;;;283    	}	
+;;;284    	//if(bn>MAX_BLOCK_IN_MCU)exit(1);	
+;;;285    	cinfo->block_in_mcu=bn;
 000072  344c              ADDS     r4,r4,#0x4c
 000074  f8c4a068          STR      r10,[r4,#0x68]
-;;;254    	cinfo->mcu_width=cinfo->max_h_factor*DCTSIZE;
+;;;286    	cinfo->mcu_width=cinfo->max_h_factor*DCTSIZE;
 000078  6fa0              LDR      r0,[r4,#0x78]
 00007a  00c0              LSLS     r0,r0,#3
 00007c  66e0              STR      r0,[r4,#0x6c]
-;;;255    	cinfo->mcu_height=cinfo->max_v_factor*DCTSIZE;
+;;;287    	cinfo->mcu_height=cinfo->max_v_factor*DCTSIZE;
 00007e  6fe0              LDR      r0,[r4,#0x7c]
 000080  00c0              LSLS     r0,r0,#3
 000082  6720              STR      r0,[r4,#0x70]
-;;;256    	cinfo->mcu_blocks=cinfo->mcu_width*cinfo->mcu_height;	
+;;;288    	cinfo->mcu_blocks=cinfo->mcu_width*cinfo->mcu_height;	
 000084  e9d4011b          LDRD     r0,r1,[r4,#0x6c]
 000088  4348              MULS     r0,r1,r0
 00008a  6760              STR      r0,[r4,#0x74]
-;;;257    	//设置和MCU有关的值 
-;;;258    	cinfo->mcu_per_row=cinfo->image_width/cinfo->mcu_width;
+;;;289    	//设置和MCU有关的值 
+;;;290    	cinfo->mcu_per_row=cinfo->image_width/cinfo->mcu_width;
 00008c  f8540c4c          LDR      r0,[r4,#-0x4c]
 000090  6ee1              LDR      r1,[r4,#0x6c]
 000092  fb90f0f1          SDIV     r0,r0,r1
 000096  6620              STR      r0,[r4,#0x60]
-;;;259    	if(cinfo->image_width%cinfo->mcu_width!=0)
+;;;291    	if(cinfo->image_width%cinfo->mcu_width!=0)
 000098  f8540c4c          LDR      r0,[r4,#-0x4c]
 00009c  6ee1              LDR      r1,[r4,#0x6c]
 00009e  3c4c              SUBS     r4,r4,#0x4c
 0000a0  fb90f2f1          SDIV     r2,r0,r1
 0000a4  fb010012          MLS      r0,r1,r2,r0
 0000a8  b120              CBZ      r0,|L22.180|
-;;;260    	cinfo->mcu_per_row++;
+;;;292    	cinfo->mcu_per_row++;
 0000aa  f8d400ac          LDR      r0,[r4,#0xac]
 0000ae  1c40              ADDS     r0,r0,#1
 0000b0  f8c400ac          STR      r0,[r4,#0xac]
                   |L22.180|
-;;;261    	cinfo->mcu_rows=cinfo->image_height/cinfo->mcu_height;
+;;;293    	cinfo->mcu_rows=cinfo->image_height/cinfo->mcu_height;
 0000b4  f8d410bc          LDR      r1,[r4,#0xbc]
 0000b8  6860              LDR      r0,[r4,#4]
 0000ba  fb90f0f1          SDIV     r0,r0,r1
 0000be  f8c400b0          STR      r0,[r4,#0xb0]
-;;;262    	if(cinfo->image_height%cinfo->mcu_height!=0)
+;;;294    	if(cinfo->image_height%cinfo->mcu_height!=0)
 0000c2  f8d410bc          LDR      r1,[r4,#0xbc]
 0000c6  6860              LDR      r0,[r4,#4]
 0000c8  fb90f2f1          SDIV     r2,r0,r1
 0000cc  fb010012          MLS      r0,r1,r2,r0
 0000d0  b120              CBZ      r0,|L22.220|
-;;;263    	cinfo->mcu_rows++;	
+;;;295    	cinfo->mcu_rows++;	
 0000d2  f8d400b0          LDR      r0,[r4,#0xb0]
 0000d6  1c40              ADDS     r0,r0,#1
 0000d8  f8c400b0          STR      r0,[r4,#0xb0]
                   |L22.220|
-;;;264    	//设置输入缓冲区
-;;;265    	cinfo->inbuf_width=cinfo->mcu_per_row*cinfo->mcu_width;
+;;;296    	//设置输入缓冲区
+;;;297    	cinfo->inbuf_width=cinfo->mcu_per_row*cinfo->mcu_width;
 0000dc  f8540fac          LDR      r0,[r4,#0xac]!
 0000e0  68e1              LDR      r1,[r4,#0xc]
 0000e2  4348              MULS     r0,r1,r0
 0000e4  6460              STR      r0,[r4,#0x44]
-;;;266    	cinfo->inbuf_height=cinfo->mcu_height;
+;;;298    	cinfo->inbuf_height=cinfo->mcu_height;
 0000e6  6920              LDR      r0,[r4,#0x10]
 0000e8  64a0              STR      r0,[r4,#0x48]
-;;;267    	cinfo->inbuf_size=cinfo->inbuf_width*cinfo->inbuf_height*cinfo->num_comp*sizeof(JSAMPLE);
+;;;299    	cinfo->inbuf_size=cinfo->inbuf_width*cinfo->inbuf_height*cinfo->num_comp*sizeof(JSAMPLE);
 0000ea  e9d40111          LDRD     r0,r1,[r4,#0x44]
 0000ee  4348              MULS     r0,r1,r0
 0000f0  f8541c94          LDR      r1,[r4,#-0x94]
 0000f4  4348              MULS     r0,r1,r0
 0000f6  64e0              STR      r0,[r4,#0x4c]
-;;;268    	cinfo->inbuf=(JSAMPLE*)inbuf_buf;//malloc(cinfo->inbuf_size);
+;;;300    	cinfo->inbuf=(JSAMPLE*)inbuf_buf;//malloc(cinfo->inbuf_size);
 0000f8  f8c49040          STR      r9,[r4,#0x40]
-;;;269     	cinfo->next_line=0;//复状态值
+;;;301     	cinfo->next_line=0;//复状态值
 0000fc  2000              MOVS     r0,#0
 0000fe  6560              STR      r0,[r4,#0x54]
 000100  3cac              SUBS     r4,r4,#0xac
-;;;270    }
+;;;302    }
 000102  e8bd9ff0          POP      {r4-r12,pc}
-;;;271    ///////////////////////////////////////////////////////////////////////////////////////////
+;;;303    ///////////////////////////////////////////////////////////////////////////////////////////
                           ENDP
 
 000106  0000              DCW      0x0000
@@ -2746,165 +2773,168 @@
                           AREA ||i.jpeg_finish_compress||, CODE, READONLY, ALIGN=1
 
                   jpeg_finish_compress PROC
-;;;806    //完成缓冲区中剩下数据的压缩编码,并写文件尾到输出文件
-;;;807    void jpeg_finish_compress(jpeg_compress_info *cinfo) 
+;;;838    //完成缓冲区中剩下数据的压缩编码,并写文件尾到输出文件
+;;;839    void jpeg_finish_compress(jpeg_compress_info *cinfo) 
 000000  e92d41f0          PUSH     {r4-r8,lr}
-;;;808    {
+;;;840    {
 000004  4604              MOV      r4,r0
-;;;809      	int i,startline,rowlen;
-;;;810      	JSAMPLE *data;
-;;;811      	//if(cinfo->state!=JC_START)exit(1);
-;;;812      	//完成cinfo->inbuf中数据的压缩
-;;;813      	if(cinfo->next_line%cinfo->inbuf_height!=0)
+;;;841      	int i,startline,rowlen;
+;;;842      	JSAMPLE *data;
+;;;843      	//if(cinfo->state!=JC_START)exit(1);
+;;;844      	//完成cinfo->inbuf中数据的压缩
+;;;845      	if(cinfo->next_line%cinfo->inbuf_height!=0)
 000006  f8d410f4          LDR      r1,[r4,#0xf4]
 00000a  f8d40100          LDR      r0,[r4,#0x100]
 00000e  fb90f2f1          SDIV     r2,r0,r1
 000012  fb010012          MLS      r0,r1,r2,r0
 000016  b318              CBZ      r0,|L23.96|
-;;;814    	{
-;;;815    		rowlen=cinfo->inbuf_width*cinfo->num_comp*sizeof(JSAMPLE);
+;;;846    	{
+;;;847    		rowlen=cinfo->inbuf_width*cinfo->num_comp*sizeof(JSAMPLE);
 000018  3484              ADDS     r4,r4,#0x84
 00001a  f8541c6c          LDR      r1,[r4,#-0x6c]
 00001e  6ee0              LDR      r0,[r4,#0x6c]
 000020  fb00f501          MUL      r5,r0,r1
-;;;816    		startline=cinfo->next_line%cinfo->inbuf_height;
+;;;848    		startline=cinfo->next_line%cinfo->inbuf_height;
 000024  6f21              LDR      r1,[r4,#0x70]
 000026  6fe0              LDR      r0,[r4,#0x7c]
 000028  fb90f2f1          SDIV     r2,r0,r1
 00002c  fb010712          MLS      r7,r1,r2,r0
-;;;817    		data=&cinfo->inbuf[(startline-1)*rowlen];
+;;;849    		data=&cinfo->inbuf[(startline-1)*rowlen];
 000030  6ea1              LDR      r1,[r4,#0x68]
 000032  3c84              SUBS     r4,r4,#0x84
 000034  1e78              SUBS     r0,r7,#1
 000036  fb001805          MLA      r8,r0,r5,r1
-;;;818    		if(startline!=0)
+;;;850    		if(startline!=0)
 00003a  b177              CBZ      r7,|L23.90|
-;;;819    			for(i=startline;i<cinfo->inbuf_height;i++)
+;;;851    			for(i=startline;i<cinfo->inbuf_height;i++)
 00003c  463e              MOV      r6,r7
 00003e  e008              B        |L23.82|
                   |L23.64|
-;;;820    				memcpy(&cinfo->inbuf[i*rowlen],data,rowlen);
+;;;852    				memcpy(&cinfo->inbuf[i*rowlen],data,rowlen);
 000040  f8d410ec          LDR      r1,[r4,#0xec]
 000044  fb061005          MLA      r0,r6,r5,r1
 000048  462a              MOV      r2,r5
 00004a  4641              MOV      r1,r8
 00004c  f7fffffe          BL       __aeabi_memcpy
-000050  1c76              ADDS     r6,r6,#1              ;819
+000050  1c76              ADDS     r6,r6,#1              ;851
                   |L23.82|
-000052  f8d400f4          LDR      r0,[r4,#0xf4]         ;819
-000056  42b0              CMP      r0,r6                 ;819
+000052  f8d400f4          LDR      r0,[r4,#0xf4]         ;851
+000056  42b0              CMP      r0,r6                 ;851
 000058  dcf2              BGT      |L23.64|
                   |L23.90|
-;;;821        	jint_process_rows(cinfo);  
+;;;853        	jint_process_rows(cinfo);  
 00005a  4620              MOV      r0,r4
 00005c  f7fffffe          BL       jint_process_rows
                   |L23.96|
-;;;822      	}
-;;;823      	jhuff_flush_buffer(cinfo); 
+;;;854      	}
+;;;855      	jhuff_flush_buffer(cinfo); 
 000060  4620              MOV      r0,r4
 000062  f7fffffe          BL       jhuff_flush_buffer
-;;;824      	jmkr_write_end(cinfo);//添加JPEG文件尾  	
+;;;856      	jmkr_write_end(cinfo);//添加JPEG文件尾  	
 000066  4620              MOV      r0,r4
 000068  f7fffffe          BL       jmkr_write_end
-;;;825    }
+;;;857    }
 00006c  e8bd81f0          POP      {r4-r8,pc}
-;;;826    //清除/释放缓冲区
+;;;858    //清除/释放缓冲区
                           ENDP
 
 
                           AREA ||i.jpeg_set_default||, CODE, READONLY, ALIGN=2
 
                   jpeg_set_default PROC
-;;;112    //设置默认参数
-;;;113    void jpeg_set_default(jpeg_compress_info *cinfo,u8 *inbuf_buf) 
+;;;141    //设置默认参数
+;;;142    void jpeg_set_default(jpeg_compress_info *cinfo,u8 *inbuf_buf) 
 000000  b570              PUSH     {r4-r6,lr}
-;;;114    {
+;;;143    {
 000002  4604              MOV      r4,r0
 000004  460d              MOV      r5,r1
-;;;115      	cinfo->precision=8;//采样精度8  
+;;;144      	cinfo->precision=8;//采样精度8  
 000006  2008              MOVS     r0,#8
 000008  60e0              STR      r0,[r4,#0xc]
-;;;116      	cinfo->in_color_space=JCS_RGB;//色彩空间
+;;;145      	cinfo->in_color_space=JCS_RGB;//色彩空间
 00000a  2002              MOVS     r0,#2
 00000c  7520              STRB     r0,[r4,#0x14]
-;;;117    	  cinfo->quality=JPEG_QUALITY;//图像质量,值越小质量越好 
+;;;146      	//cinfo->quality=0.2f;//图像质量,值越小质量越好 
+;;;147    	
+;;;148    	cinfo->quality=photo_qulity;//图像质量,值越小质量越好 
 00000e  4818              LDR      r0,|L24.112|
-000010  6120              STR      r0,[r4,#0x10]
-;;;118      	//初始化元件颜色为YCbCr彩色  
-;;;119      	cinfo->num_comp=3;//像素组成字节数
-000012  2003              MOVS     r0,#3
-000014  61a0              STR      r0,[r4,#0x18]
-;;;120      	SET_COMP(cinfo->comp[0],1,2,2,0,0,0);////图像采样率，YUV422
-000016  2001              MOVS     r0,#1
-000018  7720              STRB     r0,[r4,#0x1c]
-00001a  2101              MOVS     r1,#1
-00001c  7761              STRB     r1,[r4,#0x1d]
-00001e  2102              MOVS     r1,#2
-000020  6221              STR      r1,[r4,#0x20]
-000022  6261              STR      r1,[r4,#0x24]
-000024  2100              MOVS     r1,#0
-000026  62a1              STR      r1,[r4,#0x28]
-000028  62e1              STR      r1,[r4,#0x2c]
-00002a  6321              STR      r1,[r4,#0x30]
-;;;121      	SET_COMP(cinfo->comp[1],2,1,1,1,1,1);//
-00002c  2102              MOVS     r1,#2
-00002e  f8841040          STRB     r1,[r4,#0x40]
-000032  f8841041          STRB     r1,[r4,#0x41]
-000036  2101              MOVS     r1,#1
-000038  6461              STR      r1,[r4,#0x44]
-00003a  64a1              STR      r1,[r4,#0x48]
-00003c  64e1              STR      r1,[r4,#0x4c]
-00003e  6521              STR      r1,[r4,#0x50]
-000040  6561              STR      r1,[r4,#0x54]
-;;;122      	SET_COMP(cinfo->comp[2],3,1,1,1,1,1);//  	
-000042  2103              MOVS     r1,#3
-000044  f8841064          STRB     r1,[r4,#0x64]
-000048  f8841065          STRB     r1,[r4,#0x65]
-00004c  2101              MOVS     r1,#1
-00004e  66a1              STR      r1,[r4,#0x68]
-000050  66e1              STR      r1,[r4,#0x6c]
-000052  6721              STR      r1,[r4,#0x70]
-000054  6761              STR      r1,[r4,#0x74]
-000056  67a1              STR      r1,[r4,#0x78]
-;;;123      	jint_std_quant_tables(cinfo);//设置标准量化表  	
-000058  4620              MOV      r0,r4
-00005a  f7fffffe          BL       jint_std_quant_tables
-;;;124      	jint_std_huff_tables(cinfo);//设置标准huffman表  
-00005e  4620              MOV      r0,r4
-000060  f7fffffe          BL       jint_std_huff_tables
-;;;125      	jpeg_calc_value(cinfo,inbuf_buf);//其它变量
-000064  4629              MOV      r1,r5
-000066  4620              MOV      r0,r4
-000068  f7fffffe          BL       jpeg_calc_value
-;;;126    }
-00006c  bd70              POP      {r4-r6,pc}
-;;;127    //设置标准量化表
+000010  6800              LDR      r0,[r0,#0]  ; photo_qulity
+000012  6120              STR      r0,[r4,#0x10]
+;;;149    	
+;;;150      	//初始化元件颜色为YCbCr彩色  
+;;;151      	cinfo->num_comp=3;//元件数量为3
+000014  2003              MOVS     r0,#3
+000016  61a0              STR      r0,[r4,#0x18]
+;;;152      	SET_COMP(cinfo->comp[0],1,2,2,0,0,0);//
+000018  2001              MOVS     r0,#1
+00001a  7720              STRB     r0,[r4,#0x1c]
+00001c  2101              MOVS     r1,#1
+00001e  7761              STRB     r1,[r4,#0x1d]
+000020  2102              MOVS     r1,#2
+000022  6221              STR      r1,[r4,#0x20]
+000024  6261              STR      r1,[r4,#0x24]
+000026  2100              MOVS     r1,#0
+000028  62a1              STR      r1,[r4,#0x28]
+00002a  62e1              STR      r1,[r4,#0x2c]
+00002c  6321              STR      r1,[r4,#0x30]
+;;;153      	SET_COMP(cinfo->comp[1],2,1,1,1,1,1);//
+00002e  2102              MOVS     r1,#2
+000030  f8841040          STRB     r1,[r4,#0x40]
+000034  f8841041          STRB     r1,[r4,#0x41]
+000038  2101              MOVS     r1,#1
+00003a  6461              STR      r1,[r4,#0x44]
+00003c  64a1              STR      r1,[r4,#0x48]
+00003e  64e1              STR      r1,[r4,#0x4c]
+000040  6521              STR      r1,[r4,#0x50]
+000042  6561              STR      r1,[r4,#0x54]
+;;;154      	SET_COMP(cinfo->comp[2],3,1,1,1,1,1);//  	
+000044  2103              MOVS     r1,#3
+000046  f8841064          STRB     r1,[r4,#0x64]
+00004a  f8841065          STRB     r1,[r4,#0x65]
+00004e  2101              MOVS     r1,#1
+000050  66a1              STR      r1,[r4,#0x68]
+000052  66e1              STR      r1,[r4,#0x6c]
+000054  6721              STR      r1,[r4,#0x70]
+000056  6761              STR      r1,[r4,#0x74]
+000058  67a1              STR      r1,[r4,#0x78]
+;;;155      	jint_std_quant_tables(cinfo);//设置标准量化表  	
+00005a  4620              MOV      r0,r4
+00005c  f7fffffe          BL       jint_std_quant_tables
+;;;156      	jint_std_huff_tables(cinfo);//设置标准huffman表  
+000060  4620              MOV      r0,r4
+000062  f7fffffe          BL       jint_std_huff_tables
+;;;157      	jpeg_calc_value(cinfo,inbuf_buf);//其它变量
+000066  4629              MOV      r1,r5
+000068  4620              MOV      r0,r4
+00006a  f7fffffe          BL       jpeg_calc_value
+;;;158    }
+00006e  bd70              POP      {r4-r6,pc}
+;;;159    //设置标准量化表
                           ENDP
 
-00006e  0000              DCW      0x0000
                   |L24.112|
-                          DCD      0x3f4ccccd
+                          DCD      photo_qulity
 
                           AREA ||i.jpeg_start_compress||, CODE, READONLY, ALIGN=1
 
                   jpeg_start_compress PROC
-;;;286    //开始压缩编码,写入头信息
-;;;287    void jpeg_start_compress(jpeg_compress_info *cinfo) 
+;;;318    //开始压缩编码,写入头信息
+;;;319    void jpeg_start_compress(jpeg_compress_info *cinfo) 
 000000  b570              PUSH     {r4-r6,lr}
-;;;288    {
+;;;320    {
 000002  4604              MOV      r4,r0
-;;;289      	int i;
-;;;290    
-;;;291      	jmkr_write_start(cinfo);//写头信息,包括文件头,帧头和扫描开始  
+;;;321      	int i;
+;;;322    
+;;;323      	jmkr_write_start(cinfo);//写头信息,包括文件头,帧头和扫描开始  
 000004  4620              MOV      r0,r4
 000006  f7fffffe          BL       jmkr_write_start
-;;;292      	cinfo->state=JC_START;//保存当前状态(开始)
+;;;324      	cinfo->state=JC_START;//保存当前状态(开始)
 00000a  2002              MOVS     r0,#2
 00000c  f88400fc          STRB     r0,[r4,#0xfc]
-;;;293      	cinfo->next_line=0;//初始化开始变量
+;;;325      	cinfo->next_line=0;//初始化开始变量
 000010  2000              MOVS     r0,#0
 000012  f8c40100          STR      r0,[r4,#0x100]
-;;;294      	for(i=0;i<cinfo->num_comp;i++)cinfo->comp[i].preval=0;
+;;;326      	for(i=0;i<cinfo->num_comp;i++)cinfo->comp[i].preval=0;
 000016  2500              MOVS     r5,#0
 000018  e008              B        |L25.44|
                   |L25.26|
@@ -2918,52 +2948,52 @@
 00002c  69a0              LDR      r0,[r4,#0x18]
 00002e  42a8              CMP      r0,r5
 000030  dcf3              BGT      |L25.26|
-;;;295    }
+;;;327    }
 000032  bd70              POP      {r4-r6,pc}
-;;;296    //写头信息
+;;;328    //写头信息
                           ENDP
 
 
                           AREA ||i.jutl_cc_rgb2ycc||, CODE, READONLY, ALIGN=2
 
                   jutl_cc_rgb2ycc PROC
-;;;484    //RGB转YUV
-;;;485    void jutl_cc_rgb2ycc(JSAMPLE *data,int num) 
+;;;516    //RGB转YUV
+;;;517    void jutl_cc_rgb2ycc(JSAMPLE *data,int num) 
 000000  e92d4ff0          PUSH     {r4-r11,lr}
-;;;486    {
+;;;518    {
 000004  b085              SUB      sp,sp,#0x14
 000006  4606              MOV      r6,r0
 000008  460f              MOV      r7,r1
-;;;487     int i;
-;;;488     float a,b,c;
-;;;489     struct three_component_color{
-;;;490     JSAMPLE a,b,c;
-;;;491      } *pcolor;
-;;;492     pcolor=(struct three_component_color*)data;
+;;;519      	int i;
+;;;520      	float a,b,c;
+;;;521      	struct three_component_color{
+;;;522    		JSAMPLE a,b,c;
+;;;523      	} *pcolor;
+;;;524    	pcolor=(struct three_component_color*)data;
 00000a  4635              MOV      r5,r6
-;;;493    	for(i=0;i<num;i++)
+;;;525    	for(i=0;i<num;i++)
 00000c  2400              MOVS     r4,#0
 00000e  e076              B        |L26.254|
                   |L26.16|
-;;;494    	{
-;;;495    		a=pcolor[i].a;
+;;;526    	{
+;;;527    		a=pcolor[i].a;
 000010  eb040144          ADD      r1,r4,r4,LSL #1
 000014  5c68              LDRB     r0,[r5,r1]
 000016  f7fffffe          BL       __aeabi_ui2f
 00001a  4683              MOV      r11,r0
-;;;496    		b=pcolor[i].b;
+;;;528    		b=pcolor[i].b;
 00001c  eb040144          ADD      r1,r4,r4,LSL #1
 000020  4429              ADD      r1,r1,r5
 000022  7848              LDRB     r0,[r1,#1]
 000024  f7fffffe          BL       __aeabi_ui2f
 000028  9004              STR      r0,[sp,#0x10]
-;;;497    		c=pcolor[i].c;
+;;;529    		c=pcolor[i].c;
 00002a  eb040144          ADD      r1,r4,r4,LSL #1
 00002e  4429              ADD      r1,r1,r5
 000030  7888              LDRB     r0,[r1,#2]
 000032  f7fffffe          BL       __aeabi_ui2f
 000036  9003              STR      r0,[sp,#0xc]
-;;;498    		pcolor[i].a=(0.29900f*a+0.58700f*b+0.11400f*c);//Y color  转换公式
+;;;530    		pcolor[i].a=(0.29900f*a+0.58700f*b+0.11400f*c);//Y color
 000038  4833              LDR      r0,|L26.264|
 00003a  9903              LDR      r1,[sp,#0xc]
 00003c  f7fffffe          BL       __aeabi_fmul
@@ -2985,7 +3015,7 @@
 000066  f7fffffe          BL       __aeabi_f2uiz
 00006a  eb040144          ADD      r1,r4,r4,LSL #1
 00006e  5468              STRB     r0,[r5,r1]
-;;;499    		pcolor[i].b=(-0.16874f*a-0.33126f*b+0.50000f*c+128);//Cb color
+;;;531    		pcolor[i].b=(-0.16874f*a-0.33126f*b+0.50000f*c+128);//Cb color
 000070  f04f507c          MOV      r0,#0x3f000000
 000074  9903              LDR      r1,[sp,#0xc]
 000076  f7fffffe          BL       __aeabi_fmul
@@ -3011,7 +3041,7 @@
 0000ae  eb040144          ADD      r1,r4,r4,LSL #1
 0000b2  4429              ADD      r1,r1,r5
 0000b4  7048              STRB     r0,[r1,#1]
-;;;500    		pcolor[i].c=(0.50000f*a-0.41869f*b-0.08131f*c+128);//Cr color 
+;;;532    		pcolor[i].c=(0.50000f*a-0.41869f*b-0.08131f*c+128);//Cr color 
 0000b6  4819              LDR      r0,|L26.284|
 0000b8  9903              LDR      r1,[sp,#0xc]
 0000ba  f7fffffe          BL       __aeabi_fmul
@@ -3037,15 +3067,15 @@
 0000f4  eb040144          ADD      r1,r4,r4,LSL #1
 0000f8  4429              ADD      r1,r1,r5
 0000fa  7088              STRB     r0,[r1,#2]
-0000fc  1c64              ADDS     r4,r4,#1              ;493
+0000fc  1c64              ADDS     r4,r4,#1              ;525
                   |L26.254|
-0000fe  42bc              CMP      r4,r7                 ;493
+0000fe  42bc              CMP      r4,r7                 ;525
 000100  db86              BLT      |L26.16|
-;;;501      	}
-;;;502    }
+;;;533      	}
+;;;534    }
 000102  b005              ADD      sp,sp,#0x14
 000104  e8bd8ff0          POP      {r4-r11,pc}
-;;;503    //处理所有元件中的MCU数据
+;;;535    //处理所有元件中的MCU数据
                           ENDP
 
                   |L26.264|
@@ -3066,27 +3096,27 @@
                           AREA ||i.jutl_write_byte||, CODE, READONLY, ALIGN=2
 
                   jutl_write_byte PROC
-;;;273    u16 wr_pt=0;
-;;;274    void jutl_write_byte(u8 c,char *f,jpeg_compress_info *cinfo)
+;;;305    u16 wr_pt=0;
+;;;306    void jutl_write_byte(u8 c,char *f,jpeg_compress_info *cinfo)
 000000  b5f8              PUSH     {r3-r7,lr}
-;;;275    {
+;;;307    {
 000002  4605              MOV      r5,r0
 000004  460e              MOV      r6,r1
 000006  4614              MOV      r4,r2
-;;;276    	UINT WRBytes;
-;;;277    
-;;;278    	write_buf[wr_pt]=c;
+;;;308    	UINT WRBytes;
+;;;309    
+;;;310    	write_buf[wr_pt]=c;
 000008  480e              LDR      r0,|L27.68|
 00000a  490f              LDR      r1,|L27.72|
 00000c  8809              LDRH     r1,[r1,#0]  ; wr_pt
 00000e  5445              STRB     r5,[r0,r1]
-;;;279    	wr_pt++;
+;;;311    	wr_pt++;
 000010  480d              LDR      r0,|L27.72|
 000012  8800              LDRH     r0,[r0,#0]  ; wr_pt
 000014  1c40              ADDS     r0,r0,#1
 000016  490c              LDR      r1,|L27.72|
 000018  8008              STRH     r0,[r1,#0]
-;;;280      	if(wr_pt==512||cinfo->state==JC_FINISH)//512字节写一次
+;;;312      	if(wr_pt==512||cinfo->state==JC_FINISH)//512字节写一次
 00001a  4608              MOV      r0,r1
 00001c  8800              LDRH     r0,[r0,#0]  ; wr_pt
 00001e  f5b07f00          CMP      r0,#0x200
@@ -3095,23 +3125,23 @@
 000028  2803              CMP      r0,#3
 00002a  d10a              BNE      |L27.66|
                   |L27.44|
-;;;281    	{
-;;;282    		f_write(cinfo->fileW,write_buf,wr_pt,&WRBytes);
+;;;313    	{
+;;;314    		f_write(cinfo->fileW,write_buf,wr_pt,&WRBytes);
 00002c  466b              MOV      r3,sp
 00002e  4906              LDR      r1,|L27.72|
 000030  880a              LDRH     r2,[r1,#0]  ; wr_pt
 000032  4904              LDR      r1,|L27.68|
 000034  f8d40104          LDR      r0,[r4,#0x104]
 000038  f7fffffe          BL       f_write
-;;;283    		wr_pt=0;
+;;;315    		wr_pt=0;
 00003c  2000              MOVS     r0,#0
 00003e  4902              LDR      r1,|L27.72|
 000040  8008              STRH     r0,[r1,#0]
                   |L27.66|
-;;;284    	}
-;;;285    }
+;;;316    	}
+;;;317    }
 000042  bdf8              POP      {r3-r7,pc}
-;;;286    //开始压缩编码,写入头信息
+;;;318    //开始压缩编码,写入头信息
                           ENDP
 
                   |L27.68|
@@ -3122,21 +3152,21 @@
                           AREA ||i.jutl_zigzag_sort||, CODE, READONLY, ALIGN=2
 
                   jutl_zigzag_sort PROC
-;;;143    //Z形排序
-;;;144    void jutl_zigzag_sort(DCTBLOCK dptr) 
+;;;175    //Z形排序
+;;;176    void jutl_zigzag_sort(DCTBLOCK dptr) 
 000000  b530              PUSH     {r4,r5,lr}
-;;;145    {
+;;;177    {
 000002  b0a1              SUB      sp,sp,#0x84
 000004  4605              MOV      r5,r0
-;;;146      	int i;
-;;;147    
-;;;148      	DCTBLOCK dtmp;
-;;;149      	memcpy(&dtmp,dptr,sizeof(DCTBLOCK));
+;;;178      	int i;
+;;;179    
+;;;180      	DCTBLOCK dtmp;
+;;;181      	memcpy(&dtmp,dptr,sizeof(DCTBLOCK));
 000006  2280              MOVS     r2,#0x80
 000008  4629              MOV      r1,r5
 00000a  a801              ADD      r0,sp,#4
 00000c  f7fffffe          BL       __aeabi_memcpy
-;;;150      	for(i=0;i<DCTSIZE2;i++)dptr[zz_order[i]]=dtmp[i];
+;;;182      	for(i=0;i<DCTSIZE2;i++)dptr[zz_order[i]]=dtmp[i];
 000010  2400              MOVS     r4,#0
 000012  e007              B        |L28.36|
                   |L28.20|
@@ -3149,10 +3179,10 @@
                   |L28.36|
 000024  2c40              CMP      r4,#0x40
 000026  dbf5              BLT      |L28.20|
-;;;151    }
+;;;183    }
 000028  b021              ADD      sp,sp,#0x84
 00002a  bd30              POP      {r4,r5,pc}
-;;;152    //设置标准huffman表
+;;;184    //设置标准huffman表
                           ENDP
 
                   |L28.44|
@@ -3401,5 +3431,7 @@
 00000d  00                DCB      0x00
                   b
 00000e  0000              DCB      0x00,0x00
+                  photo_qulity
+000010  3f800000          DCFS     0x3f800000 ; 1
                   wr_pt
-000010  0000              DCW      0x0000
+000014  0000              DCW      0x0000

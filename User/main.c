@@ -71,13 +71,15 @@ void Hardware_Init()
 {
 	
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);	//中断控制器分组设置
+	LED_GPIO_Config();
+	OV7725_GPIO_Config();
+	Door_GPIO_Config();
   //TIM4_PWM_Init();
   ILI9341_Init();
-	
 	USART_Config();  //调试串口
 	
-	//LED_GPIO_Config();
-	OV7725_GPIO_Config();
+	
+  Camera_Init();
 	M8266_init();//SPI-wifi模块
 	printf("wifi init \r\n");
 	Fatfs_Init();  
@@ -102,7 +104,7 @@ int main(void)
 	while(OneNet_DevLink())			//接入OneNET
 	mDelay(500);
 	Net_status=Conneted;
-	//LED_BLUE;  
+	LED_BLUE;  
   Camera_Set_Test();
 	CameraFous();	
 	Camera_Set();
@@ -112,7 +114,7 @@ int main(void)
 	xTaskCreate((TaskFunction_t)Net_Task,"Net_Task",Net_Task_Stack,"Net_Task",Net_Task_Prioruty,&NetTask_Handler);
 	xTaskCreate((TaskFunction_t)CheckSensorTask,"Check_Task",CheckSensor_Stack,"Check_Task",CheckSensor_Priority,&CheckSensor_Handler);
 
-	//xTaskCreate((TaskFunction_t)DisplayTask,"Display",Display_Stack,"Display",Display_Prioruty,&Display_Handler);
+	//     xTaskCreate((TaskFunction_t)DisplayTask,"Display",Display_Stack,"Display",Display_Prioruty,&Display_Handler);
 	vTaskStartScheduler();
 
 }

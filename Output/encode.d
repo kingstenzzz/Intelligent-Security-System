@@ -30,8 +30,12 @@
 ..\..\output\encode.o: ..\..\User\FATFS\integer.h
 ..\..\output\encode.o: ..\..\User\FATFS\ffconf.h
 ..\..\output\encode.o: ..\..\User\delay\delay.h
+..\..\output\encode.o: ..\..\User\./led/bsp_led.h
 ..\..\output\encode.o: ..\..\User\./usart/bsp_usart.h
 ..\..\output\encode.o: F:\Keil_v5\ARM\ARMCC\Bin\..\include\stdarg.h
 ..\..\output\encode.o: F:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 ..\..\output\encode.o: F:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 ..\..\output\encode.o: ..\..\User\./ov7725/bsp_ov7725.h
+..\..\output\encode.o: ..\..\User\./bmp/bsp_bmp.h
+..\..\output\encode.o: F:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
+..\..\output\encode.o: F:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h

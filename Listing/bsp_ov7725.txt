@@ -9,138 +9,149 @@
 ;;;840    void CameraFous()
 000000  b510              PUSH     {r4,lr}
 ;;;841    {
-;;;842    	ILI9341_DispStringLine_EN(LINE(14),"Lens focus.Press KEY2 to enter system.");
-000002  f7fffffe          BL       LCD_GetFont
-000006  88c0              LDRH     r0,[r0,#6]
-000008  ebc000c0          RSB      r0,r0,r0,LSL #3
-00000c  0440              LSLS     r0,r0,#17
-00000e  0c04              LSRS     r4,r0,#16
-000010  a117              ADR      r1,|L1.112|
-000012  4620              MOV      r0,r4
-000014  f7fffffe          BL       ILI9341_DispStringLine_EN
-;;;843    	while(1)
-000018  e026              B        |L1.104|
-                  |L1.26|
-;;;844    	{
-;;;845    		if( Ov7725_vsync == 2 )
-00001a  481f              LDR      r0,|L1.152|
-00001c  7800              LDRB     r0,[r0,#0]  ; Ov7725_vsync
-00001e  2802              CMP      r0,#2
-000020  d11a              BNE      |L1.88|
-;;;846    		{
-;;;847    			FIFO_PREPARE;  		//	FIFO准备				
-000022  bf00              NOP      
-000024  2004              MOVS     r0,#4
-000026  491d              LDR      r1,|L1.156|
-000028  6008              STR      r0,[r1,#0]
-00002a  2020              MOVS     r0,#0x20
-00002c  491c              LDR      r1,|L1.160|
-00002e  6148              STR      r0,[r1,#0x14]
-000030  6108              STR      r0,[r1,#0x10]
-000032  2004              MOVS     r0,#4
-000034  4919              LDR      r1,|L1.156|
-000036  1f09              SUBS     r1,r1,#4
-000038  6008              STR      r0,[r1,#0]
-00003a  2020              MOVS     r0,#0x20
-00003c  4918              LDR      r1,|L1.160|
-00003e  6148              STR      r0,[r1,#0x14]
-000040  6108              STR      r0,[r1,#0x10]
-000042  bf00              NOP      
-;;;848    			ImagDisp(cam_mode_test.lcd_sx,
-000044  4c17              LDR      r4,|L1.164|
-000046  8923              LDRH     r3,[r4,#8]  ; cam_mode_test
-000048  88e2              LDRH     r2,[r4,#6]  ; cam_mode_test
-00004a  89a1              LDRH     r1,[r4,#0xc]  ; cam_mode_test
-00004c  8960              LDRH     r0,[r4,#0xa]  ; cam_mode_test
-00004e  f7fffffe          BL       ImagDisp
-;;;849    								cam_mode_test.lcd_sy,
-;;;850    								cam_mode_test.cam_width,
-;;;851    								cam_mode_test.cam_height);			//采集并显示
-;;;852    			
-;;;853    			Ov7725_vsync = 0;			
-000052  2000              MOVS     r0,#0
-000054  4910              LDR      r1,|L1.152|
-000056  7008              STRB     r0,[r1,#0]
-                  |L1.88|
-;;;854    		}
-;;;855    				if( Key_Scan(KEY1_GPIO_PORT,KEY1_GPIO_PIN) == KEY_ON  )
-000058  2101              MOVS     r1,#1
-00005a  4810              LDR      r0,|L1.156|
-00005c  3814              SUBS     r0,r0,#0x14
-00005e  f7fffffe          BL       Key_Scan
-000062  2801              CMP      r0,#1
-000064  d100              BNE      |L1.104|
-;;;856    	{	
-;;;857    			break;
-000066  e000              B        |L1.106|
-                  |L1.104|
-000068  e7d7              B        |L1.26|
+;;;842    	Ov7725_vsync = 0;
+000002  2000              MOVS     r0,#0
+000004  491e              LDR      r1,|L1.128|
+000006  7008              STRB     r0,[r1,#0]
+;;;843    	ILI9341_DispStringLine_EN(LINE(14),"Lens focus.Press KEY2 to enter system.");
+000008  f7fffffe          BL       LCD_GetFont
+00000c  88c0              LDRH     r0,[r0,#6]
+00000e  ebc000c0          RSB      r0,r0,r0,LSL #3
+000012  0440              LSLS     r0,r0,#17
+000014  0c04              LSRS     r4,r0,#16
+000016  a11b              ADR      r1,|L1.132|
+000018  4620              MOV      r0,r4
+00001a  f7fffffe          BL       ILI9341_DispStringLine_EN
+;;;844    	Door_ClOSE;
+00001e  2201              MOVS     r2,#1
+000020  0311              LSLS     r1,r2,#12
+000022  4822              LDR      r0,|L1.172|
+000024  f7fffffe          BL       GPIO_WriteBit
+;;;845    	while(1)
+000028  e026              B        |L1.120|
+                  |L1.42|
+;;;846    	{
+;;;847    	
+;;;848    		if( Ov7725_vsync == 2 )
+00002a  4815              LDR      r0,|L1.128|
+00002c  7800              LDRB     r0,[r0,#0]  ; Ov7725_vsync
+00002e  2802              CMP      r0,#2
+000030  d11b              BNE      |L1.106|
+;;;849    		{
+;;;850    			FIFO_PREPARE;  		//	FIFO准备				
+000032  bf00              NOP      
+000034  2004              MOVS     r0,#4
+000036  491d              LDR      r1,|L1.172|
+000038  3114              ADDS     r1,r1,#0x14
+00003a  6008              STR      r0,[r1,#0]
+00003c  2020              MOVS     r0,#0x20
+00003e  491c              LDR      r1,|L1.176|
+000040  6148              STR      r0,[r1,#0x14]
+000042  6108              STR      r0,[r1,#0x10]
+000044  2004              MOVS     r0,#4
+000046  4919              LDR      r1,|L1.172|
+000048  3110              ADDS     r1,r1,#0x10
+00004a  6008              STR      r0,[r1,#0]
+00004c  2020              MOVS     r0,#0x20
+00004e  4918              LDR      r1,|L1.176|
+000050  6148              STR      r0,[r1,#0x14]
+000052  6108              STR      r0,[r1,#0x10]
+000054  bf00              NOP      
+;;;851    			ImagDisp(cam_mode_test.lcd_sx,
+000056  4c17              LDR      r4,|L1.180|
+000058  8923              LDRH     r3,[r4,#8]  ; cam_mode_test
+00005a  88e2              LDRH     r2,[r4,#6]  ; cam_mode_test
+00005c  89a1              LDRH     r1,[r4,#0xc]  ; cam_mode_test
+00005e  8960              LDRH     r0,[r4,#0xa]  ; cam_mode_test
+000060  f7fffffe          BL       ImagDisp
+;;;852    								cam_mode_test.lcd_sy,
+;;;853    								cam_mode_test.cam_width,
+;;;854    								cam_mode_test.cam_height);			//采集并显示
+;;;855    			
+;;;856    			Ov7725_vsync = 0;			
+000064  2000              MOVS     r0,#0
+000066  4906              LDR      r1,|L1.128|
+000068  7008              STRB     r0,[r1,#0]
                   |L1.106|
-00006a  bf00              NOP      
-;;;858    	}
-;;;859    	}
-;;;860    	
-;;;861    	
-;;;862    }
-00006c  bd10              POP      {r4,pc}
-;;;863    void Camera_Set_Test()
+;;;857    		}
+;;;858    				if( Key_Scan(KEY1_GPIO_PORT,KEY1_GPIO_PIN) == KEY_ON  )
+00006a  2101              MOVS     r1,#1
+00006c  480f              LDR      r0,|L1.172|
+00006e  f7fffffe          BL       Key_Scan
+000072  2801              CMP      r0,#1
+000074  d100              BNE      |L1.120|
+;;;859    	{	
+;;;860    			break;
+000076  e000              B        |L1.122|
+                  |L1.120|
+000078  e7d7              B        |L1.42|
+                  |L1.122|
+00007a  bf00              NOP      
+;;;861    		
+;;;862    	}
+;;;863    	}
+;;;864    	
+;;;865    	
+;;;866    }
+00007c  bd10              POP      {r4,pc}
+;;;867    void Camera_Set_Test()
                           ENDP
 
-00006e  0000              DCW      0x0000
-                  |L1.112|
-000070  4c656e73          DCB      "Lens focus.Press KEY2 to enter system.",0
-000074  20666f63
-000078  75732e50
-00007c  72657373
-000080  204b4559
-000084  3220746f
-000088  20656e74
-00008c  65722073
-000090  79737465
-000094  6d2e00  
-000097  00                DCB      0
-                  |L1.152|
+00007e  0000              DCW      0x0000
+                  |L1.128|
                           DCD      Ov7725_vsync
-                  |L1.156|
-                          DCD      0x40010814
-                  |L1.160|
+                  |L1.132|
+000084  4c656e73          DCB      "Lens focus.Press KEY2 to enter system.",0
+000088  20666f63
+00008c  75732e50
+000090  72657373
+000094  204b4559
+000098  3220746f
+00009c  20656e74
+0000a0  65722073
+0000a4  79737465
+0000a8  6d2e00  
+0000ab  00                DCB      0
+                  |L1.172|
+                          DCD      0x40010800
+                  |L1.176|
                           DCD      0x40011000
-                  |L1.164|
+                  |L1.180|
                           DCD      cam_mode_test
 
                           AREA ||i.Camera_Init||, CODE, READONLY, ALIGN=2
 
                   Camera_Init PROC
-;;;891    
-;;;892    void Camera_Init()
+;;;895    
+;;;896    void Camera_Init()
 000000  b510              PUSH     {r4,lr}
-;;;893    {
-;;;894    	u8  retry;
-;;;895    	if(OV7725_Init() != SUCCESS)
+;;;897    {
+;;;898    	u8  retry;
+;;;899    	if(OV7725_Init() != SUCCESS)
 000002  f7fffffe          BL       OV7725_Init
 000006  2801              CMP      r0,#1
 000008  d006              BEQ      |L2.24|
-;;;896    	{
-;;;897    		retry++;
+;;;900    	{
+;;;901    		retry++;
 00000a  1c60              ADDS     r0,r4,#1
 00000c  b2c4              UXTB     r4,r0
-;;;898    		if(retry>5)
+;;;902    		if(retry>5)
 00000e  2c05              CMP      r4,#5
 000010  dd02              BLE      |L2.24|
-;;;899    		{
-;;;900    			printf("\r\n没有检测到OV7725摄像头\r\n");
+;;;903    		{
+;;;904    			printf("\r\n没有检测到OV7725摄像头\r\n");
 000012  a003              ADR      r0,|L2.32|
 000014  f7fffffe          BL       __2printf
                   |L2.24|
-;;;901    		}
-;;;902    	}
-;;;903    	printf("\r\nOV7725摄像头初始化完成\r\n");
+;;;905    		}
+;;;906    	}
+;;;907    	printf("\r\nOV7725摄像头初始化完成\r\n");
 000018  a008              ADR      r0,|L2.60|
 00001a  f7fffffe          BL       __2printf
-;;;904    	
-;;;905    }
+;;;908    	
+;;;909    }
 00001e  bd10              POP      {r4,pc}
-;;;906    
+;;;910    
                           ENDP
 
                   |L2.32|
@@ -165,11 +176,11 @@
                           AREA ||i.Camera_Set||, CODE, READONLY, ALIGN=2
 
                   Camera_Set PROC
-;;;906    
-;;;907    void Camera_Set()
+;;;910    
+;;;911    void Camera_Set()
 000000  b538              PUSH     {r3-r5,lr}
-;;;908    {
-;;;909    	OV7725_Window_Set(cam_mode.cam_sx,
+;;;912    {
+;;;913    	OV7725_Window_Set(cam_mode.cam_sx,
 000002  4809              LDR      r0,|L3.40|
 000004  7800              LDRB     r0,[r0,#0]  ; cam_mode
 000006  4c08              LDR      r4,|L3.40|
@@ -179,11 +190,12 @@
 00000e  88a1              LDRH     r1,[r4,#4]  ; cam_mode
 000010  8860              LDRH     r0,[r4,#2]  ; cam_mode
 000012  f7fffffe          BL       OV7725_Window_Set
-;;;910    														cam_mode.cam_sy,
-;;;911    														cam_mode.cam_width,
-;;;912    														cam_mode.cam_height,
-;;;913    														cam_mode.QVGA_VGA);
-;;;914    	ILI9341_Clear(0,0,LCD_X_LENGTH,LCD_Y_LENGTH);	/* 清屏，显示全黑 */
+;;;914    														cam_mode.cam_sy,
+;;;915    														cam_mode.cam_width,
+;;;916    														cam_mode.cam_height,
+;;;917    														cam_mode.QVGA_VGA);
+;;;918    
+;;;919    	ILI9341_Clear(0,0,LCD_X_LENGTH,LCD_Y_LENGTH);	/* 清屏，显示全黑 */
 000016  4805              LDR      r0,|L3.44|
 000018  8803              LDRH     r3,[r0,#0]  ; LCD_Y_LENGTH
 00001a  4805              LDR      r0,|L3.48|
@@ -191,9 +203,9 @@
 00001e  2100              MOVS     r1,#0
 000020  4608              MOV      r0,r1
 000022  f7fffffe          BL       ILI9341_Clear
-;;;915    }
+;;;920    }
 000026  bd38              POP      {r3-r5,pc}
-;;;916    
+;;;921    
                           ENDP
 
                   |L3.40|
@@ -206,77 +218,73 @@
                           AREA ||i.Camera_Set_Test||, CODE, READONLY, ALIGN=2
 
                   Camera_Set_Test PROC
-;;;862    }
-;;;863    void Camera_Set_Test()
+;;;866    }
+;;;867    void Camera_Set_Test()
 000000  b538              PUSH     {r3-r5,lr}
-;;;864    {
-;;;865    	/*根据摄像头参数组配置模式*/
-;;;866    	OV7725_Special_Effect(cam_mode_test.effect);
-000002  4916              LDR      r1,|L4.92|
+;;;868    {
+;;;869    	/*根据摄像头参数组配置模式*/
+;;;870    	OV7725_Special_Effect(cam_mode_test.effect);
+000002  4915              LDR      r1,|L4.88|
 000004  7cc8              LDRB     r0,[r1,#0x13]  ; cam_mode_test
 000006  f7fffffe          BL       OV7725_Special_Effect
-;;;867    	/*光照模式*/
-;;;868    	OV7725_Light_Mode(cam_mode_test.light_mode);
-00000a  4914              LDR      r1,|L4.92|
+;;;871    	/*光照模式*/
+;;;872    	OV7725_Light_Mode(cam_mode_test.light_mode);
+00000a  4913              LDR      r1,|L4.88|
 00000c  7bc8              LDRB     r0,[r1,#0xf]  ; cam_mode_test
 00000e  f7fffffe          BL       OV7725_Light_Mode
-;;;869    	/*饱和度*/
-;;;870    	OV7725_Color_Saturation(cam_mode_test.saturation);
-000012  4912              LDR      r1,|L4.92|
+;;;873    	/*饱和度*/
+;;;874    	OV7725_Color_Saturation(cam_mode_test.saturation);
+000012  4911              LDR      r1,|L4.88|
 000014  f9910010          LDRSB    r0,[r1,#0x10]  ; cam_mode_test
 000018  f7fffffe          BL       OV7725_Color_Saturation
-;;;871    	/*光照度*/
-;;;872    	OV7725_Brightness(cam_mode_test.brightness);
-00001c  490f              LDR      r1,|L4.92|
+;;;875    	/*光照度*/
+;;;876    	OV7725_Brightness(cam_mode_test.brightness);
+00001c  490e              LDR      r1,|L4.88|
 00001e  f9910011          LDRSB    r0,[r1,#0x11]  ; cam_mode_test
 000022  f7fffffe          BL       OV7725_Brightness
-;;;873    	/*对比度*/
-;;;874    	OV7725_Contrast(cam_mode_test.contrast);
-000026  490d              LDR      r1,|L4.92|
+;;;877    	/*对比度*/
+;;;878    	OV7725_Contrast(cam_mode_test.contrast);
+000026  490c              LDR      r1,|L4.88|
 000028  f9910012          LDRSB    r0,[r1,#0x12]  ; cam_mode_test
 00002c  f7fffffe          BL       OV7725_Contrast
-;;;875    	/*特殊效果*/
-;;;876    	OV7725_Special_Effect(cam_mode_test.effect);
-000030  490a              LDR      r1,|L4.92|
+;;;879    	/*特殊效果*/
+;;;880    	OV7725_Special_Effect(cam_mode_test.effect);
+000030  4909              LDR      r1,|L4.88|
 000032  7cc8              LDRB     r0,[r1,#0x13]  ; cam_mode_test
 000034  f7fffffe          BL       OV7725_Special_Effect
-;;;877    	
-;;;878    	/*设置图像采样及模式大小*/
-;;;879    	
-;;;880    	
-;;;881    	OV7725_Window_Set(cam_mode_test.cam_sx,
-000038  4808              LDR      r0,|L4.92|
+;;;881    	
+;;;882    	/*设置图像采样及模式大小*/
+;;;883    	
+;;;884    	
+;;;885    	OV7725_Window_Set(cam_mode_test.cam_sx,
+000038  4807              LDR      r0,|L4.88|
 00003a  7800              LDRB     r0,[r0,#0]  ; cam_mode_test
-00003c  4c07              LDR      r4,|L4.92|
+00003c  4c06              LDR      r4,|L4.88|
 00003e  9000              STR      r0,[sp,#0]
 000040  8923              LDRH     r3,[r4,#8]  ; cam_mode_test
 000042  88e2              LDRH     r2,[r4,#6]  ; cam_mode_test
 000044  88a1              LDRH     r1,[r4,#4]  ; cam_mode_test
 000046  8860              LDRH     r0,[r4,#2]  ; cam_mode_test
 000048  f7fffffe          BL       OV7725_Window_Set
-;;;882    														cam_mode_test.cam_sy,
-;;;883    														cam_mode_test.cam_width,
-;;;884    														cam_mode_test.cam_height,
-;;;885    														cam_mode_test.QVGA_VGA);
-;;;886    	
-;;;887    	ILI9341_GramScan( cam_mode_test.lcd_scan );
+;;;886    														cam_mode_test.cam_sy,
+;;;887    														cam_mode_test.cam_width,
+;;;888    														cam_mode_test.cam_height,
+;;;889    														cam_mode_test.QVGA_VGA);
+;;;890    ILI9341_GramScan( cam_mode_test.lcd_scan );
 00004c  4621              MOV      r1,r4
 00004e  7b88              LDRB     r0,[r1,#0xe]  ; cam_mode_test
 000050  f7fffffe          BL       ILI9341_GramScan
-;;;888    	Ov7725_vsync = 0;
-000054  2000              MOVS     r0,#0
-000056  4902              LDR      r1,|L4.96|
-000058  7008              STRB     r0,[r1,#0]
-;;;889    	
-;;;890    }
-00005a  bd38              POP      {r3-r5,pc}
-;;;891    
+;;;891    	
+;;;892    
+;;;893    	
+;;;894    }
+000054  bd38              POP      {r3-r5,pc}
+;;;895    
                           ENDP
 
-                  |L4.92|
+000056  0000              DCW      0x0000
+                  |L4.88|
                           DCD      cam_mode_test
-                  |L4.96|
-                          DCD      Ov7725_vsync
 
                           AREA ||i.FIFO_GPIO_Config||, CODE, READONLY, ALIGN=2
 

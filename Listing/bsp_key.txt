@@ -2,6 +2,51 @@
 ; commandline ArmCC [--c99 --list --split_sections --debug -c --asm --interleave -o..\..\output\bsp_key.o --asm_dir=..\..\Listing\ --list_dir=..\..\Listing\ --depend=..\..\output\bsp_key.d --cpu=Cortex-M3 --apcs=interwork -O0 --diag_suppress=9931 -I..\..\Libraries\CMSIS -I..\..\User -I..\..\Libraries\FWlib\inc -I..\..\User\FATFS\option -I..\..\User\FATFS -I..\..\User\delay -I..\..\User\onenet\inc -I..\..\User\device\inc -I..\..\User\EDP -I..\..\User\onenet\inc -I..\..\User\hwtimer -I..\..\User\JPEGENCODE -I..\..\User\MALLOC -I..\..\User\dht11 -I..\..\User\flame -I..\..\User\warning -I..\..\User\beep -I..\..\User\adc -I..\..\User\IIC -I..\..\Freee-RTOS\include -I..\..\Freee-RTOS\portable\RVDS\ARM_CM3 -I..\..\User\IWDG -I..\..\User\light_moto -I..\..\User\M8266WIFI -I..\..\User\TIMER -I.\RTE\_____ -IF:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\2.2.0\Device\Include -IF:\Keil_v5\ARM\CMSIS\Include -D__MICROLIB -D__UVISION_VERSION=525 -DSTM32F10X_HD -DSTM32F10X_HD -DUSE_STDPERIPH_DRIVER --omf_browse=..\..\output\bsp_key.crf ..\..\User\Key\bsp_key.c]
                           THUMB
 
+                          AREA ||i.Door_GPIO_Config||, CODE, READONLY, ALIGN=2
+
+                  Door_GPIO_Config PROC
+;;;52     
+;;;53     void Door_GPIO_Config(void)
+000000  b508              PUSH     {r3,lr}
+;;;54     {
+;;;55     	GPIO_InitTypeDef GPIO_InitStructure;
+;;;56     	
+;;;57     	/*开启按键端口的时钟*/
+;;;58     	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA,ENABLE);
+000002  2101              MOVS     r1,#1
+000004  2004              MOVS     r0,#4
+000006  f7fffffe          BL       RCC_APB2PeriphClockCmd
+;;;59     	
+;;;60     	//选择按键的引脚
+;;;61     	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12; 
+00000a  f44f5080          MOV      r0,#0x1000
+00000e  f8ad0000          STRH     r0,[sp,#0]
+;;;62     	// 设置按键的引脚为浮空输入
+;;;63     	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD; 
+000012  2014              MOVS     r0,#0x14
+000014  f88d0003          STRB     r0,[sp,#3]
+;;;64     	//使用结构体初始化按键
+;;;65     	GPIO_Init(GPIOA, &GPIO_InitStructure);
+000018  4669              MOV      r1,sp
+00001a  4804              LDR      r0,|L1.44|
+00001c  f7fffffe          BL       GPIO_Init
+;;;66       Door_ClOSE;
+000020  2201              MOVS     r2,#1
+000022  0311              LSLS     r1,r2,#12
+000024  4801              LDR      r0,|L1.44|
+000026  f7fffffe          BL       GPIO_WriteBit
+;;;67     	//Door_OPEN;
+;;;68     
+;;;69     
+;;;70     
+;;;71     }
+00002a  bd08              POP      {r3,pc}
+;;;72     
+                          ENDP
+
+                  |L1.44|
+                          DCD      0x40010800
+
                           AREA ||i.Key_GPIO_Config||, CODE, READONLY, ALIGN=2
 
                   Key_GPIO_Config PROC
@@ -28,7 +73,7 @@
 ;;;20     	//使用结构体初始化按键
 ;;;21     	GPIO_Init(KEY1_GPIO_PORT, &GPIO_InitStructure);
 000016  4669              MOV      r1,sp
-000018  4807              LDR      r0,|L1.56|
+000018  4807              LDR      r0,|L2.56|
 00001a  f7fffffe          BL       GPIO_Init
 ;;;22     	
 ;;;23     	//选择按键的引脚
@@ -42,7 +87,7 @@
 ;;;27     	//使用结构体初始化按键
 ;;;28     	GPIO_Init(KEY2_GPIO_PORT, &GPIO_InitStructure);	
 00002c  4669              MOV      r1,sp
-00002e  4803              LDR      r0,|L1.60|
+00002e  4803              LDR      r0,|L2.60|
 000030  f7fffffe          BL       GPIO_Init
 ;;;29     }
 000034  bd08              POP      {r3,pc}
@@ -50,9 +95,9 @@
                           ENDP
 
 000036  0000              DCW      0x0000
-                  |L1.56|
+                  |L2.56|
                           DCD      0x40010800
-                  |L1.60|
+                  |L2.60|
                           DCD      0x40011000
 
                           AREA ||i.Key_Scan||, CODE, READONLY, ALIGN=1
@@ -70,28 +115,28 @@
 000008  4620              MOV      r0,r4
 00000a  f7fffffe          BL       GPIO_ReadInputDataBit
 00000e  2801              CMP      r0,#1
-000010  d108              BNE      |L2.36|
+000010  d108              BNE      |L3.36|
 ;;;42     	{	 
 ;;;43     		/*等待按键释放 */
 ;;;44     		while(GPIO_ReadInputDataBit(GPIOx,GPIO_Pin) == KEY_ON);   
 000012  bf00              NOP      
-                  |L2.20|
+                  |L3.20|
 000014  4629              MOV      r1,r5
 000016  4620              MOV      r0,r4
 000018  f7fffffe          BL       GPIO_ReadInputDataBit
 00001c  2801              CMP      r0,#1
-00001e  d0f9              BEQ      |L2.20|
+00001e  d0f9              BEQ      |L3.20|
 ;;;45     		return 	KEY_ON;	 
 000020  2001              MOVS     r0,#1
-                  |L2.34|
+                  |L3.34|
 ;;;46     	}
 ;;;47     	else
 ;;;48     		return KEY_OFF;
 ;;;49     }
 000022  bd70              POP      {r4-r6,pc}
-                  |L2.36|
+                  |L3.36|
 000024  2000              MOVS     r0,#0                 ;48
-000026  e7fc              B        |L2.34|
-;;;50     /*********************************************END OF FILE**********************/
+000026  e7fc              B        |L3.34|
+;;;50     
                           ENDP
 

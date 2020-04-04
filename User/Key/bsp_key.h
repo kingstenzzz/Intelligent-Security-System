@@ -12,6 +12,10 @@
 #define    KEY2_GPIO_CLK     RCC_APB2Periph_GPIOC
 #define    KEY2_GPIO_PORT    GPIOC		   
 #define    KEY2_GPIO_PIN		  GPIO_Pin_13
+#define Door_OPEN 	GPIO_WriteBit(GPIOA,GPIO_Pin_12,Bit_RESET)
+#define Door_ClOSE 	GPIO_WriteBit(GPIOA,GPIO_Pin_12,Bit_SET)
+
+
 
 
  /** 按键按下标置宏
@@ -23,6 +27,7 @@
 
 void Key_GPIO_Config(void);
 uint8_t Key_Scan(GPIO_TypeDef* GPIOx,uint16_t GPIO_Pin);
+void Door_GPIO_Config();
 
 
 #endif /* __KEY_H */

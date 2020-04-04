@@ -839,9 +839,12 @@ uint16_t i, j;
 */
 void CameraFous()
 {
+	Ov7725_vsync = 0;
 	ILI9341_DispStringLine_EN(LINE(14),"Lens focus.Press KEY2 to enter system.");
+	Door_ClOSE;
 	while(1)
 	{
+	
 		if( Ov7725_vsync == 2 )
 		{
 			FIFO_PREPARE;  		//	FIFO准备				
@@ -855,6 +858,7 @@ void CameraFous()
 				if( Key_Scan(KEY1_GPIO_PORT,KEY1_GPIO_PIN) == KEY_ON  )
 	{	
 			break;
+		
 	}
 	}
 	
@@ -883,9 +887,9 @@ void Camera_Set_Test()
 														cam_mode_test.cam_width,
 														cam_mode_test.cam_height,
 														cam_mode_test.QVGA_VGA);
+ILI9341_GramScan( cam_mode_test.lcd_scan );
 	
-	ILI9341_GramScan( cam_mode_test.lcd_scan );
-	Ov7725_vsync = 0;
+
 	
 }
 
@@ -911,6 +915,7 @@ void Camera_Set()
 														cam_mode.cam_width,
 														cam_mode.cam_height,
 														cam_mode.QVGA_VGA);
+
 	ILI9341_Clear(0,0,LCD_X_LENGTH,LCD_Y_LENGTH);	/* 清屏，显示全黑 */
 }
 

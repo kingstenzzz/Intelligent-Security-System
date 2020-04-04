@@ -28150,7 +28150,6 @@ N	ILI9341_Rst ();
 N	ILI9341_REG_Config ();
 N	
 N	//设置默认扫描方向，其中 6 模式为大部分液晶例程的默认显示方向  
-N	ILI9341_GramScan(LCD_SCAN_MODE);
 N	ILI9341_GramScan ( 3 );
 N	LCD_SetFont(&Font8x16);
 N	LCD_SetColors(RED,BLACK);

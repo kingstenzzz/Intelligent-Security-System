@@ -27731,6 +27731,9 @@ Nvoid ShanWai_SendCamera(u16 length_w, u16 length_h);
 Nvoid CameraFous(void);
 Nvoid Camera_Set(void);
 Nvoid Camera_Set_Test(void);
+W "..\..\User\./ov7725/bsp_ov7725.h" 310 6 Deprecated declaration Camera_Init - give arg types
+Nvoid Camera_Init();
+N
 N
 N																					
 N

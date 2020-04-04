@@ -27351,6 +27351,10 @@ N
 N#define    KEY2_GPIO_CLK     RCC_APB2Periph_GPIOC
 N#define    KEY2_GPIO_PORT    GPIOC		   
 N#define    KEY2_GPIO_PIN		  GPIO_Pin_13
+N#define Door_OPEN 	GPIO_WriteBit(GPIOA,GPIO_Pin_12,Bit_RESET)
+N#define Door_ClOSE 	GPIO_WriteBit(GPIOA,GPIO_Pin_12,Bit_SET)
+N
+N
 N
 N
 N /** 按键按下标置宏
@@ -27362,6 +27366,8 @@ N#define KEY_OFF	0
 N
 Nvoid Key_GPIO_Config(void);
 Nuint8_t Key_Scan(GPIO_TypeDef* GPIOx,uint16_t GPIO_Pin);
+W "..\..\User\./key/bsp_key.h" 30 6 Deprecated declaration Door_GPIO_Config - give arg types
+Nvoid Door_GPIO_Config();
 N
 N
 N#endif /* __KEY_H */
@@ -27423,4 +27429,35 @@ N	else
 N		return KEY_OFF;
 X		return 0;
 N}
+N
+N
+N
+Nvoid Door_GPIO_Config(void)
+N{
+N	GPIO_InitTypeDef GPIO_InitStructure;
+N	
+N	/*开启按键端口的时钟*/
+N	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA,ENABLE);
+X	RCC_APB2PeriphClockCmd(((uint32_t)0x00000004),ENABLE);
+N	
+N	//选择按键的引脚
+N	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12; 
+X	GPIO_InitStructure.GPIO_Pin = ((uint16_t)0x1000); 
+N	// 设置按键的引脚为浮空输入
+N	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD; 
+N	//使用结构体初始化按键
+N	GPIO_Init(GPIOA, &GPIO_InitStructure);
+X	GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)), &GPIO_InitStructure);
+N  Door_ClOSE;
+X  GPIO_WriteBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)),((uint16_t)0x1000),Bit_SET);
+N	//Door_OPEN;
+N
+N
+N
+N}
+N
+N
+N
+N
+N
 N/*********************************************END OF FILE**********************/

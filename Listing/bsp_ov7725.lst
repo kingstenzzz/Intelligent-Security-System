@@ -27665,6 +27665,9 @@ Nvoid ShanWai_SendCamera(u16 length_w, u16 length_h);
 Nvoid CameraFous(void);
 Nvoid Camera_Set(void);
 Nvoid Camera_Set_Test(void);
+W "..\..\User\./ov7725/bsp_ov7725.h" 310 6 Deprecated declaration Camera_Init - give arg types
+Nvoid Camera_Init();
+N
 N
 N																					
 N
@@ -29915,6 +29918,10 @@ N
 N#define    KEY2_GPIO_CLK     RCC_APB2Periph_GPIOC
 N#define    KEY2_GPIO_PORT    GPIOC		   
 N#define    KEY2_GPIO_PIN		  GPIO_Pin_13
+N#define Door_OPEN 	GPIO_WriteBit(GPIOA,GPIO_Pin_12,Bit_RESET)
+N#define Door_ClOSE 	GPIO_WriteBit(GPIOA,GPIO_Pin_12,Bit_SET)
+N
+N
 N
 N
 N /** 按键按下标置宏
@@ -29926,6 +29933,8 @@ N#define KEY_OFF	0
 N
 Nvoid Key_GPIO_Config(void);
 Nuint8_t Key_Scan(GPIO_TypeDef* GPIOx,uint16_t GPIO_Pin);
+W "..\..\User\./key/bsp_key.h" 30 6 Deprecated declaration Door_GPIO_Config - give arg types
+Nvoid Door_GPIO_Config();
 N
 N
 N#endif /* __KEY_H */
@@ -30899,10 +30908,14 @@ N
 N*/
 Nvoid CameraFous()
 N{
+N	Ov7725_vsync = 0;
 N	ILI9341_DispStringLine_EN(LINE(14),"Lens focus.Press KEY2 to enter system.");
 X	ILI9341_DispStringLine_EN(((14) * (((sFONT *)LCD_GetFont())->Height)),"Lens focus.Press KEY2 to enter system.");
+N	Door_ClOSE;
+X	GPIO_WriteBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)),((uint16_t)0x1000),Bit_SET);
 N	while(1)
 N	{
+N	
 N		if( Ov7725_vsync == 2 )
 N		{
 N			FIFO_PREPARE;  		//	FIFO准备				
@@ -30918,6 +30931,7 @@ N				if( Key_Scan(KEY1_GPIO_PORT,KEY1_GPIO_PIN) == KEY_ON  )
 X				if( Key_Scan(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)),((uint16_t)0x0001)) == 1  )
 N	{	
 N			break;
+N		
 N	}
 N	}
 N	
@@ -30946,9 +30960,9 @@ N														cam_mode_test.cam_sy,
 N														cam_mode_test.cam_width,
 N														cam_mode_test.cam_height,
 N														cam_mode_test.QVGA_VGA);
+NILI9341_GramScan( cam_mode_test.lcd_scan );
 N	
-N	ILI9341_GramScan( cam_mode_test.lcd_scan );
-N	Ov7725_vsync = 0;
+N
 N	
 N}
 N
@@ -30974,6 +30988,7 @@ N														cam_mode.cam_sy,
 N														cam_mode.cam_width,
 N														cam_mode.cam_height,
 N														cam_mode.QVGA_VGA);
+N
 N	ILI9341_Clear(0,0,LCD_X_LENGTH,LCD_Y_LENGTH);	/* 清屏，显示全黑 */
 N}
 N

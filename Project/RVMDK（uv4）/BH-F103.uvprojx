@@ -592,11 +592,6 @@
               <FilePath>..\..\User\warning\warning.c</FilePath>
             </File>
             <File>
-              <FileName>light_moto.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\light_moto\light_moto.c</FilePath>
-            </File>
-            <File>
               <FileName>dht11.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\dht11\dht11.c</FilePath>
@@ -630,11 +625,6 @@
               <FileName>bsp_key.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\User\Key\bsp_key.c</FilePath>
-            </File>
-            <File>
-              <FileName>timer_BG90.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\User\TIMER\timer_BG90.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -33584,6 +33584,45 @@ N
 W "..\..\User\TIMER\timer.h" 10 7 last line of file ends without a newline
 N#endif
 L 26 "..\..\User\onenet\src\onenet.c" 2
+N#include "./key/bsp_key.h"  
+L 1 "..\..\User\./key/bsp_key.h" 1
+N#ifndef __KEY_H
+N#define	__KEY_H
+N
+N
+N#include "stm32f10x.h"
+N
+N//  引脚定义
+N#define    KEY1_GPIO_CLK     RCC_APB2Periph_GPIOA
+N#define    KEY1_GPIO_PORT    GPIOA			   
+N#define    KEY1_GPIO_PIN		 GPIO_Pin_0
+N
+N#define    KEY2_GPIO_CLK     RCC_APB2Periph_GPIOC
+N#define    KEY2_GPIO_PORT    GPIOC		   
+N#define    KEY2_GPIO_PIN		  GPIO_Pin_13
+N#define Door_OPEN 	GPIO_WriteBit(GPIOA,GPIO_Pin_12,Bit_RESET)
+N#define Door_ClOSE 	GPIO_WriteBit(GPIOA,GPIO_Pin_12,Bit_SET)
+N
+N
+N
+N
+N /** 按键按下标置宏
+N	*  按键按下为高电平，设置 KEY_ON=1， KEY_OFF=0
+N	*  若按键按下为低电平，把宏设置成KEY_ON=0 ，KEY_OFF=1 即可
+N	*/
+N#define KEY_ON	1
+N#define KEY_OFF	0
+N
+Nvoid Key_GPIO_Config(void);
+Nuint8_t Key_Scan(GPIO_TypeDef* GPIOx,uint16_t GPIO_Pin);
+W "..\..\User\./key/bsp_key.h" 30 6 Deprecated declaration Door_GPIO_Config - give arg types
+Nvoid Door_GPIO_Config();
+N
+N
+N#endif /* __KEY_H */
+N
+L 27 "..\..\User\onenet\src\onenet.c" 2
+N
 N
 N
 N//C库
@@ -33762,7 +33801,7 @@ N	short int body_len = 0, i = 0;
 N		
 N	memset(buf, 0, sizeof(buf));
 N	
-W "..\..\User\onenet\src\onenet.c" 185 32 argument of type "volatile data_Stream *" is incompatible with parameter of type "data_Stream *"
+W "..\..\User\onenet\src\onenet.c" 187 32 argument of type "volatile data_Stream *" is incompatible with parameter of type "data_Stream *"
 N	body_len = OneNet_FillBuf(buf,data_stream);		//获取当前需要发送的数据流的总长度
 N	
 N	if(body_len)
@@ -33925,6 +33964,14 @@ N						else if(strstr((char *)req, "Temp_Min"))				//搜索"Fire"
 N				{
 N					temp_min=num;   //赋值
 N
+N				}
+N				else if(strstr((char *)req, "door"))
+N				{
+N					if(num == 1)       Door_OPEN;
+X					if(num == 1)       GPIO_WriteBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)),((uint16_t)0x1000),Bit_RESET);
+N			    else             	 Door_ClOSE;	
+X			    else             	 GPIO_WriteBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0800)),((uint16_t)0x1000),Bit_SET);	
+N					
 N				}
 N	}
 N	

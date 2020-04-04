@@ -47,4 +47,31 @@ uint8_t Key_Scan(GPIO_TypeDef* GPIOx,uint16_t GPIO_Pin)
 	else
 		return KEY_OFF;
 }
+
+
+
+void Door_GPIO_Config(void)
+{
+	GPIO_InitTypeDef GPIO_InitStructure;
+	
+	/*开启按键端口的时钟*/
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA,ENABLE);
+	
+	//选择按键的引脚
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12; 
+	// 设置按键的引脚为浮空输入
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_OD; 
+	//使用结构体初始化按键
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
+  Door_ClOSE;
+	//Door_OPEN;
+
+
+
+}
+
+
+
+
+
 /*********************************************END OF FILE**********************/

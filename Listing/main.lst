@@ -27651,6 +27651,9 @@ Nvoid ShanWai_SendCamera(u16 length_w, u16 length_h);
 Nvoid CameraFous(void);
 Nvoid Camera_Set(void);
 Nvoid Camera_Set_Test(void);
+W "..\..\User\./ov7725/bsp_ov7725.h" 310 6 Deprecated declaration Camera_Init - give arg types
+Nvoid Camera_Init();
+N
 N
 N																					
 N
@@ -29990,6 +29993,10 @@ N
 N#define    KEY2_GPIO_CLK     RCC_APB2Periph_GPIOC
 N#define    KEY2_GPIO_PORT    GPIOC		   
 N#define    KEY2_GPIO_PIN		  GPIO_Pin_13
+N#define Door_OPEN 	GPIO_WriteBit(GPIOA,GPIO_Pin_12,Bit_RESET)
+N#define Door_ClOSE 	GPIO_WriteBit(GPIOA,GPIO_Pin_12,Bit_SET)
+N
+N
 N
 N
 N /** 按键按下标置宏
@@ -30001,6 +30008,8 @@ N#define KEY_OFF	0
 N
 Nvoid Key_GPIO_Config(void);
 Nuint8_t Key_Scan(GPIO_TypeDef* GPIOx,uint16_t GPIO_Pin);
+W "..\..\User\./key/bsp_key.h" 30 6 Deprecated declaration Door_GPIO_Config - give arg types
+Nvoid Door_GPIO_Config();
 N
 N
 N#endif /* __KEY_H */
@@ -43206,13 +43215,15 @@ N{
 N	
 N	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);	//中断控制器分组设置
 X	NVIC_PriorityGroupConfig(((uint32_t)0x500));	
+N	LED_GPIO_Config();
+N	OV7725_GPIO_Config();
+N	Door_GPIO_Config();
 N  //TIM4_PWM_Init();
 N  ILI9341_Init();
-N	
 N	USART_Config();  //调试串口
 N	
-N	//LED_GPIO_Config();
-N	OV7725_GPIO_Config();
+N	
+N  Camera_Init();
 N	M8266_init();//SPI-wifi模块
 N	printf("wifi init \r\n");
 N	Fatfs_Init();  
@@ -43237,7 +43248,8 @@ N	/* 液晶初始化 */
 N	while(OneNet_DevLink())			//接入OneNET
 N	mDelay(500);
 N	Net_status=Conneted;
-N	//LED_BLUE;  
+N	LED_BLUE;  
+X	{((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0C00))->BSRR=((uint16_t)0x0020);}; {((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0C00))->BSRR=((uint16_t)0x0001);} {((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0C00))->BRR=((uint16_t)0x0002);};  
 N  Camera_Set_Test();
 N	CameraFous();	
 N	Camera_Set();
@@ -43251,7 +43263,7 @@ X	xTaskCreate((TaskFunction_t)Net_Task,"Net_Task",1024,"Net_Task",6,&NetTask_Han
 N	xTaskCreate((TaskFunction_t)CheckSensorTask,"Check_Task",CheckSensor_Stack,"Check_Task",CheckSensor_Priority,&CheckSensor_Handler);
 X	xTaskCreate((TaskFunction_t)CheckSensorTask,"Check_Task",512,"Check_Task",5,&CheckSensor_Handler);
 N
-N	//xTaskCreate((TaskFunction_t)DisplayTask,"Display",Display_Stack,"Display",Display_Prioruty,&Display_Handler);
+N	//     xTaskCreate((TaskFunction_t)DisplayTask,"Display",Display_Stack,"Display",Display_Prioruty,&Display_Handler);
 N	vTaskStartScheduler();
 N
 N}
@@ -43408,4 +43420,4 @@ N
 N
 N/*********************************************END OF FILE**********************/
 N
-W "..\..\User\main.c" 191 13 function "DisplayTask"  was declared but never referenced
+W "..\..\User\main.c" 193 13 function "DisplayTask"  was declared but never referenced

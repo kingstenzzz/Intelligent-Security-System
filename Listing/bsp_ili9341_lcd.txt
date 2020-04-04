@@ -5,29 +5,29 @@
                           AREA ||i.ILI9341_BackLed_Control||, CODE, READONLY, ALIGN=2
 
                   ILI9341_BackLed_Control PROC
-;;;462     */
-;;;463    void ILI9341_BackLed_Control ( FunctionalState enumState )
+;;;461     */
+;;;462    void ILI9341_BackLed_Control ( FunctionalState enumState )
 000000  b510              PUSH     {r4,lr}
-;;;464    {
+;;;463    {
 000002  4604              MOV      r4,r0
-;;;465    	if ( enumState )
+;;;464    	if ( enumState )
 000004  b12c              CBZ      r4,|L1.18|
-;;;466    		GPIO_ResetBits ( ILI9341_BK_PORT, ILI9341_BK_PIN );	
+;;;465    		GPIO_ResetBits ( ILI9341_BK_PORT, ILI9341_BK_PIN );	
 000006  f44f5180          MOV      r1,#0x1000
 00000a  4805              LDR      r0,|L1.32|
 00000c  f7fffffe          BL       GPIO_ResetBits
 000010  e004              B        |L1.28|
                   |L1.18|
-;;;467    	else
-;;;468    		GPIO_SetBits ( ILI9341_BK_PORT, ILI9341_BK_PIN );
+;;;466    	else
+;;;467    		GPIO_SetBits ( ILI9341_BK_PORT, ILI9341_BK_PIN );
 000012  f44f5180          MOV      r1,#0x1000
 000016  4802              LDR      r0,|L1.32|
 000018  f7fffffe          BL       GPIO_SetBits
                   |L1.28|
-;;;469    		
-;;;470    }
+;;;468    		
+;;;469    }
 00001c  bd10              POP      {r4,pc}
-;;;471    
+;;;470    
                           ENDP
 
 00001e  0000              DCW      0x0000
@@ -37,30 +37,30 @@
                           AREA ||i.ILI9341_Clear||, CODE, READONLY, ALIGN=2
 
                   ILI9341_Clear PROC
-;;;653     */
-;;;654    void ILI9341_Clear ( uint16_t usX, uint16_t usY, uint16_t usWidth, uint16_t usHeight )
+;;;652     */
+;;;653    void ILI9341_Clear ( uint16_t usX, uint16_t usY, uint16_t usWidth, uint16_t usHeight )
 000000  e92d41f0          PUSH     {r4-r8,lr}
-;;;655    {
+;;;654    {
 000004  4606              MOV      r6,r0
 000006  460f              MOV      r7,r1
 000008  4614              MOV      r4,r2
 00000a  461d              MOV      r5,r3
-;;;656    	ILI9341_OpenWindow ( usX, usY, usWidth, usHeight );
+;;;655    	ILI9341_OpenWindow ( usX, usY, usWidth, usHeight );
 00000c  462b              MOV      r3,r5
 00000e  4622              MOV      r2,r4
 000010  4639              MOV      r1,r7
 000012  4630              MOV      r0,r6
 000014  f7fffffe          BL       ILI9341_OpenWindow
-;;;657    
-;;;658    	ILI9341_FillColor ( usWidth * usHeight, CurrentBackColor );		
+;;;656    
+;;;657    	ILI9341_FillColor ( usWidth * usHeight, CurrentBackColor );		
 000018  fb04f005          MUL      r0,r4,r5
 00001c  4902              LDR      r1,|L2.40|
 00001e  8809              LDRH     r1,[r1,#0]  ; CurrentBackColor
 000020  f7fffffe          BL       ILI9341_FillColor
-;;;659    	
-;;;660    }
+;;;658    	
+;;;659    }
 000024  e8bd81f0          POP      {r4-r8,pc}
-;;;661    
+;;;660    
                           ENDP
 
                   |L2.40|
@@ -93,24 +93,24 @@
                           AREA ||i.ILI9341_DispChar_EN||, CODE, READONLY, ALIGN=2
 
                   ILI9341_DispChar_EN PROC
-;;;918     */
-;;;919    void ILI9341_DispChar_EN ( uint16_t usX, uint16_t usY, const char cChar )
+;;;917     */
+;;;918    void ILI9341_DispChar_EN ( uint16_t usX, uint16_t usY, const char cChar )
 000000  e92d4ff0          PUSH     {r4-r11,lr}
-;;;920    {
+;;;919    {
 000004  4680              MOV      r8,r0
 000006  4689              MOV      r9,r1
 000008  4616              MOV      r6,r2
-;;;921    	uint8_t  byteCount, bitCount,fontLength;	
-;;;922    	uint16_t ucRelativePositon;
-;;;923    	uint8_t *Pfont;
-;;;924    	
-;;;925    	//对ascii码表偏移（字模表不包含ASCII表的前32个非图形符号）
-;;;926    	ucRelativePositon = cChar - ' ';
+;;;920    	uint8_t  byteCount, bitCount,fontLength;	
+;;;921    	uint16_t ucRelativePositon;
+;;;922    	uint8_t *Pfont;
+;;;923    	
+;;;924    	//对ascii码表偏移（字模表不包含ASCII表的前32个非图形符号）
+;;;925    	ucRelativePositon = cChar - ' ';
 00000a  f1a60020          SUB      r0,r6,#0x20
 00000e  fa1ffa80          UXTH     r10,r0
-;;;927    	
-;;;928    	//每个字模的字节数
-;;;929    	fontLength = (LCD_Currentfonts->Width*LCD_Currentfonts->Height)/8;
+;;;926    	
+;;;927    	//每个字模的字节数
+;;;928    	fontLength = (LCD_Currentfonts->Width*LCD_Currentfonts->Height)/8;
 000012  491e              LDR      r1,|L4.140|
 000014  6809              LDR      r1,[r1,#0]  ; LCD_Currentfonts
 000016  8889              LDRH     r1,[r1,#4]
@@ -121,17 +121,17 @@
 000022  17c1              ASRS     r1,r0,#31
 000024  eb007151          ADD      r1,r0,r1,LSR #29
 000028  f3c107c7          UBFX     r7,r1,#3,#8
-;;;930    		
-;;;931    	//字模首地址
-;;;932    	/*ascii码表偏移值乘以每个字模的字节数，求出字模的偏移位置*/
-;;;933    	Pfont = (uint8_t *)&LCD_Currentfonts->table[ucRelativePositon * fontLength];
+;;;929    		
+;;;930    	//字模首地址
+;;;931    	/*ascii码表偏移值乘以每个字模的字节数，求出字模的偏移位置*/
+;;;932    	Pfont = (uint8_t *)&LCD_Currentfonts->table[ucRelativePositon * fontLength];
 00002c  4817              LDR      r0,|L4.140|
 00002e  6800              LDR      r0,[r0,#0]  ; LCD_Currentfonts
 000030  6800              LDR      r0,[r0,#0]
 000032  fb0a0b07          MLA      r11,r10,r7,r0
-;;;934    	
-;;;935    	//设置显示窗口
-;;;936    	ILI9341_OpenWindow ( usX, usY, LCD_Currentfonts->Width, LCD_Currentfonts->Height);
+;;;933    	
+;;;934    	//设置显示窗口
+;;;935    	ILI9341_OpenWindow ( usX, usY, LCD_Currentfonts->Width, LCD_Currentfonts->Height);
 000036  4815              LDR      r0,|L4.140|
 000038  6800              LDR      r0,[r0,#0]  ; LCD_Currentfonts
 00003a  88c3              LDRH     r3,[r0,#6]
@@ -141,57 +141,57 @@
 000042  4649              MOV      r1,r9
 000044  4640              MOV      r0,r8
 000046  f7fffffe          BL       ILI9341_OpenWindow
-;;;937    	
-;;;938    	ILI9341_Write_Cmd ( CMD_SetPixel );			
+;;;936    	
+;;;937    	ILI9341_Write_Cmd ( CMD_SetPixel );			
 00004a  202c              MOVS     r0,#0x2c
 00004c  f7fffffe          BL       ILI9341_Write_Cmd
-;;;939    
-;;;940    	//按字节读取字模数据
-;;;941    	//由于前面直接设置了显示窗口，显示数据会自动换行
-;;;942    	for ( byteCount = 0; byteCount < fontLength; byteCount++ )
+;;;938    
+;;;939    	//按字节读取字模数据
+;;;940    	//由于前面直接设置了显示窗口，显示数据会自动换行
+;;;941    	for ( byteCount = 0; byteCount < fontLength; byteCount++ )
 000050  2400              MOVS     r4,#0
 000052  e016              B        |L4.130|
                   |L4.84|
-;;;943    	{
-;;;944    			//一位一位处理要显示的颜色
-;;;945    			for ( bitCount = 0; bitCount < 8; bitCount++ )
+;;;942    	{
+;;;943    			//一位一位处理要显示的颜色
+;;;944    			for ( bitCount = 0; bitCount < 8; bitCount++ )
 000054  2500              MOVS     r5,#0
 000056  e010              B        |L4.122|
                   |L4.88|
-;;;946    			{
-;;;947    					if ( Pfont[byteCount] & (0x80>>bitCount) )
+;;;945    			{
+;;;946    					if ( Pfont[byteCount] & (0x80>>bitCount) )
 000058  f81b0004          LDRB     r0,[r11,r4]
 00005c  2180              MOVS     r1,#0x80
 00005e  4129              ASRS     r1,r1,r5
 000060  4008              ANDS     r0,r0,r1
 000062  b120              CBZ      r0,|L4.110|
-;;;948    						ILI9341_Write_Data ( CurrentTextColor );			
+;;;947    						ILI9341_Write_Data ( CurrentTextColor );			
 000064  480a              LDR      r0,|L4.144|
 000066  8800              LDRH     r0,[r0,#0]  ; CurrentTextColor
 000068  f7fffffe          BL       ILI9341_Write_Data
 00006c  e003              B        |L4.118|
                   |L4.110|
-;;;949    					else
-;;;950    						ILI9341_Write_Data ( CurrentBackColor );
+;;;948    					else
+;;;949    						ILI9341_Write_Data ( CurrentBackColor );
 00006e  4809              LDR      r0,|L4.148|
 000070  8800              LDRH     r0,[r0,#0]  ; CurrentBackColor
 000072  f7fffffe          BL       ILI9341_Write_Data
                   |L4.118|
-000076  1c68              ADDS     r0,r5,#1              ;945
-000078  b2c5              UXTB     r5,r0                 ;945
+000076  1c68              ADDS     r0,r5,#1              ;944
+000078  b2c5              UXTB     r5,r0                 ;944
                   |L4.122|
-00007a  2d08              CMP      r5,#8                 ;945
+00007a  2d08              CMP      r5,#8                 ;944
 00007c  dbec              BLT      |L4.88|
-00007e  1c60              ADDS     r0,r4,#1              ;942
-000080  b2c4              UXTB     r4,r0                 ;942
+00007e  1c60              ADDS     r0,r4,#1              ;941
+000080  b2c4              UXTB     r4,r0                 ;941
                   |L4.130|
-000082  42bc              CMP      r4,r7                 ;942
+000082  42bc              CMP      r4,r7                 ;941
 000084  dbe6              BLT      |L4.84|
-;;;951    			}	
-;;;952    	}	
-;;;953    }
+;;;950    			}	
+;;;951    	}	
+;;;952    }
 000086  e8bd8ff0          POP      {r4-r11,pc}
-;;;954    
+;;;953    
                           ENDP
 
 00008a  0000              DCW      0x0000
@@ -205,20 +205,20 @@
                           AREA ||i.ILI9341_DispStringLine_EN||, CODE, READONLY, ALIGN=2
 
                   ILI9341_DispStringLine_EN PROC
-;;;965     */
-;;;966    void ILI9341_DispStringLine_EN (  uint16_t line,  char * pStr )
+;;;964     */
+;;;965    void ILI9341_DispStringLine_EN (  uint16_t line,  char * pStr )
 000000  b570              PUSH     {r4-r6,lr}
-;;;967    {
+;;;966    {
 000002  4604              MOV      r4,r0
 000004  460d              MOV      r5,r1
-;;;968    	uint16_t usX = 0;
+;;;967    	uint16_t usX = 0;
 000006  2600              MOVS     r6,#0
-;;;969    	
-;;;970    	while ( * pStr != '\0' )
+;;;968    	
+;;;969    	while ( * pStr != '\0' )
 000008  e024              B        |L5.84|
                   |L5.10|
-;;;971    	{
-;;;972    		if ( ( usX - ILI9341_DispWindow_X_Star + LCD_Currentfonts->Width ) > LCD_X_LENGTH )
+;;;970    	{
+;;;971    		if ( ( usX - ILI9341_DispWindow_X_Star + LCD_Currentfonts->Width ) > LCD_X_LENGTH )
 00000a  4630              MOV      r0,r6
 00000c  4913              LDR      r1,|L5.92|
 00000e  6809              LDR      r1,[r1,#0]  ; LCD_Currentfonts
@@ -228,19 +228,19 @@
 000016  8809              LDRH     r1,[r1,#0]  ; LCD_X_LENGTH
 000018  4288              CMP      r0,r1
 00001a  dd05              BLE      |L5.40|
-;;;973    		{
-;;;974    			usX = ILI9341_DispWindow_X_Star;
+;;;972    		{
+;;;973    			usX = ILI9341_DispWindow_X_Star;
 00001c  2600              MOVS     r6,#0
-;;;975    			line += LCD_Currentfonts->Height;
+;;;974    			line += LCD_Currentfonts->Height;
 00001e  480f              LDR      r0,|L5.92|
 000020  6800              LDR      r0,[r0,#0]  ; LCD_Currentfonts
 000022  88c0              LDRH     r0,[r0,#6]
 000024  4420              ADD      r0,r0,r4
 000026  b284              UXTH     r4,r0
                   |L5.40|
-;;;976    		}
-;;;977    		
-;;;978    		if ( ( line - ILI9341_DispWindow_Y_Star + LCD_Currentfonts->Height ) > LCD_Y_LENGTH )
+;;;975    		}
+;;;976    		
+;;;977    		if ( ( line - ILI9341_DispWindow_Y_Star + LCD_Currentfonts->Height ) > LCD_Y_LENGTH )
 000028  4620              MOV      r0,r4
 00002a  490c              LDR      r1,|L5.92|
 00002c  6809              LDR      r1,[r1,#0]  ; LCD_Currentfonts
@@ -250,39 +250,39 @@
 000034  8809              LDRH     r1,[r1,#0]  ; LCD_Y_LENGTH
 000036  4288              CMP      r0,r1
 000038  dd01              BLE      |L5.62|
-;;;979    		{
-;;;980    			usX = ILI9341_DispWindow_X_Star;
+;;;978    		{
+;;;979    			usX = ILI9341_DispWindow_X_Star;
 00003a  2600              MOVS     r6,#0
-;;;981    			line = ILI9341_DispWindow_Y_Star;
+;;;980    			line = ILI9341_DispWindow_Y_Star;
 00003c  2400              MOVS     r4,#0
                   |L5.62|
-;;;982    		}
-;;;983    		
-;;;984    		ILI9341_DispChar_EN ( usX, line, * pStr);
+;;;981    		}
+;;;982    		
+;;;983    		ILI9341_DispChar_EN ( usX, line, * pStr);
 00003e  782a              LDRB     r2,[r5,#0]
 000040  4621              MOV      r1,r4
 000042  4630              MOV      r0,r6
 000044  f7fffffe          BL       ILI9341_DispChar_EN
-;;;985    		
-;;;986    		pStr ++;
+;;;984    		
+;;;985    		pStr ++;
 000048  1c6d              ADDS     r5,r5,#1
-;;;987    		
-;;;988    		usX += LCD_Currentfonts->Width;
+;;;986    		
+;;;987    		usX += LCD_Currentfonts->Width;
 00004a  4804              LDR      r0,|L5.92|
 00004c  6800              LDR      r0,[r0,#0]  ; LCD_Currentfonts
 00004e  8880              LDRH     r0,[r0,#4]
 000050  4430              ADD      r0,r0,r6
 000052  b286              UXTH     r6,r0
                   |L5.84|
-000054  7828              LDRB     r0,[r5,#0]            ;970
-000056  2800              CMP      r0,#0                 ;970
+000054  7828              LDRB     r0,[r5,#0]            ;969
+000056  2800              CMP      r0,#0                 ;969
 000058  d1d7              BNE      |L5.10|
-;;;989    		
-;;;990    	}
-;;;991    	
-;;;992    }
+;;;988    		
+;;;989    	}
+;;;990    	
+;;;991    }
 00005a  bd70              POP      {r4-r6,pc}
-;;;993    
+;;;992    
                           ENDP
 
                   |L5.92|
@@ -295,18 +295,18 @@
                           AREA ||i.ILI9341_DispString_EN||, CODE, READONLY, ALIGN=2
 
                   ILI9341_DispString_EN PROC
-;;;1002    */
-;;;1003   void ILI9341_DispString_EN ( 	uint16_t usX ,uint16_t usY,  char * pStr )
+;;;1001    */
+;;;1002   void ILI9341_DispString_EN ( 	uint16_t usX ,uint16_t usY,  char * pStr )
 000000  b570              PUSH     {r4-r6,lr}
-;;;1004   {
+;;;1003   {
 000002  4605              MOV      r5,r0
 000004  460e              MOV      r6,r1
 000006  4614              MOV      r4,r2
-;;;1005   	while ( * pStr != '\0' )
+;;;1004   	while ( * pStr != '\0' )
 000008  e024              B        |L6.84|
                   |L6.10|
-;;;1006   	{
-;;;1007   		if ( ( usX - ILI9341_DispWindow_X_Star + LCD_Currentfonts->Width ) > LCD_X_LENGTH )
+;;;1005   	{
+;;;1006   		if ( ( usX - ILI9341_DispWindow_X_Star + LCD_Currentfonts->Width ) > LCD_X_LENGTH )
 00000a  4628              MOV      r0,r5
 00000c  4913              LDR      r1,|L6.92|
 00000e  6809              LDR      r1,[r1,#0]  ; LCD_Currentfonts
@@ -316,19 +316,19 @@
 000016  8809              LDRH     r1,[r1,#0]  ; LCD_X_LENGTH
 000018  4288              CMP      r0,r1
 00001a  dd05              BLE      |L6.40|
-;;;1008   		{
-;;;1009   			usX = ILI9341_DispWindow_X_Star;
+;;;1007   		{
+;;;1008   			usX = ILI9341_DispWindow_X_Star;
 00001c  2500              MOVS     r5,#0
-;;;1010   			usY += LCD_Currentfonts->Height;
+;;;1009   			usY += LCD_Currentfonts->Height;
 00001e  480f              LDR      r0,|L6.92|
 000020  6800              LDR      r0,[r0,#0]  ; LCD_Currentfonts
 000022  88c0              LDRH     r0,[r0,#6]
 000024  4430              ADD      r0,r0,r6
 000026  b286              UXTH     r6,r0
                   |L6.40|
-;;;1011   		}
-;;;1012   		
-;;;1013   		if ( ( usY - ILI9341_DispWindow_Y_Star + LCD_Currentfonts->Height ) > LCD_Y_LENGTH )
+;;;1010   		}
+;;;1011   		
+;;;1012   		if ( ( usY - ILI9341_DispWindow_Y_Star + LCD_Currentfonts->Height ) > LCD_Y_LENGTH )
 000028  4630              MOV      r0,r6
 00002a  490c              LDR      r1,|L6.92|
 00002c  6809              LDR      r1,[r1,#0]  ; LCD_Currentfonts
@@ -338,39 +338,39 @@
 000034  8809              LDRH     r1,[r1,#0]  ; LCD_Y_LENGTH
 000036  4288              CMP      r0,r1
 000038  dd01              BLE      |L6.62|
-;;;1014   		{
-;;;1015   			usX = ILI9341_DispWindow_X_Star;
+;;;1013   		{
+;;;1014   			usX = ILI9341_DispWindow_X_Star;
 00003a  2500              MOVS     r5,#0
-;;;1016   			usY = ILI9341_DispWindow_Y_Star;
+;;;1015   			usY = ILI9341_DispWindow_Y_Star;
 00003c  2600              MOVS     r6,#0
                   |L6.62|
-;;;1017   		}
-;;;1018   		
-;;;1019   		ILI9341_DispChar_EN ( usX, usY, * pStr);
+;;;1016   		}
+;;;1017   		
+;;;1018   		ILI9341_DispChar_EN ( usX, usY, * pStr);
 00003e  7822              LDRB     r2,[r4,#0]
 000040  4631              MOV      r1,r6
 000042  4628              MOV      r0,r5
 000044  f7fffffe          BL       ILI9341_DispChar_EN
-;;;1020   		
-;;;1021   		pStr ++;
+;;;1019   		
+;;;1020   		pStr ++;
 000048  1c64              ADDS     r4,r4,#1
-;;;1022   		
-;;;1023   		usX += LCD_Currentfonts->Width;
+;;;1021   		
+;;;1022   		usX += LCD_Currentfonts->Width;
 00004a  4804              LDR      r0,|L6.92|
 00004c  6800              LDR      r0,[r0,#0]  ; LCD_Currentfonts
 00004e  8880              LDRH     r0,[r0,#4]
 000050  4428              ADD      r0,r0,r5
 000052  b285              UXTH     r5,r0
                   |L6.84|
-000054  7820              LDRB     r0,[r4,#0]            ;1005
-000056  2800              CMP      r0,#0                 ;1005
+000054  7820              LDRB     r0,[r4,#0]            ;1004
+000056  2800              CMP      r0,#0                 ;1004
 000058  d1d7              BNE      |L6.10|
-;;;1024   		
-;;;1025   	}
-;;;1026   	
-;;;1027   }
+;;;1023   		
+;;;1024   	}
+;;;1025   	
+;;;1026   }
 00005a  bd70              POP      {r4-r6,pc}
-;;;1028   
+;;;1027   
                           ENDP
 
                   |L6.92|
@@ -383,18 +383,18 @@
                           AREA ||i.ILI9341_DispString_EN_YDir||, CODE, READONLY, ALIGN=2
 
                   ILI9341_DispString_EN_YDir PROC
-;;;1037    */
-;;;1038   void ILI9341_DispString_EN_YDir (	 uint16_t usX,uint16_t usY ,  char * pStr )
+;;;1036    */
+;;;1037   void ILI9341_DispString_EN_YDir (	 uint16_t usX,uint16_t usY ,  char * pStr )
 000000  b570              PUSH     {r4-r6,lr}
-;;;1039   {	
+;;;1038   {	
 000002  4605              MOV      r5,r0
 000004  460e              MOV      r6,r1
 000006  4614              MOV      r4,r2
-;;;1040   	while ( * pStr != '\0' )
+;;;1039   	while ( * pStr != '\0' )
 000008  e024              B        |L7.84|
                   |L7.10|
-;;;1041   	{
-;;;1042   		if ( ( usY - ILI9341_DispWindow_Y_Star + LCD_Currentfonts->Height ) >LCD_Y_LENGTH  )
+;;;1040   	{
+;;;1041   		if ( ( usY - ILI9341_DispWindow_Y_Star + LCD_Currentfonts->Height ) >LCD_Y_LENGTH  )
 00000a  4630              MOV      r0,r6
 00000c  4913              LDR      r1,|L7.92|
 00000e  6809              LDR      r1,[r1,#0]  ; LCD_Currentfonts
@@ -404,19 +404,19 @@
 000016  8809              LDRH     r1,[r1,#0]  ; LCD_Y_LENGTH
 000018  4288              CMP      r0,r1
 00001a  dd05              BLE      |L7.40|
-;;;1043   		{
-;;;1044   			usY = ILI9341_DispWindow_Y_Star;
+;;;1042   		{
+;;;1043   			usY = ILI9341_DispWindow_Y_Star;
 00001c  2600              MOVS     r6,#0
-;;;1045   			usX += LCD_Currentfonts->Width;
+;;;1044   			usX += LCD_Currentfonts->Width;
 00001e  480f              LDR      r0,|L7.92|
 000020  6800              LDR      r0,[r0,#0]  ; LCD_Currentfonts
 000022  8880              LDRH     r0,[r0,#4]
 000024  4428              ADD      r0,r0,r5
 000026  b285              UXTH     r5,r0
                   |L7.40|
-;;;1046   		}
-;;;1047   		
-;;;1048   		if ( ( usX - ILI9341_DispWindow_X_Star + LCD_Currentfonts->Width ) >  LCD_X_LENGTH)
+;;;1045   		}
+;;;1046   		
+;;;1047   		if ( ( usX - ILI9341_DispWindow_X_Star + LCD_Currentfonts->Width ) >  LCD_X_LENGTH)
 000028  4628              MOV      r0,r5
 00002a  490c              LDR      r1,|L7.92|
 00002c  6809              LDR      r1,[r1,#0]  ; LCD_Currentfonts
@@ -426,37 +426,37 @@
 000034  8809              LDRH     r1,[r1,#0]  ; LCD_X_LENGTH
 000036  4288              CMP      r0,r1
 000038  dd01              BLE      |L7.62|
-;;;1049   		{
-;;;1050   			usX = ILI9341_DispWindow_X_Star;
+;;;1048   		{
+;;;1049   			usX = ILI9341_DispWindow_X_Star;
 00003a  2500              MOVS     r5,#0
-;;;1051   			usY = ILI9341_DispWindow_Y_Star;
+;;;1050   			usY = ILI9341_DispWindow_Y_Star;
 00003c  2600              MOVS     r6,#0
                   |L7.62|
-;;;1052   		}
-;;;1053   		
-;;;1054   		ILI9341_DispChar_EN ( usX, usY, * pStr);
+;;;1051   		}
+;;;1052   		
+;;;1053   		ILI9341_DispChar_EN ( usX, usY, * pStr);
 00003e  7822              LDRB     r2,[r4,#0]
 000040  4631              MOV      r1,r6
 000042  4628              MOV      r0,r5
 000044  f7fffffe          BL       ILI9341_DispChar_EN
-;;;1055   		
-;;;1056   		pStr ++;
+;;;1054   		
+;;;1055   		pStr ++;
 000048  1c64              ADDS     r4,r4,#1
-;;;1057   		
-;;;1058   		usY += LCD_Currentfonts->Height;		
+;;;1056   		
+;;;1057   		usY += LCD_Currentfonts->Height;		
 00004a  4804              LDR      r0,|L7.92|
 00004c  6800              LDR      r0,[r0,#0]  ; LCD_Currentfonts
 00004e  88c0              LDRH     r0,[r0,#6]
 000050  4430              ADD      r0,r0,r6
 000052  b286              UXTH     r6,r0
                   |L7.84|
-000054  7820              LDRB     r0,[r4,#0]            ;1040
-000056  2800              CMP      r0,#0                 ;1040
+000054  7820              LDRB     r0,[r4,#0]            ;1039
+000056  2800              CMP      r0,#0                 ;1039
 000058  d1d7              BNE      |L7.10|
-;;;1059   	}	
-;;;1060   }
+;;;1058   	}	
+;;;1059   }
 00005a  bd70              POP      {r4-r6,pc}
-;;;1061   
+;;;1060   
                           ENDP
 
                   |L7.92|
@@ -469,390 +469,390 @@
                           AREA ||i.ILI9341_DrawCircle||, CODE, READONLY, ALIGN=1
 
                   ILI9341_DrawCircle PROC
-;;;850     */
-;;;851    void ILI9341_DrawCircle ( uint16_t usX_Center, uint16_t usY_Center, uint16_t usRadius, uint8_t ucFilled )
+;;;849     */
+;;;850    void ILI9341_DrawCircle ( uint16_t usX_Center, uint16_t usY_Center, uint16_t usRadius, uint8_t ucFilled )
 000000  e92d5ff0          PUSH     {r4-r12,lr}
-;;;852    {
+;;;851    {
 000004  4605              MOV      r5,r0
 000006  460e              MOV      r6,r1
 000008  4691              MOV      r9,r2
 00000a  469b              MOV      r11,r3
-;;;853    	int16_t sCurrentX, sCurrentY;
-;;;854    	int16_t sError;
+;;;852    	int16_t sCurrentX, sCurrentY;
+;;;853    	int16_t sError;
+;;;854    	
 ;;;855    	
-;;;856    	
-;;;857    	sCurrentX = 0; sCurrentY = usRadius;	  
+;;;856    	sCurrentX = 0; sCurrentY = usRadius;	  
 00000c  2400              MOVS     r4,#0
 00000e  fa0ff789          SXTH     r7,r9
-;;;858    	
-;;;859    	sError = 3 - ( usRadius << 1 );     //判断下个点位置的标志
+;;;857    	
+;;;858    	sError = 3 - ( usRadius << 1 );     //判断下个点位置的标志
 000012  2003              MOVS     r0,#3
 000014  eba00049          SUB      r0,r0,r9,LSL #1
 000018  fa0ffa80          SXTH     r10,r0
+;;;859    	
 ;;;860    	
-;;;861    	
-;;;862    	while ( sCurrentX <= sCurrentY )
+;;;861    	while ( sCurrentX <= sCurrentY )
 00001c  e087              B        |L8.302|
                   |L8.30|
-;;;863    	{
-;;;864    		int16_t sCountY;
+;;;862    	{
+;;;863    		int16_t sCountY;
+;;;864    		
 ;;;865    		
-;;;866    		
-;;;867    		if ( ucFilled ) 			
+;;;866    		if ( ucFilled ) 			
 00001e  f1bb0f00          CMP      r11,#0
 000022  d040              BEQ      |L8.166|
-;;;868    			for ( sCountY = sCurrentX; sCountY <= sCurrentY; sCountY ++ ) 
+;;;867    			for ( sCountY = sCurrentX; sCountY <= sCurrentY; sCountY ++ ) 
 000024  46a0              MOV      r8,r4
 000026  e03b              B        |L8.160|
                   |L8.40|
-;;;869    			{                      
-;;;870    				ILI9341_SetPointPixel ( usX_Center + sCurrentX, usY_Center + sCountY );           //1，研究对象 
+;;;868    			{                      
+;;;869    				ILI9341_SetPointPixel ( usX_Center + sCurrentX, usY_Center + sCountY );           //1，研究对象 
 000028  eb060208          ADD      r2,r6,r8
 00002c  b291              UXTH     r1,r2
 00002e  192a              ADDS     r2,r5,r4
 000030  b290              UXTH     r0,r2
 000032  f7fffffe          BL       ILI9341_SetPointPixel
-;;;871    				ILI9341_SetPointPixel ( usX_Center - sCurrentX, usY_Center + sCountY );           //2       
+;;;870    				ILI9341_SetPointPixel ( usX_Center - sCurrentX, usY_Center + sCountY );           //2       
 000036  eb060208          ADD      r2,r6,r8
 00003a  b291              UXTH     r1,r2
 00003c  1b2a              SUBS     r2,r5,r4
 00003e  b290              UXTH     r0,r2
 000040  f7fffffe          BL       ILI9341_SetPointPixel
-;;;872    				ILI9341_SetPointPixel ( usX_Center - sCountY,   usY_Center + sCurrentX );           //3
+;;;871    				ILI9341_SetPointPixel ( usX_Center - sCountY,   usY_Center + sCurrentX );           //3
 000044  1932              ADDS     r2,r6,r4
 000046  b291              UXTH     r1,r2
 000048  eba50208          SUB      r2,r5,r8
 00004c  b290              UXTH     r0,r2
 00004e  f7fffffe          BL       ILI9341_SetPointPixel
-;;;873    				ILI9341_SetPointPixel ( usX_Center - sCountY,   usY_Center - sCurrentX );           //4
+;;;872    				ILI9341_SetPointPixel ( usX_Center - sCountY,   usY_Center - sCurrentX );           //4
 000052  1b32              SUBS     r2,r6,r4
 000054  b291              UXTH     r1,r2
 000056  eba50208          SUB      r2,r5,r8
 00005a  b290              UXTH     r0,r2
 00005c  f7fffffe          BL       ILI9341_SetPointPixel
-;;;874    				ILI9341_SetPointPixel ( usX_Center - sCurrentX, usY_Center - sCountY );           //5    
+;;;873    				ILI9341_SetPointPixel ( usX_Center - sCurrentX, usY_Center - sCountY );           //5    
 000060  eba60208          SUB      r2,r6,r8
 000064  b291              UXTH     r1,r2
 000066  1b2a              SUBS     r2,r5,r4
 000068  b290              UXTH     r0,r2
 00006a  f7fffffe          BL       ILI9341_SetPointPixel
-;;;875            ILI9341_SetPointPixel ( usX_Center + sCurrentX, usY_Center - sCountY );           //6
+;;;874            ILI9341_SetPointPixel ( usX_Center + sCurrentX, usY_Center - sCountY );           //6
 00006e  eba60208          SUB      r2,r6,r8
 000072  b291              UXTH     r1,r2
 000074  192a              ADDS     r2,r5,r4
 000076  b290              UXTH     r0,r2
 000078  f7fffffe          BL       ILI9341_SetPointPixel
-;;;876    				ILI9341_SetPointPixel ( usX_Center + sCountY,   usY_Center - sCurrentX );           //7 	
+;;;875    				ILI9341_SetPointPixel ( usX_Center + sCountY,   usY_Center - sCurrentX );           //7 	
 00007c  1b32              SUBS     r2,r6,r4
 00007e  b291              UXTH     r1,r2
 000080  eb050208          ADD      r2,r5,r8
 000084  b290              UXTH     r0,r2
 000086  f7fffffe          BL       ILI9341_SetPointPixel
-;;;877            ILI9341_SetPointPixel ( usX_Center + sCountY,   usY_Center + sCurrentX );           //0				
+;;;876            ILI9341_SetPointPixel ( usX_Center + sCountY,   usY_Center + sCurrentX );           //0				
 00008a  1932              ADDS     r2,r6,r4
 00008c  b291              UXTH     r1,r2
 00008e  eb050208          ADD      r2,r5,r8
 000092  b290              UXTH     r0,r2
 000094  f7fffffe          BL       ILI9341_SetPointPixel
-000098  f1080001          ADD      r0,r8,#1              ;868
-00009c  fa0ff880          SXTH     r8,r0                 ;868
+000098  f1080001          ADD      r0,r8,#1              ;867
+00009c  fa0ff880          SXTH     r8,r0                 ;867
                   |L8.160|
-0000a0  45b8              CMP      r8,r7                 ;868
+0000a0  45b8              CMP      r8,r7                 ;867
 0000a2  ddc1              BLE      |L8.40|
 0000a4  e02f              B        |L8.262|
                   |L8.166|
-;;;878    			}
-;;;879    		
-;;;880    		else
-;;;881    		{          
-;;;882    			ILI9341_SetPointPixel ( usX_Center + sCurrentX, usY_Center + sCurrentY );             //1，研究对象
+;;;877    			}
+;;;878    		
+;;;879    		else
+;;;880    		{          
+;;;881    			ILI9341_SetPointPixel ( usX_Center + sCurrentX, usY_Center + sCurrentY );             //1，研究对象
 0000a6  19f2              ADDS     r2,r6,r7
 0000a8  b291              UXTH     r1,r2
 0000aa  192a              ADDS     r2,r5,r4
 0000ac  b290              UXTH     r0,r2
 0000ae  f7fffffe          BL       ILI9341_SetPointPixel
-;;;883    			ILI9341_SetPointPixel ( usX_Center - sCurrentX, usY_Center + sCurrentY );             //2      
+;;;882    			ILI9341_SetPointPixel ( usX_Center - sCurrentX, usY_Center + sCurrentY );             //2      
 0000b2  19f2              ADDS     r2,r6,r7
 0000b4  b291              UXTH     r1,r2
 0000b6  1b2a              SUBS     r2,r5,r4
 0000b8  b290              UXTH     r0,r2
 0000ba  f7fffffe          BL       ILI9341_SetPointPixel
-;;;884    			ILI9341_SetPointPixel ( usX_Center - sCurrentY, usY_Center + sCurrentX );             //3
+;;;883    			ILI9341_SetPointPixel ( usX_Center - sCurrentY, usY_Center + sCurrentX );             //3
 0000be  1932              ADDS     r2,r6,r4
 0000c0  b291              UXTH     r1,r2
 0000c2  1bea              SUBS     r2,r5,r7
 0000c4  b290              UXTH     r0,r2
 0000c6  f7fffffe          BL       ILI9341_SetPointPixel
-;;;885    			ILI9341_SetPointPixel ( usX_Center - sCurrentY, usY_Center - sCurrentX );             //4
+;;;884    			ILI9341_SetPointPixel ( usX_Center - sCurrentY, usY_Center - sCurrentX );             //4
 0000ca  1b32              SUBS     r2,r6,r4
 0000cc  b291              UXTH     r1,r2
 0000ce  1bea              SUBS     r2,r5,r7
 0000d0  b290              UXTH     r0,r2
 0000d2  f7fffffe          BL       ILI9341_SetPointPixel
-;;;886    			ILI9341_SetPointPixel ( usX_Center - sCurrentX, usY_Center - sCurrentY );             //5       
+;;;885    			ILI9341_SetPointPixel ( usX_Center - sCurrentX, usY_Center - sCurrentY );             //5       
 0000d6  1bf2              SUBS     r2,r6,r7
 0000d8  b291              UXTH     r1,r2
 0000da  1b2a              SUBS     r2,r5,r4
 0000dc  b290              UXTH     r0,r2
 0000de  f7fffffe          BL       ILI9341_SetPointPixel
-;;;887    			ILI9341_SetPointPixel ( usX_Center + sCurrentX, usY_Center - sCurrentY );             //6
+;;;886    			ILI9341_SetPointPixel ( usX_Center + sCurrentX, usY_Center - sCurrentY );             //6
 0000e2  1bf2              SUBS     r2,r6,r7
 0000e4  b291              UXTH     r1,r2
 0000e6  192a              ADDS     r2,r5,r4
 0000e8  b290              UXTH     r0,r2
 0000ea  f7fffffe          BL       ILI9341_SetPointPixel
-;;;888    			ILI9341_SetPointPixel ( usX_Center + sCurrentY, usY_Center - sCurrentX );             //7 
+;;;887    			ILI9341_SetPointPixel ( usX_Center + sCurrentY, usY_Center - sCurrentX );             //7 
 0000ee  1b32              SUBS     r2,r6,r4
 0000f0  b291              UXTH     r1,r2
 0000f2  19ea              ADDS     r2,r5,r7
 0000f4  b290              UXTH     r0,r2
 0000f6  f7fffffe          BL       ILI9341_SetPointPixel
-;;;889    			ILI9341_SetPointPixel ( usX_Center + sCurrentY, usY_Center + sCurrentX );             //0
+;;;888    			ILI9341_SetPointPixel ( usX_Center + sCurrentY, usY_Center + sCurrentX );             //0
 0000fa  1932              ADDS     r2,r6,r4
 0000fc  b291              UXTH     r1,r2
 0000fe  19ea              ADDS     r2,r5,r7
 000100  b290              UXTH     r0,r2
 000102  f7fffffe          BL       ILI9341_SetPointPixel
                   |L8.262|
-;;;890        }			
+;;;889        }			
+;;;890    		
 ;;;891    		
-;;;892    		
-;;;893    		sCurrentX ++;
+;;;892    		sCurrentX ++;
 000106  1c60              ADDS     r0,r4,#1
 000108  b204              SXTH     r4,r0
-;;;894    
-;;;895    		
-;;;896    		if ( sError < 0 ) 
+;;;893    
+;;;894    		
+;;;895    		if ( sError < 0 ) 
 00010a  f1ba0f00          CMP      r10,#0
 00010e  da05              BGE      |L8.284|
-;;;897    			sError += 4 * sCurrentX + 6;	  
+;;;896    			sError += 4 * sCurrentX + 6;	  
 000110  00a0              LSLS     r0,r4,#2
 000112  1d80              ADDS     r0,r0,#6
 000114  4450              ADD      r0,r0,r10
 000116  fa0ffa80          SXTH     r10,r0
 00011a  e007              B        |L8.300|
                   |L8.284|
-;;;898    		
-;;;899    		else
-;;;900    		{
-;;;901    			sError += 10 + 4 * ( sCurrentX - sCurrentY );   
+;;;897    		
+;;;898    		else
+;;;899    		{
+;;;900    			sError += 10 + 4 * ( sCurrentX - sCurrentY );   
 00011c  1be0              SUBS     r0,r4,r7
 00011e  0080              LSLS     r0,r0,#2
 000120  300a              ADDS     r0,r0,#0xa
 000122  4450              ADD      r0,r0,r10
 000124  fa0ffa80          SXTH     r10,r0
-;;;902    			sCurrentY --;
+;;;901    			sCurrentY --;
 000128  1e78              SUBS     r0,r7,#1
 00012a  b207              SXTH     r7,r0
                   |L8.300|
-;;;903    		} 	
+;;;902    		} 	
+;;;903    		
 ;;;904    		
-;;;905    		
-;;;906    	}
+;;;905    	}
 00012c  bf00              NOP      
                   |L8.302|
-00012e  42bc              CMP      r4,r7                 ;862
+00012e  42bc              CMP      r4,r7                 ;861
 000130  f77faf75          BLE      |L8.30|
+;;;906    	
 ;;;907    	
-;;;908    	
-;;;909    }
+;;;908    }
 000134  e8bd9ff0          POP      {r4-r12,pc}
-;;;910    
+;;;909    
                           ENDP
 
 
                           AREA ||i.ILI9341_DrawLine||, CODE, READONLY, ALIGN=1
 
                   ILI9341_DrawLine PROC
-;;;733     */
-;;;734    void ILI9341_DrawLine ( uint16_t usX1, uint16_t usY1, uint16_t usX2, uint16_t usY2 )
+;;;732     */
+;;;733    void ILI9341_DrawLine ( uint16_t usX1, uint16_t usY1, uint16_t usX2, uint16_t usY2 )
 000000  e92d4fff          PUSH     {r0-r11,lr}
-;;;735    {
+;;;734    {
 000004  b083              SUB      sp,sp,#0xc
 000006  4681              MOV      r9,r0
-;;;736    	uint16_t us; 
-;;;737    	uint16_t usX_Current, usY_Current;
-;;;738    	
-;;;739    	int32_t lError_X = 0, lError_Y = 0, lDelta_X, lDelta_Y, lDistance; 
+;;;735    	uint16_t us; 
+;;;736    	uint16_t usX_Current, usY_Current;
+;;;737    	
+;;;738    	int32_t lError_X = 0, lError_Y = 0, lDelta_X, lDelta_Y, lDistance; 
 000008  f04f0a00          MOV      r10,#0
 00000c  46d3              MOV      r11,r10
-;;;740    	int32_t lIncrease_X, lIncrease_Y; 	
+;;;739    	int32_t lIncrease_X, lIncrease_Y; 	
+;;;740    	
 ;;;741    	
-;;;742    	
-;;;743    	lDelta_X = usX2 - usX1; //计算坐标增量 
+;;;742    	lDelta_X = usX2 - usX1; //计算坐标增量 
 00000e  9805              LDR      r0,[sp,#0x14]
 000010  eba00509          SUB      r5,r0,r9
-;;;744    	lDelta_Y = usY2 - usY1; 
+;;;743    	lDelta_Y = usY2 - usY1; 
 000014  9904              LDR      r1,[sp,#0x10]
 000016  9806              LDR      r0,[sp,#0x18]
 000018  1a46              SUBS     r6,r0,r1
-;;;745    	
-;;;746    	usX_Current = usX1; 
+;;;744    	
+;;;745    	usX_Current = usX1; 
 00001a  f8cd9004          STR      r9,[sp,#4]
-;;;747    	usY_Current = usY1; 
+;;;746    	usY_Current = usY1; 
 00001e  9804              LDR      r0,[sp,#0x10]
 000020  9000              STR      r0,[sp,#0]
+;;;747    	
 ;;;748    	
-;;;749    	
-;;;750    	if ( lDelta_X > 0 ) 
+;;;749    	if ( lDelta_X > 0 ) 
 000022  2d00              CMP      r5,#0
 000024  dd01              BLE      |L9.42|
-;;;751    		lIncrease_X = 1; //设置单步方向 
+;;;750    		lIncrease_X = 1; //设置单步方向 
 000026  2701              MOVS     r7,#1
 000028  e005              B        |L9.54|
                   |L9.42|
-;;;752    	
-;;;753    	else if ( lDelta_X == 0 ) 
+;;;751    	
+;;;752    	else if ( lDelta_X == 0 ) 
 00002a  b90d              CBNZ     r5,|L9.48|
-;;;754    		lIncrease_X = 0;//垂直线 
+;;;753    		lIncrease_X = 0;//垂直线 
 00002c  2700              MOVS     r7,#0
 00002e  e002              B        |L9.54|
                   |L9.48|
-;;;755    	
-;;;756    	else 
-;;;757      { 
-;;;758        lIncrease_X = -1;
+;;;754    	
+;;;755    	else 
+;;;756      { 
+;;;757        lIncrease_X = -1;
 000030  f04f37ff          MOV      r7,#0xffffffff
-;;;759        lDelta_X = - lDelta_X;
+;;;758        lDelta_X = - lDelta_X;
 000034  426d              RSBS     r5,r5,#0
                   |L9.54|
-;;;760      } 
-;;;761    
-;;;762    	
-;;;763    	if ( lDelta_Y > 0 )
+;;;759      } 
+;;;760    
+;;;761    	
+;;;762    	if ( lDelta_Y > 0 )
 000036  2e00              CMP      r6,#0
 000038  dd02              BLE      |L9.64|
-;;;764    		lIncrease_Y = 1; 
+;;;763    		lIncrease_Y = 1; 
 00003a  f04f0801          MOV      r8,#1
 00003e  e006              B        |L9.78|
                   |L9.64|
-;;;765    	
-;;;766    	else if ( lDelta_Y == 0 )
+;;;764    	
+;;;765    	else if ( lDelta_Y == 0 )
 000040  b916              CBNZ     r6,|L9.72|
-;;;767    		lIncrease_Y = 0;//水平线 
+;;;766    		lIncrease_Y = 0;//水平线 
 000042  f04f0800          MOV      r8,#0
 000046  e002              B        |L9.78|
                   |L9.72|
-;;;768    	
-;;;769    	else 
-;;;770      {
-;;;771        lIncrease_Y = -1;
+;;;767    	
+;;;768    	else 
+;;;769      {
+;;;770        lIncrease_Y = -1;
 000048  f04f38ff          MOV      r8,#0xffffffff
-;;;772        lDelta_Y = - lDelta_Y;
+;;;771        lDelta_Y = - lDelta_Y;
 00004c  4276              RSBS     r6,r6,#0
                   |L9.78|
-;;;773      } 
-;;;774    
-;;;775    	
-;;;776    	if (  lDelta_X > lDelta_Y )
+;;;772      } 
+;;;773    
+;;;774    	
+;;;775    	if (  lDelta_X > lDelta_Y )
 00004e  42b5              CMP      r5,r6
 000050  dd01              BLE      |L9.86|
-;;;777    		lDistance = lDelta_X; //选取基本增量坐标轴 
+;;;776    		lDistance = lDelta_X; //选取基本增量坐标轴 
 000052  462c              MOV      r4,r5
 000054  e000              B        |L9.88|
                   |L9.86|
-;;;778    	
-;;;779    	else 
-;;;780    		lDistance = lDelta_Y; 
+;;;777    	
+;;;778    	else 
+;;;779    		lDistance = lDelta_Y; 
 000056  4634              MOV      r4,r6
                   |L9.88|
-;;;781    
-;;;782    	
-;;;783    	for ( us = 0; us <= lDistance + 1; us ++ )//画线输出 
+;;;780    
+;;;781    	
+;;;782    	for ( us = 0; us <= lDistance + 1; us ++ )//画线输出 
 000058  2000              MOVS     r0,#0
 00005a  9002              STR      r0,[sp,#8]
 00005c  e019              B        |L9.146|
                   |L9.94|
-;;;784    	{  
-;;;785    		ILI9341_SetPointPixel ( usX_Current, usY_Current );//画点 
+;;;783    	{  
+;;;784    		ILI9341_SetPointPixel ( usX_Current, usY_Current );//画点 
 00005e  e9dd1000          LDRD     r1,r0,[sp,#0]
 000062  f7fffffe          BL       ILI9341_SetPointPixel
-;;;786    		
-;;;787    		lError_X += lDelta_X ; 
+;;;785    		
+;;;786    		lError_X += lDelta_X ; 
 000066  44aa              ADD      r10,r10,r5
-;;;788    		lError_Y += lDelta_Y ; 
+;;;787    		lError_Y += lDelta_Y ; 
 000068  44b3              ADD      r11,r11,r6
-;;;789    		
-;;;790    		if ( lError_X > lDistance ) 
+;;;788    		
+;;;789    		if ( lError_X > lDistance ) 
 00006a  45a2              CMP      r10,r4
 00006c  dd05              BLE      |L9.122|
-;;;791    		{ 
-;;;792    			lError_X -= lDistance; 
+;;;790    		{ 
+;;;791    			lError_X -= lDistance; 
 00006e  ebaa0a04          SUB      r10,r10,r4
-;;;793    			usX_Current += lIncrease_X; 
+;;;792    			usX_Current += lIncrease_X; 
 000072  9801              LDR      r0,[sp,#4]
 000074  4438              ADD      r0,r0,r7
 000076  b280              UXTH     r0,r0
 000078  9001              STR      r0,[sp,#4]
                   |L9.122|
-;;;794    		}  
-;;;795    		
-;;;796    		if ( lError_Y > lDistance ) 
+;;;793    		}  
+;;;794    		
+;;;795    		if ( lError_Y > lDistance ) 
 00007a  45a3              CMP      r11,r4
 00007c  dd05              BLE      |L9.138|
-;;;797    		{ 
-;;;798    			lError_Y -= lDistance; 
+;;;796    		{ 
+;;;797    			lError_Y -= lDistance; 
 00007e  ebab0b04          SUB      r11,r11,r4
-;;;799    			usY_Current += lIncrease_Y; 
+;;;798    			usY_Current += lIncrease_Y; 
 000082  9800              LDR      r0,[sp,#0]
 000084  4440              ADD      r0,r0,r8
 000086  b280              UXTH     r0,r0
 000088  9000              STR      r0,[sp,#0]
                   |L9.138|
-00008a  9802              LDR      r0,[sp,#8]            ;783
-00008c  1c40              ADDS     r0,r0,#1              ;783
-00008e  b280              UXTH     r0,r0                 ;783
-000090  9002              STR      r0,[sp,#8]            ;783
+00008a  9802              LDR      r0,[sp,#8]            ;782
+00008c  1c40              ADDS     r0,r0,#1              ;782
+00008e  b280              UXTH     r0,r0                 ;782
+000090  9002              STR      r0,[sp,#8]            ;782
                   |L9.146|
-000092  1c61              ADDS     r1,r4,#1              ;783
-000094  9802              LDR      r0,[sp,#8]            ;783
-000096  4288              CMP      r0,r1                 ;783
+000092  1c61              ADDS     r1,r4,#1              ;782
+000094  9802              LDR      r0,[sp,#8]            ;782
+000096  4288              CMP      r0,r1                 ;782
 000098  dde1              BLE      |L9.94|
-;;;800    		} 
-;;;801    		
-;;;802    	}  
+;;;799    		} 
+;;;800    		
+;;;801    	}  
+;;;802    	
 ;;;803    	
-;;;804    	
-;;;805    }   
+;;;804    }   
 00009a  b007              ADD      sp,sp,#0x1c
 00009c  e8bd8ff0          POP      {r4-r11,pc}
-;;;806    
+;;;805    
                           ENDP
 
 
                           AREA ||i.ILI9341_DrawRectangle||, CODE, READONLY, ALIGN=2
 
                   ILI9341_DrawRectangle PROC
-;;;820     */
-;;;821    void ILI9341_DrawRectangle ( uint16_t usX_Start, uint16_t usY_Start, uint16_t usWidth, uint16_t usHeight, uint8_t ucFilled )
+;;;819     */
+;;;820    void ILI9341_DrawRectangle ( uint16_t usX_Start, uint16_t usY_Start, uint16_t usWidth, uint16_t usHeight, uint8_t ucFilled )
 000000  e92d41f0          PUSH     {r4-r8,lr}
-;;;822    {
+;;;821    {
 000004  4604              MOV      r4,r0
 000006  460d              MOV      r5,r1
 000008  4616              MOV      r6,r2
 00000a  461f              MOV      r7,r3
 00000c  f8dd8018          LDR      r8,[sp,#0x18]
-;;;823    	if ( ucFilled )
+;;;822    	if ( ucFilled )
 000010  f1b80f00          CMP      r8,#0
 000014  d00c              BEQ      |L10.48|
-;;;824    	{
-;;;825    		ILI9341_OpenWindow ( usX_Start, usY_Start, usWidth, usHeight );
+;;;823    	{
+;;;824    		ILI9341_OpenWindow ( usX_Start, usY_Start, usWidth, usHeight );
 000016  463b              MOV      r3,r7
 000018  4632              MOV      r2,r6
 00001a  4629              MOV      r1,r5
 00001c  4620              MOV      r0,r4
 00001e  f7fffffe          BL       ILI9341_OpenWindow
-;;;826    		ILI9341_FillColor ( usWidth * usHeight ,CurrentTextColor);	
+;;;825    		ILI9341_FillColor ( usWidth * usHeight ,CurrentTextColor);	
 000022  fb06f007          MUL      r0,r6,r7
 000026  4917              LDR      r1,|L10.132|
 000028  8809              LDRH     r1,[r1,#0]  ; CurrentTextColor
 00002a  f7fffffe          BL       ILI9341_FillColor
 00002e  e027              B        |L10.128|
                   |L10.48|
-;;;827    	}
-;;;828    	else
-;;;829    	{
-;;;830    		ILI9341_DrawLine ( usX_Start, usY_Start, usX_Start + usWidth - 1, usY_Start );
+;;;826    	}
+;;;827    	else
+;;;828    	{
+;;;829    		ILI9341_DrawLine ( usX_Start, usY_Start, usX_Start + usWidth - 1, usY_Start );
 000030  19a0              ADDS     r0,r4,r6
 000032  1e40              SUBS     r0,r0,#1
 000034  b282              UXTH     r2,r0
@@ -860,7 +860,7 @@
 000038  4629              MOV      r1,r5
 00003a  4620              MOV      r0,r4
 00003c  f7fffffe          BL       ILI9341_DrawLine
-;;;831    		ILI9341_DrawLine ( usX_Start, usY_Start + usHeight - 1, usX_Start + usWidth - 1, usY_Start + usHeight - 1 );
+;;;830    		ILI9341_DrawLine ( usX_Start, usY_Start + usHeight - 1, usX_Start + usWidth - 1, usY_Start + usHeight - 1 );
 000040  19e8              ADDS     r0,r5,r7
 000042  1e40              SUBS     r0,r0,#1
 000044  b283              UXTH     r3,r0
@@ -872,7 +872,7 @@
 000050  b281              UXTH     r1,r0
 000052  4620              MOV      r0,r4
 000054  f7fffffe          BL       ILI9341_DrawLine
-;;;832    		ILI9341_DrawLine ( usX_Start, usY_Start, usX_Start, usY_Start + usHeight - 1 );
+;;;831    		ILI9341_DrawLine ( usX_Start, usY_Start, usX_Start, usY_Start + usHeight - 1 );
 000058  19e8              ADDS     r0,r5,r7
 00005a  1e40              SUBS     r0,r0,#1
 00005c  b283              UXTH     r3,r0
@@ -880,7 +880,7 @@
 000060  4629              MOV      r1,r5
 000062  4620              MOV      r0,r4
 000064  f7fffffe          BL       ILI9341_DrawLine
-;;;833    		ILI9341_DrawLine ( usX_Start + usWidth - 1, usY_Start, usX_Start + usWidth - 1, usY_Start + usHeight - 1 );		
+;;;832    		ILI9341_DrawLine ( usX_Start + usWidth - 1, usY_Start, usX_Start + usWidth - 1, usY_Start + usHeight - 1 );		
 000068  19e9              ADDS     r1,r5,r7
 00006a  1e49              SUBS     r1,r1,#1
 00006c  b28b              UXTH     r3,r1
@@ -893,11 +893,11 @@
 00007a  4629              MOV      r1,r5
 00007c  f7fffffe          BL       ILI9341_DrawLine
                   |L10.128|
-;;;834    	}
-;;;835    
-;;;836    }
+;;;833    	}
+;;;834    
+;;;835    }
 000080  e8bd81f0          POP      {r4-r8,pc}
-;;;837    
+;;;836    
                           ENDP
 
                   |L10.132|
@@ -1007,37 +1007,37 @@
                           AREA ||i.ILI9341_FillColor||, CODE, READONLY, ALIGN=1
 
                   ILI9341_FillColor PROC
-;;;629     */
-;;;630    static __inline void ILI9341_FillColor ( uint32_t ulAmout_Point, uint16_t usColor )
+;;;628     */
+;;;629    static __inline void ILI9341_FillColor ( uint32_t ulAmout_Point, uint16_t usColor )
 000000  b510              PUSH     {r4,lr}
-;;;631    {
+;;;630    {
 000002  4602              MOV      r2,r0
 000004  460b              MOV      r3,r1
-;;;632    	uint32_t i = 0;
+;;;631    	uint32_t i = 0;
 000006  2400              MOVS     r4,#0
+;;;632    	
 ;;;633    	
-;;;634    	
-;;;635    	/* memory write */
-;;;636    	ILI9341_Write_Cmd ( CMD_SetPixel );	
+;;;634    	/* memory write */
+;;;635    	ILI9341_Write_Cmd ( CMD_SetPixel );	
 000008  202c              MOVS     r0,#0x2c
 00000a  f7fffffe          BL       ILI9341_Write_Cmd
-;;;637    		
-;;;638    	for ( i = 0; i < ulAmout_Point; i ++ )
+;;;636    		
+;;;637    	for ( i = 0; i < ulAmout_Point; i ++ )
 00000e  bf00              NOP      
 000010  e003              B        |L12.26|
                   |L12.18|
-;;;639    		ILI9341_Write_Data ( usColor );
+;;;638    		ILI9341_Write_Data ( usColor );
 000012  4618              MOV      r0,r3
 000014  f7fffffe          BL       ILI9341_Write_Data
-000018  1c64              ADDS     r4,r4,#1              ;638
+000018  1c64              ADDS     r4,r4,#1              ;637
                   |L12.26|
-00001a  4294              CMP      r4,r2                 ;638
+00001a  4294              CMP      r4,r2                 ;637
 00001c  d3f9              BCC      |L12.18|
-;;;640    		
-;;;641    	
-;;;642    }
+;;;639    		
+;;;640    	
+;;;641    }
 00001e  bd10              POP      {r4,pc}
-;;;643    
+;;;642    
                           ENDP
 
 
@@ -1297,149 +1297,149 @@
                           AREA ||i.ILI9341_GetPointPixel||, CODE, READONLY, ALIGN=1
 
                   ILI9341_GetPointPixel PROC
-;;;710     */
-;;;711    uint16_t ILI9341_GetPointPixel ( uint16_t usX, uint16_t usY )
+;;;709     */
+;;;710    uint16_t ILI9341_GetPointPixel ( uint16_t usX, uint16_t usY )
 000000  b570              PUSH     {r4-r6,lr}
-;;;712    { 
+;;;711    { 
 000002  4604              MOV      r4,r0
 000004  460d              MOV      r5,r1
-;;;713    	uint16_t usPixelData;
-;;;714    
-;;;715    	
-;;;716    	ILI9341_SetCursor ( usX, usY );
+;;;712    	uint16_t usPixelData;
+;;;713    
+;;;714    	
+;;;715    	ILI9341_SetCursor ( usX, usY );
 000006  4629              MOV      r1,r5
 000008  4620              MOV      r0,r4
 00000a  f7fffffe          BL       ILI9341_SetCursor
-;;;717    	
-;;;718    	usPixelData = ILI9341_Read_PixelData ();
+;;;716    	
+;;;717    	usPixelData = ILI9341_Read_PixelData ();
 00000e  f7fffffe          BL       ILI9341_Read_PixelData
 000012  4606              MOV      r6,r0
-;;;719    	
-;;;720    	return usPixelData;
+;;;718    	
+;;;719    	return usPixelData;
 000014  4630              MOV      r0,r6
-;;;721    	
-;;;722    }
+;;;720    	
+;;;721    }
 000016  bd70              POP      {r4-r6,pc}
-;;;723    
+;;;722    
                           ENDP
 
 
                           AREA ||i.ILI9341_GramScan||, CODE, READONLY, ALIGN=2
 
                   ILI9341_GramScan PROC
-;;;542     *******************************************************/
-;;;543    void ILI9341_GramScan ( uint8_t ucOption )
+;;;541     *******************************************************/
+;;;542    void ILI9341_GramScan ( uint8_t ucOption )
 000000  b500              PUSH     {lr}
-;;;544    {	
+;;;543    {	
 000002  4602              MOV      r2,r0
-;;;545    	//参数检查，只可输入0-7
-;;;546    	if(ucOption >7 )
+;;;544    	//参数检查，只可输入0-7
+;;;545    	if(ucOption >7 )
 000004  2a07              CMP      r2,#7
 000006  dd00              BLE      |L15.10|
                   |L15.8|
-;;;547    		return;
-;;;548    	
-;;;549    	//根据模式更新LCD_SCAN_MODE的值，主要用于触摸屏选择计算参数
-;;;550    	LCD_SCAN_MODE = ucOption;
-;;;551    	
-;;;552    	//根据模式更新XY方向的像素宽度
-;;;553    	if(ucOption%2 == 0)	
-;;;554    	{
-;;;555    		//0 2 4 6模式下X方向像素宽度为240，Y方向为320
-;;;556    		LCD_X_LENGTH = ILI9341_LESS_PIXEL;
-;;;557    		LCD_Y_LENGTH =	ILI9341_MORE_PIXEL;
-;;;558    	}
-;;;559    	else				
-;;;560    	{
-;;;561    		//1 3 5 7模式下X方向像素宽度为320，Y方向为240
-;;;562    		LCD_X_LENGTH = ILI9341_MORE_PIXEL;
-;;;563    		LCD_Y_LENGTH =	ILI9341_LESS_PIXEL; 
-;;;564    	}
-;;;565    
-;;;566    	//0x36命令参数的高3位可用于设置GRAM扫描方向	
-;;;567    	ILI9341_Write_Cmd ( 0x36 ); 
-;;;568    	ILI9341_Write_Data ( 0x08 |(ucOption<<5));//根据ucOption的值设置LCD参数，共0-7种模式
-;;;569    	ILI9341_Write_Cmd ( CMD_SetCoordinateX ); 
-;;;570    	ILI9341_Write_Data ( 0x00 );		/* x 起始坐标高8位 */
-;;;571    	ILI9341_Write_Data ( 0x00 );		/* x 起始坐标低8位 */
-;;;572    	ILI9341_Write_Data ( ((LCD_X_LENGTH-1)>>8)&0xFF ); /* x 结束坐标高8位 */	
-;;;573    	ILI9341_Write_Data ( (LCD_X_LENGTH-1)&0xFF );				/* x 结束坐标低8位 */
-;;;574    
-;;;575    	ILI9341_Write_Cmd ( CMD_SetCoordinateY ); 
-;;;576    	ILI9341_Write_Data ( 0x00 );		/* y 起始坐标高8位 */
-;;;577    	ILI9341_Write_Data ( 0x00 );		/* y 起始坐标低8位 */
-;;;578    	ILI9341_Write_Data ( ((LCD_Y_LENGTH-1)>>8)&0xFF );	/* y 结束坐标高8位 */	 
-;;;579    	ILI9341_Write_Data ( (LCD_Y_LENGTH-1)&0xFF );				/* y 结束坐标低8位 */
-;;;580    
-;;;581    	/* write gram start */
-;;;582    	ILI9341_Write_Cmd ( CMD_SetPixel );	
-;;;583    }
+;;;546    		return;
+;;;547    	
+;;;548    	//根据模式更新LCD_SCAN_MODE的值，主要用于触摸屏选择计算参数
+;;;549    	LCD_SCAN_MODE = ucOption;
+;;;550    	
+;;;551    	//根据模式更新XY方向的像素宽度
+;;;552    	if(ucOption%2 == 0)	
+;;;553    	{
+;;;554    		//0 2 4 6模式下X方向像素宽度为240，Y方向为320
+;;;555    		LCD_X_LENGTH = ILI9341_LESS_PIXEL;
+;;;556    		LCD_Y_LENGTH =	ILI9341_MORE_PIXEL;
+;;;557    	}
+;;;558    	else				
+;;;559    	{
+;;;560    		//1 3 5 7模式下X方向像素宽度为320，Y方向为240
+;;;561    		LCD_X_LENGTH = ILI9341_MORE_PIXEL;
+;;;562    		LCD_Y_LENGTH =	ILI9341_LESS_PIXEL; 
+;;;563    	}
+;;;564    
+;;;565    	//0x36命令参数的高3位可用于设置GRAM扫描方向	
+;;;566    	ILI9341_Write_Cmd ( 0x36 ); 
+;;;567    	ILI9341_Write_Data ( 0x08 |(ucOption<<5));//根据ucOption的值设置LCD参数，共0-7种模式
+;;;568    	ILI9341_Write_Cmd ( CMD_SetCoordinateX ); 
+;;;569    	ILI9341_Write_Data ( 0x00 );		/* x 起始坐标高8位 */
+;;;570    	ILI9341_Write_Data ( 0x00 );		/* x 起始坐标低8位 */
+;;;571    	ILI9341_Write_Data ( ((LCD_X_LENGTH-1)>>8)&0xFF ); /* x 结束坐标高8位 */	
+;;;572    	ILI9341_Write_Data ( (LCD_X_LENGTH-1)&0xFF );				/* x 结束坐标低8位 */
+;;;573    
+;;;574    	ILI9341_Write_Cmd ( CMD_SetCoordinateY ); 
+;;;575    	ILI9341_Write_Data ( 0x00 );		/* y 起始坐标高8位 */
+;;;576    	ILI9341_Write_Data ( 0x00 );		/* y 起始坐标低8位 */
+;;;577    	ILI9341_Write_Data ( ((LCD_Y_LENGTH-1)>>8)&0xFF );	/* y 结束坐标高8位 */	 
+;;;578    	ILI9341_Write_Data ( (LCD_Y_LENGTH-1)&0xFF );				/* y 结束坐标低8位 */
+;;;579    
+;;;580    	/* write gram start */
+;;;581    	ILI9341_Write_Cmd ( CMD_SetPixel );	
+;;;582    }
 000008  bd00              POP      {pc}
                   |L15.10|
 00000a  4828              LDR      r0,|L15.172|
-00000c  7002              STRB     r2,[r0,#0]            ;550
-00000e  4610              MOV      r0,r2                 ;553
-000010  eb0271d0          ADD      r1,r2,r0,LSR #31      ;553
-000014  1049              ASRS     r1,r1,#1              ;553
-000016  eba20141          SUB      r1,r2,r1,LSL #1       ;553
+00000c  7002              STRB     r2,[r0,#0]            ;549
+00000e  4610              MOV      r0,r2                 ;552
+000010  eb0271d0          ADD      r1,r2,r0,LSR #31      ;552
+000014  1049              ASRS     r1,r1,#1              ;552
+000016  eba20141          SUB      r1,r2,r1,LSL #1       ;552
 00001a  b939              CBNZ     r1,|L15.44|
-00001c  20f0              MOVS     r0,#0xf0              ;556
+00001c  20f0              MOVS     r0,#0xf0              ;555
 00001e  4924              LDR      r1,|L15.176|
-000020  8008              STRH     r0,[r1,#0]            ;556
-000022  f44f70a0          MOV      r0,#0x140             ;557
+000020  8008              STRH     r0,[r1,#0]            ;555
+000022  f44f70a0          MOV      r0,#0x140             ;556
 000026  4923              LDR      r1,|L15.180|
-000028  8008              STRH     r0,[r1,#0]            ;557
+000028  8008              STRH     r0,[r1,#0]            ;556
 00002a  e006              B        |L15.58|
                   |L15.44|
-00002c  f44f70a0          MOV      r0,#0x140             ;562
+00002c  f44f70a0          MOV      r0,#0x140             ;561
 000030  491f              LDR      r1,|L15.176|
-000032  8008              STRH     r0,[r1,#0]            ;562
-000034  20f0              MOVS     r0,#0xf0              ;563
+000032  8008              STRH     r0,[r1,#0]            ;561
+000034  20f0              MOVS     r0,#0xf0              ;562
 000036  491f              LDR      r1,|L15.180|
-000038  8008              STRH     r0,[r1,#0]            ;563
+000038  8008              STRH     r0,[r1,#0]            ;562
                   |L15.58|
-00003a  2036              MOVS     r0,#0x36              ;567
+00003a  2036              MOVS     r0,#0x36              ;566
 00003c  f7fffffe          BL       ILI9341_Write_Cmd
-000040  2108              MOVS     r1,#8                 ;568
-000042  ea411042          ORR      r0,r1,r2,LSL #5       ;568
+000040  2108              MOVS     r1,#8                 ;567
+000042  ea411042          ORR      r0,r1,r2,LSL #5       ;567
 000046  f7fffffe          BL       ILI9341_Write_Data
-00004a  202a              MOVS     r0,#0x2a              ;569
+00004a  202a              MOVS     r0,#0x2a              ;568
 00004c  f7fffffe          BL       ILI9341_Write_Cmd
-000050  2000              MOVS     r0,#0                 ;570
+000050  2000              MOVS     r0,#0                 ;569
 000052  f7fffffe          BL       ILI9341_Write_Data
-000056  2000              MOVS     r0,#0                 ;571
+000056  2000              MOVS     r0,#0                 ;570
 000058  f7fffffe          BL       ILI9341_Write_Data
 00005c  4914              LDR      r1,|L15.176|
-00005e  8809              LDRH     r1,[r1,#0]            ;572  ; LCD_X_LENGTH
-000060  1e49              SUBS     r1,r1,#1              ;572
-000062  f3c12007          UBFX     r0,r1,#8,#8           ;572
+00005e  8809              LDRH     r1,[r1,#0]            ;571  ; LCD_X_LENGTH
+000060  1e49              SUBS     r1,r1,#1              ;571
+000062  f3c12007          UBFX     r0,r1,#8,#8           ;571
 000066  f7fffffe          BL       ILI9341_Write_Data
 00006a  4911              LDR      r1,|L15.176|
-00006c  7809              LDRB     r1,[r1,#0]            ;573  ; LCD_X_LENGTH
-00006e  1e49              SUBS     r1,r1,#1              ;573
-000070  b2c8              UXTB     r0,r1                 ;573
+00006c  7809              LDRB     r1,[r1,#0]            ;572  ; LCD_X_LENGTH
+00006e  1e49              SUBS     r1,r1,#1              ;572
+000070  b2c8              UXTB     r0,r1                 ;572
 000072  f7fffffe          BL       ILI9341_Write_Data
-000076  202b              MOVS     r0,#0x2b              ;575
+000076  202b              MOVS     r0,#0x2b              ;574
 000078  f7fffffe          BL       ILI9341_Write_Cmd
-00007c  2000              MOVS     r0,#0                 ;576
+00007c  2000              MOVS     r0,#0                 ;575
 00007e  f7fffffe          BL       ILI9341_Write_Data
-000082  2000              MOVS     r0,#0                 ;577
+000082  2000              MOVS     r0,#0                 ;576
 000084  f7fffffe          BL       ILI9341_Write_Data
 000088  490a              LDR      r1,|L15.180|
-00008a  8809              LDRH     r1,[r1,#0]            ;578  ; LCD_Y_LENGTH
-00008c  1e49              SUBS     r1,r1,#1              ;578
-00008e  f3c12007          UBFX     r0,r1,#8,#8           ;578
+00008a  8809              LDRH     r1,[r1,#0]            ;577  ; LCD_Y_LENGTH
+00008c  1e49              SUBS     r1,r1,#1              ;577
+00008e  f3c12007          UBFX     r0,r1,#8,#8           ;577
 000092  f7fffffe          BL       ILI9341_Write_Data
 000096  4907              LDR      r1,|L15.180|
-000098  7809              LDRB     r1,[r1,#0]            ;579  ; LCD_Y_LENGTH
-00009a  1e49              SUBS     r1,r1,#1              ;579
-00009c  b2c8              UXTB     r0,r1                 ;579
+000098  7809              LDRB     r1,[r1,#0]            ;578  ; LCD_Y_LENGTH
+00009a  1e49              SUBS     r1,r1,#1              ;578
+00009c  b2c8              UXTB     r0,r1                 ;578
 00009e  f7fffffe          BL       ILI9341_Write_Data
-0000a2  202c              MOVS     r0,#0x2c              ;582
+0000a2  202c              MOVS     r0,#0x2c              ;581
 0000a4  f7fffffe          BL       ILI9341_Write_Cmd
 0000a8  bf00              NOP      
 0000aa  e7ad              B        |L15.8|
-;;;584    
+;;;583    
                           ENDP
 
                   |L15.172|
@@ -1470,94 +1470,88 @@
 000014  f7fffffe          BL       ILI9341_REG_Config
 ;;;445    	
 ;;;446    	//设置默认扫描方向，其中 6 模式为大部分液晶例程的默认显示方向  
-;;;447    	ILI9341_GramScan(LCD_SCAN_MODE);
-000018  480b              LDR      r0,|L16.72|
-00001a  7800              LDRB     r0,[r0,#0]  ; LCD_SCAN_MODE
-00001c  f7fffffe          BL       ILI9341_GramScan
-;;;448    	ILI9341_GramScan ( 3 );
-000020  2003              MOVS     r0,#3
-000022  f7fffffe          BL       ILI9341_GramScan
-;;;449    	LCD_SetFont(&Font8x16);
-000026  4809              LDR      r0,|L16.76|
-000028  f7fffffe          BL       LCD_SetFont
-;;;450    	LCD_SetColors(RED,BLACK);
-00002c  2100              MOVS     r1,#0
-00002e  f44f4078          MOV      r0,#0xf800
-000032  f7fffffe          BL       LCD_SetColors
-;;;451      ILI9341_Clear(0,0,LCD_X_LENGTH,LCD_Y_LENGTH);	/* 清屏，显示全黑 */
-000036  4806              LDR      r0,|L16.80|
-000038  8803              LDRH     r3,[r0,#0]  ; LCD_Y_LENGTH
-00003a  4806              LDR      r0,|L16.84|
-00003c  8802              LDRH     r2,[r0,#0]  ; LCD_X_LENGTH
-00003e  2100              MOVS     r1,#0
-000040  4608              MOV      r0,r1
-000042  f7fffffe          BL       ILI9341_Clear
-;;;452    }
-000046  bd10              POP      {r4,pc}
-;;;453    
+;;;447    	ILI9341_GramScan ( 3 );
+000018  2003              MOVS     r0,#3
+00001a  f7fffffe          BL       ILI9341_GramScan
+;;;448    	LCD_SetFont(&Font8x16);
+00001e  4808              LDR      r0,|L16.64|
+000020  f7fffffe          BL       LCD_SetFont
+;;;449    	LCD_SetColors(RED,BLACK);
+000024  2100              MOVS     r1,#0
+000026  f44f4078          MOV      r0,#0xf800
+00002a  f7fffffe          BL       LCD_SetColors
+;;;450      ILI9341_Clear(0,0,LCD_X_LENGTH,LCD_Y_LENGTH);	/* 清屏，显示全黑 */
+00002e  4805              LDR      r0,|L16.68|
+000030  8803              LDRH     r3,[r0,#0]  ; LCD_Y_LENGTH
+000032  4805              LDR      r0,|L16.72|
+000034  8802              LDRH     r2,[r0,#0]  ; LCD_X_LENGTH
+000036  2100              MOVS     r1,#0
+000038  4608              MOV      r0,r1
+00003a  f7fffffe          BL       ILI9341_Clear
+;;;451    }
+00003e  bd10              POP      {r4,pc}
+;;;452    
                           ENDP
 
-                  |L16.72|
-                          DCD      LCD_SCAN_MODE
-                  |L16.76|
+                  |L16.64|
                           DCD      Font8x16
-                  |L16.80|
+                  |L16.68|
                           DCD      LCD_Y_LENGTH
-                  |L16.84|
+                  |L16.72|
                           DCD      LCD_X_LENGTH
 
                           AREA ||i.ILI9341_OpenWindow||, CODE, READONLY, ALIGN=1
 
                   ILI9341_OpenWindow PROC
-;;;594     */
-;;;595    void ILI9341_OpenWindow ( uint16_t usX, uint16_t usY, uint16_t usWidth, uint16_t usHeight )
+;;;593     */
+;;;594    void ILI9341_OpenWindow ( uint16_t usX, uint16_t usY, uint16_t usWidth, uint16_t usHeight )
 000000  b530              PUSH     {r4,r5,lr}
-;;;596    {	
+;;;595    {	
 000002  4604              MOV      r4,r0
 000004  460d              MOV      r5,r1
-;;;597    	ILI9341_Write_Cmd ( CMD_SetCoordinateX ); 				 /* 设置X坐标 */
+;;;596    	ILI9341_Write_Cmd ( CMD_SetCoordinateX ); 				 /* 设置X坐标 */
 000006  202a              MOVS     r0,#0x2a
 000008  f7fffffe          BL       ILI9341_Write_Cmd
-;;;598    	ILI9341_Write_Data ( usX >> 8  );	 /* 先高8位，然后低8位 */
+;;;597    	ILI9341_Write_Data ( usX >> 8  );	 /* 先高8位，然后低8位 */
 00000c  1220              ASRS     r0,r4,#8
 00000e  f7fffffe          BL       ILI9341_Write_Data
-;;;599    	ILI9341_Write_Data ( usX & 0xff  );	 /* 设置起始点和结束点*/
+;;;598    	ILI9341_Write_Data ( usX & 0xff  );	 /* 设置起始点和结束点*/
 000012  b2e0              UXTB     r0,r4
 000014  f7fffffe          BL       ILI9341_Write_Data
-;;;600    	ILI9341_Write_Data ( ( usX + usWidth - 1 ) >> 8  );
+;;;599    	ILI9341_Write_Data ( ( usX + usWidth - 1 ) >> 8  );
 000018  18a1              ADDS     r1,r4,r2
 00001a  1e49              SUBS     r1,r1,#1
 00001c  f3c1200f          UBFX     r0,r1,#8,#16
 000020  f7fffffe          BL       ILI9341_Write_Data
-;;;601    	ILI9341_Write_Data ( ( usX + usWidth - 1 ) & 0xff  );
+;;;600    	ILI9341_Write_Data ( ( usX + usWidth - 1 ) & 0xff  );
 000024  18a1              ADDS     r1,r4,r2
 000026  1e49              SUBS     r1,r1,#1
 000028  b2c8              UXTB     r0,r1
 00002a  f7fffffe          BL       ILI9341_Write_Data
-;;;602    
-;;;603    	ILI9341_Write_Cmd ( CMD_SetCoordinateY ); 			     /* 设置Y坐标*/
+;;;601    
+;;;602    	ILI9341_Write_Cmd ( CMD_SetCoordinateY ); 			     /* 设置Y坐标*/
 00002e  202b              MOVS     r0,#0x2b
 000030  f7fffffe          BL       ILI9341_Write_Cmd
-;;;604    	ILI9341_Write_Data ( usY >> 8  );
+;;;603    	ILI9341_Write_Data ( usY >> 8  );
 000034  1228              ASRS     r0,r5,#8
 000036  f7fffffe          BL       ILI9341_Write_Data
-;;;605    	ILI9341_Write_Data ( usY & 0xff  );
+;;;604    	ILI9341_Write_Data ( usY & 0xff  );
 00003a  b2e8              UXTB     r0,r5
 00003c  f7fffffe          BL       ILI9341_Write_Data
-;;;606    	ILI9341_Write_Data ( ( usY + usHeight - 1 ) >> 8 );
+;;;605    	ILI9341_Write_Data ( ( usY + usHeight - 1 ) >> 8 );
 000040  18e9              ADDS     r1,r5,r3
 000042  1e49              SUBS     r1,r1,#1
 000044  f3c1200f          UBFX     r0,r1,#8,#16
 000048  f7fffffe          BL       ILI9341_Write_Data
-;;;607    	ILI9341_Write_Data ( ( usY + usHeight - 1) & 0xff );
+;;;606    	ILI9341_Write_Data ( ( usY + usHeight - 1) & 0xff );
 00004c  18e9              ADDS     r1,r5,r3
 00004e  1e49              SUBS     r1,r1,#1
 000050  b2c8              UXTB     r0,r1
 000052  f7fffffe          BL       ILI9341_Write_Data
-;;;608    	
-;;;609    }
+;;;607    	
+;;;608    }
 000056  bd30              POP      {r4,r5,pc}
-;;;610    
+;;;609    
                           ENDP
 
 
@@ -1935,75 +1929,75 @@
                           AREA ||i.ILI9341_Read_PixelData||, CODE, READONLY, ALIGN=1
 
                   ILI9341_Read_PixelData PROC
-;;;686     */
-;;;687    static uint16_t ILI9341_Read_PixelData ( void )	
+;;;685     */
+;;;686    static uint16_t ILI9341_Read_PixelData ( void )	
 000000  b510              PUSH     {r4,lr}
-;;;688    {	
-;;;689    	uint16_t usR=0, usG=0, usB=0 ;
+;;;687    {	
+;;;688    	uint16_t usR=0, usG=0, usB=0 ;
 000002  2200              MOVS     r2,#0
 000004  2300              MOVS     r3,#0
 000006  2400              MOVS     r4,#0
-;;;690    
-;;;691    	
-;;;692    	ILI9341_Write_Cmd ( 0x2E );   /* 读数据 */
+;;;689    
+;;;690    	
+;;;691    	ILI9341_Write_Cmd ( 0x2E );   /* 读数据 */
 000008  202e              MOVS     r0,#0x2e
 00000a  f7fffffe          BL       ILI9341_Write_Cmd
-;;;693    	
-;;;694    	usR = ILI9341_Read_Data (); 	/*FIRST READ OUT DUMMY DATA*/
+;;;692    	
+;;;693    	usR = ILI9341_Read_Data (); 	/*FIRST READ OUT DUMMY DATA*/
 00000e  f7fffffe          BL       ILI9341_Read_Data
 000012  4602              MOV      r2,r0
-;;;695    	
-;;;696    	usR = ILI9341_Read_Data ();  	/*READ OUT RED DATA  */
+;;;694    	
+;;;695    	usR = ILI9341_Read_Data ();  	/*READ OUT RED DATA  */
 000014  f7fffffe          BL       ILI9341_Read_Data
 000018  4602              MOV      r2,r0
-;;;697    	usB = ILI9341_Read_Data ();  	/*READ OUT BLUE DATA*/
+;;;696    	usB = ILI9341_Read_Data ();  	/*READ OUT BLUE DATA*/
 00001a  f7fffffe          BL       ILI9341_Read_Data
 00001e  4604              MOV      r4,r0
-;;;698    	usG = ILI9341_Read_Data ();  	/*READ OUT GREEN DATA*/	
+;;;697    	usG = ILI9341_Read_Data ();  	/*READ OUT GREEN DATA*/	
 000020  f7fffffe          BL       ILI9341_Read_Data
 000024  4603              MOV      r3,r0
-;;;699    	
-;;;700      return ( ( ( usR >> 11 ) << 11 ) | ( ( usG >> 10 ) << 5 ) | ( usB >> 11 ) );
+;;;698    	
+;;;699      return ( ( ( usR >> 11 ) << 11 ) | ( ( usG >> 10 ) << 5 ) | ( usB >> 11 ) );
 000026  12d0              ASRS     r0,r2,#11
 000028  02c0              LSLS     r0,r0,#11
 00002a  1299              ASRS     r1,r3,#10
 00002c  ea401041          ORR      r0,r0,r1,LSL #5
 000030  ea4020e4          ORR      r0,r0,r4,ASR #11
-;;;701    	
-;;;702    }
+;;;700    	
+;;;701    }
 000034  bd10              POP      {r4,pc}
-;;;703    
+;;;702    
                           ENDP
 
 
                           AREA ||i.ILI9341_Rst||, CODE, READONLY, ALIGN=2
 
                   ILI9341_Rst PROC
-;;;478     */
-;;;479    void ILI9341_Rst ( void )
+;;;477     */
+;;;478    void ILI9341_Rst ( void )
 000000  b510              PUSH     {r4,lr}
-;;;480    {			
-;;;481    	GPIO_ResetBits ( ILI9341_RST_PORT, ILI9341_RST_PIN );	 //低电平复位
+;;;479    {			
+;;;480    	GPIO_ResetBits ( ILI9341_RST_PORT, ILI9341_RST_PIN );	 //低电平复位
 000002  2102              MOVS     r1,#2
 000004  4807              LDR      r0,|L21.36|
 000006  f7fffffe          BL       GPIO_ResetBits
-;;;482    
-;;;483    	ILI9341_Delay ( 0xAFF ); 					   
+;;;481    
+;;;482    	ILI9341_Delay ( 0xAFF ); 					   
 00000a  f64020ff          MOV      r0,#0xaff
 00000e  f7fffffe          BL       ILI9341_Delay
-;;;484    
-;;;485    	GPIO_SetBits ( ILI9341_RST_PORT, ILI9341_RST_PIN );		 	 
+;;;483    
+;;;484    	GPIO_SetBits ( ILI9341_RST_PORT, ILI9341_RST_PIN );		 	 
 000012  2102              MOVS     r1,#2
 000014  4803              LDR      r0,|L21.36|
 000016  f7fffffe          BL       GPIO_SetBits
-;;;486    
-;;;487    	ILI9341_Delay ( 0xAFF ); 	
+;;;485    
+;;;486    	ILI9341_Delay ( 0xAFF ); 	
 00001a  f64020ff          MOV      r0,#0xaff
 00001e  f7fffffe          BL       ILI9341_Delay
-;;;488    	
-;;;489    }
+;;;487    	
+;;;488    }
 000022  bd10              POP      {r4,pc}
-;;;490    
+;;;489    
                           ENDP
 
                   |L21.36|
@@ -2012,34 +2006,34 @@
                           AREA ||i.ILI9341_SetCursor||, CODE, READONLY, ALIGN=1
 
                   ILI9341_SetCursor PROC
-;;;617     */
-;;;618    static void ILI9341_SetCursor ( uint16_t usX, uint16_t usY )	
+;;;616     */
+;;;617    static void ILI9341_SetCursor ( uint16_t usX, uint16_t usY )	
 000000  b530              PUSH     {r4,r5,lr}
-;;;619    {
+;;;618    {
 000002  4604              MOV      r4,r0
 000004  460d              MOV      r5,r1
-;;;620    	ILI9341_OpenWindow ( usX, usY, 1, 1 );
+;;;619    	ILI9341_OpenWindow ( usX, usY, 1, 1 );
 000006  2301              MOVS     r3,#1
 000008  461a              MOV      r2,r3
 00000a  4629              MOV      r1,r5
 00000c  4620              MOV      r0,r4
 00000e  f7fffffe          BL       ILI9341_OpenWindow
-;;;621    }
+;;;620    }
 000012  bd30              POP      {r4,r5,pc}
-;;;622    
+;;;621    
                           ENDP
 
 
                           AREA ||i.ILI9341_SetPointPixel||, CODE, READONLY, ALIGN=2
 
                   ILI9341_SetPointPixel PROC
-;;;669     */
-;;;670    void ILI9341_SetPointPixel ( uint16_t usX, uint16_t usY )	
+;;;668     */
+;;;669    void ILI9341_SetPointPixel ( uint16_t usX, uint16_t usY )	
 000000  b570              PUSH     {r4-r6,lr}
-;;;671    {	
+;;;670    {	
 000002  4605              MOV      r5,r0
 000004  460c              MOV      r4,r1
-;;;672    	if ( ( usX < LCD_X_LENGTH ) && ( usY < LCD_Y_LENGTH ) )
+;;;671    	if ( ( usX < LCD_X_LENGTH ) && ( usY < LCD_Y_LENGTH ) )
 000006  4809              LDR      r0,|L23.44|
 000008  8800              LDRH     r0,[r0,#0]  ; LCD_X_LENGTH
 00000a  4285              CMP      r5,r0
@@ -2048,23 +2042,23 @@
 000010  8800              LDRH     r0,[r0,#0]  ; LCD_Y_LENGTH
 000012  4284              CMP      r4,r0
 000014  da08              BGE      |L23.40|
-;;;673      {
-;;;674    		ILI9341_SetCursor ( usX, usY );
+;;;672      {
+;;;673    		ILI9341_SetCursor ( usX, usY );
 000016  4621              MOV      r1,r4
 000018  4628              MOV      r0,r5
 00001a  f7fffffe          BL       ILI9341_SetCursor
-;;;675    		
-;;;676    		ILI9341_FillColor ( 1, CurrentTextColor );
+;;;674    		
+;;;675    		ILI9341_FillColor ( 1, CurrentTextColor );
 00001e  4805              LDR      r0,|L23.52|
 000020  8801              LDRH     r1,[r0,#0]  ; CurrentTextColor
 000022  2001              MOVS     r0,#1
 000024  f7fffffe          BL       ILI9341_FillColor
                   |L23.40|
-;;;677    	}
-;;;678    	
-;;;679    }
+;;;676    	}
+;;;677    	
+;;;678    }
 000028  bd70              POP      {r4-r6,pc}
-;;;680    
+;;;679    
                           ENDP
 
 00002a  0000              DCW      0x0000
@@ -2113,12 +2107,12 @@
                           AREA ||i.LCD_ClearLine||, CODE, READONLY, ALIGN=2
 
                   LCD_ClearLine PROC
-;;;1138     */
-;;;1139   void LCD_ClearLine(uint16_t Line)
+;;;1137     */
+;;;1138   void LCD_ClearLine(uint16_t Line)
 000000  b570              PUSH     {r4-r6,lr}
-;;;1140   {
+;;;1139   {
 000002  4604              MOV      r4,r0
-;;;1141     ILI9341_Clear(0,Line,LCD_X_LENGTH,((sFONT *)LCD_GetFont())->Height);	/* 清屏，显示全黑 */
+;;;1140     ILI9341_Clear(0,Line,LCD_X_LENGTH,((sFONT *)LCD_GetFont())->Height);	/* 清屏，显示全黑 */
 000004  f7fffffe          BL       LCD_GetFont
 000008  88c5              LDRH     r5,[r0,#6]
 00000a  462b              MOV      r3,r5
@@ -2127,10 +2121,10 @@
 000010  4621              MOV      r1,r4
 000012  2000              MOVS     r0,#0
 000014  f7fffffe          BL       ILI9341_Clear
-;;;1142   
-;;;1143   }
+;;;1141   
+;;;1142   }
 000018  bd70              POP      {r4-r6,pc}
-;;;1144   /*********************end of file*************************/
+;;;1143   /*********************end of file*************************/
                           ENDP
 
 00001a  0000              DCW      0x0000
@@ -2140,20 +2134,20 @@
                           AREA ||i.LCD_GetColors||, CODE, READONLY, ALIGN=2
 
                   LCD_GetColors PROC
-;;;1105     */
-;;;1106   void LCD_GetColors(uint16_t *TextColor, uint16_t *BackColor)
+;;;1104     */
+;;;1105   void LCD_GetColors(uint16_t *TextColor, uint16_t *BackColor)
 000000  4a03              LDR      r2,|L27.16|
-;;;1107   {
-;;;1108     *TextColor = CurrentTextColor;
+;;;1106   {
+;;;1107     *TextColor = CurrentTextColor;
 000002  8812              LDRH     r2,[r2,#0]  ; CurrentTextColor
 000004  8002              STRH     r2,[r0,#0]
-;;;1109     *BackColor = CurrentBackColor;
+;;;1108     *BackColor = CurrentBackColor;
 000006  4a03              LDR      r2,|L27.20|
 000008  8812              LDRH     r2,[r2,#0]  ; CurrentBackColor
 00000a  800a              STRH     r2,[r1,#0]
-;;;1110   }
+;;;1109   }
 00000c  4770              BX       lr
-;;;1111   
+;;;1110   
                           ENDP
 
 00000e  0000              DCW      0x0000
@@ -2165,15 +2159,15 @@
                           AREA ||i.LCD_GetFont||, CODE, READONLY, ALIGN=2
 
                   LCD_GetFont PROC
-;;;1081     */
-;;;1082   sFONT *LCD_GetFont(void)
+;;;1080     */
+;;;1081   sFONT *LCD_GetFont(void)
 000000  4801              LDR      r0,|L28.8|
-;;;1083   {
-;;;1084     return LCD_Currentfonts;
+;;;1082   {
+;;;1083     return LCD_Currentfonts;
 000002  6800              LDR      r0,[r0,#0]  ; LCD_Currentfonts
-;;;1085   }
+;;;1084   }
 000004  4770              BX       lr
-;;;1086   
+;;;1085   
                           ENDP
 
 000006  0000              DCW      0x0000
@@ -2183,15 +2177,15 @@
                           AREA ||i.LCD_SetBackColor||, CODE, READONLY, ALIGN=2
 
                   LCD_SetBackColor PROC
-;;;1126     */
-;;;1127   void LCD_SetBackColor(uint16_t Color)
+;;;1125     */
+;;;1126   void LCD_SetBackColor(uint16_t Color)
 000000  4901              LDR      r1,|L29.8|
-;;;1128   {
-;;;1129     CurrentBackColor = Color;
+;;;1127   {
+;;;1128     CurrentBackColor = Color;
 000002  8008              STRH     r0,[r1,#0]
-;;;1130   }
+;;;1129   }
 000004  4770              BX       lr
-;;;1131   
+;;;1130   
                           ENDP
 
 000006  0000              DCW      0x0000
@@ -2201,18 +2195,18 @@
                           AREA ||i.LCD_SetColors||, CODE, READONLY, ALIGN=2
 
                   LCD_SetColors PROC
-;;;1093     */
-;;;1094   void LCD_SetColors(uint16_t TextColor, uint16_t BackColor) 
+;;;1092     */
+;;;1093   void LCD_SetColors(uint16_t TextColor, uint16_t BackColor) 
 000000  4a02              LDR      r2,|L30.12|
-;;;1095   {
-;;;1096     CurrentTextColor = TextColor; 
+;;;1094   {
+;;;1095     CurrentTextColor = TextColor; 
 000002  8010              STRH     r0,[r2,#0]
-;;;1097     CurrentBackColor = BackColor;
+;;;1096     CurrentBackColor = BackColor;
 000004  4a02              LDR      r2,|L30.16|
 000006  8011              STRH     r1,[r2,#0]
-;;;1098   }
+;;;1097   }
 000008  4770              BX       lr
-;;;1099   
+;;;1098   
                           ENDP
 
 00000a  0000              DCW      0x0000
@@ -2224,15 +2218,15 @@
                           AREA ||i.LCD_SetFont||, CODE, READONLY, ALIGN=2
 
                   LCD_SetFont PROC
-;;;1071     */
-;;;1072   void LCD_SetFont(sFONT *fonts)
+;;;1070     */
+;;;1071   void LCD_SetFont(sFONT *fonts)
 000000  4901              LDR      r1,|L31.8|
-;;;1073   {
-;;;1074     LCD_Currentfonts = fonts;
+;;;1072   {
+;;;1073     LCD_Currentfonts = fonts;
 000002  6008              STR      r0,[r1,#0]  ; LCD_Currentfonts
-;;;1075   }
+;;;1074   }
 000004  4770              BX       lr
-;;;1076   
+;;;1075   
                           ENDP
 
 000006  0000              DCW      0x0000
@@ -2242,15 +2236,15 @@
                           AREA ||i.LCD_SetTextColor||, CODE, READONLY, ALIGN=2
 
                   LCD_SetTextColor PROC
-;;;1116     */
-;;;1117   void LCD_SetTextColor(uint16_t Color)
+;;;1115     */
+;;;1116   void LCD_SetTextColor(uint16_t Color)
 000000  4901              LDR      r1,|L32.8|
-;;;1118   {
-;;;1119     CurrentTextColor = Color;
+;;;1117   {
+;;;1118     CurrentTextColor = Color;
 000002  8008              STRH     r0,[r1,#0]
-;;;1120   }
+;;;1119   }
 000004  4770              BX       lr
-;;;1121   
+;;;1120   
                           ENDP
 
 000006  0000              DCW      0x0000

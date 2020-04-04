@@ -23,6 +23,8 @@
 #include "delay.h"
 #include "iic.h"
 #include "timer.h"
+#include "./key/bsp_key.h"  
+
 
 
 //C¿â
@@ -327,6 +329,12 @@ void OneNet_RevPro(unsigned char *cmd)
 				{
 					temp_min=num;   //¸³Öµ
 
+				}
+				else if(strstr((char *)req, "door"))
+				{
+					if(num == 1)       Door_OPEN;
+			    else             	 Door_ClOSE;	
+					
 				}
 	}
 	

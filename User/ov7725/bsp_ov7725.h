@@ -307,6 +307,8 @@ void ShanWai_SendCamera(u16 length_w, u16 length_h);
 void CameraFous(void);
 void Camera_Set(void);
 void Camera_Set_Test(void);
+void Camera_Init();
+
 
 																					
 
