@@ -16,7 +16,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#ifdef ESP8266
+#ifdef ESP8266//如果使用esp8266
 
 #define ESP8266_ONENET_INFO		"AT+CIPSTART=\"TCP\",\"192.168.1.102\",876\r\n"
 

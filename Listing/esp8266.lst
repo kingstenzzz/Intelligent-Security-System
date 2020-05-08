@@ -111,7 +111,7 @@ S * @brief Comment the line below if you will not use the peripherals drivers.
 S   In this case, these drivers will not be included and the application code will 
 S   be based on direct access to peripherals registers 
 S   */
-S  /*#define USE_STDPERIPH_DRIVER*/
+S  #define USE_STDPERIPH_DRIVER
 N#endif
 N
 N/**
@@ -11219,7 +11219,7 @@ S * @brief Comment the line below if you will not use the peripherals drivers.
 S   In this case, these drivers will not be included and the application code will 
 S   be based on direct access to peripherals registers 
 S   */
-S  /*#define USE_STDPERIPH_DRIVER*/
+S  #define USE_STDPERIPH_DRIVER
 S#endif
 S
 S/**
@@ -29466,7 +29466,7 @@ N//C库
 N#include <string.h>
 N#include <stdio.h>
 N
-N#ifdef ESP8266
+N#ifdef ESP8266//如果使用esp8266
 S
 S#define ESP8266_ONENET_INFO		"AT+CIPSTART=\"TCP\",\"192.168.1.102\",876\r\n"
 S

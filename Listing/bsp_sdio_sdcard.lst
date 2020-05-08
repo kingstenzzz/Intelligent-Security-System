@@ -326,7 +326,7 @@ S * @brief Comment the line below if you will not use the peripherals drivers.
 S   In this case, these drivers will not be included and the application code will 
 S   be based on direct access to peripherals registers 
 S   */
-S  /*#define USE_STDPERIPH_DRIVER*/
+S  #define USE_STDPERIPH_DRIVER
 N#endif
 N
 N/**
@@ -11434,7 +11434,7 @@ S * @brief Comment the line below if you will not use the peripherals drivers.
 S   In this case, these drivers will not be included and the application code will 
 S   be based on direct access to peripherals registers 
 S   */
-S  /*#define USE_STDPERIPH_DRIVER*/
+S  #define USE_STDPERIPH_DRIVER
 S#endif
 S
 S/**

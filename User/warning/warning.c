@@ -19,7 +19,7 @@ extern int16_t temp_max;
 extern int16_t temp_min;
 extern u8 humi_max;
 extern u8 humi_min;
-extern _Bool fire;
+extern _Bool fire,photo;
 
 
 //读取数据对LED灯和蜂鸣器进行控制
@@ -33,6 +33,8 @@ void WARNING(uint8_t flag)
 		
 		case Fire:                     
 			Beep_Set(BEEP_ON);
+		photo=1;
+	
 		break;						
 		case Hot:	
 			LED_RED		//高温模式，红灯亮	
@@ -113,15 +115,14 @@ void DHT11_Check(DHT11_Data_TypeDef *DHT11_Data, int16_t temp_max, int16_t temp_
 */
 void Fire_Check(u8 *fire)
 {
-	if(FIRE_Data_IN() == 1)								//当输入信号为0时，有火焰
+	if(FIRE_Data_IN() == Bit_RESET)								//当输入信号为0时，有火焰
 	{		
-		UsartPrintf(USART_DEBUG, "火焰警报\r\n");
 		*fire = 1;			
 		alarm_mode=Fire;
 		WARNING(Fire);
 		mDelay(500);
 	}
-	else if(FIRE_Data_IN() == 0)						//当输入信号为1时，无火焰
+	else if(FIRE_Data_IN() == Bit_SET)						//当输入信号为1时，无火焰
 	{
 		*fire = 0;
 		Beep_Set(BEEP_OFF);
@@ -148,7 +149,9 @@ void Check_sensor(volatile data_Stream *data_stram)
 	    data_stram->temp=DH11_data.temp_int;
 	}
 			printf("火情%d",fire);
+	if(fire==1) printf("火情");
 			data_stram->fire=fire;
+	
 	    
 			if(data_stram->tem_max!=temp_max)
 			{

@@ -113,7 +113,7 @@ S * @brief Comment the line below if you will not use the peripherals drivers.
 S   In this case, these drivers will not be included and the application code will 
 S   be based on direct access to peripherals registers 
 S   */
-S  /*#define USE_STDPERIPH_DRIVER*/
+S  #define USE_STDPERIPH_DRIVER
 N#endif
 N
 N/**
@@ -11221,7 +11221,7 @@ S * @brief Comment the line below if you will not use the peripherals drivers.
 S   In this case, these drivers will not be included and the application code will 
 S   be based on direct access to peripherals registers 
 S   */
-S  /*#define USE_STDPERIPH_DRIVER*/
+S  #define USE_STDPERIPH_DRIVER
 S#endif
 S
 S/**
@@ -27371,7 +27371,7 @@ X	RCC_APB2PeriphClockCmd(((uint32_t)0x00000040),ENABLE);
 N		
 N	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;       
 X	GPIO_InitStructure.GPIO_Pin = ((uint16_t)0x0020);       
-N	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;	//上拉输入 
+N	GPIO_InitStructure.GPIO_Mode =GPIO_Mode_IPU;	//上拉输入 
 N	GPIO_Init(GPIOE, &GPIO_InitStructure);
 X	GPIO_Init(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1800)), &GPIO_InitStructure);
 N}

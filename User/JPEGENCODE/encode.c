@@ -77,19 +77,11 @@ _Bool JPEG_encode(char *filename)//编码主函数
 	memset((void*)(cinfo),0,sizeof(jpeg_compress_info));//所有元素清零
 //	cinfo=jpeg_create_compress();//创建JPEG压缩文件
 	cinfo->image_width=camera_WIDTH;
-  	cinfo->image_height=camera_HEIGHT;
-  	cinfo->output=0;//数据输出到NULL;
-	
-	cinfo->fileW=fileW;//文件/////////////文件///////////文件///////////文件/////////////文件///////////文件/////////
-	
-  	jpeg_set_default(cinfo,inbuf_buf);//设置默认参数
-	
-	  	 //printf("	JPEG_encode//设置默认参数");///////////////////////////////////////////
-	
+  cinfo->image_height=camera_HEIGHT;
+  cinfo->output=0;//数据输出到NULL;
+	cinfo->fileW=fileW;//文件/////////////文件
+  jpeg_set_default(cinfo,inbuf_buf);//设置默认参数	
 	jpeg_start_compress(cinfo);//开始压缩,写压缩文件头信息
-	
-		  	 //printf("	JPEG_encode//开始压缩,写压缩文件头信息");///////////////////////////////////////////
-	
 	FIFO_PREPARE;  			/*FIFO准备*/					
   count=0;
 	while(cinfo->next_line<cinfo->image_height)
@@ -102,8 +94,7 @@ _Bool JPEG_encode(char *filename)//编码主函数
 			cinfo->inbuf[count++]=(u8)((color&0x001f)<<3);						
 		}
 		
-		cinfo->next_line++; 
-	  	//当数据填满时压缩并输出数据(填满16行)
+		cinfo->next_line++; //当数据填满时压缩并输出数据(填满16行)
 	  	if(cinfo->next_line%cinfo->inbuf_height==0)
 		{
 			count=0;

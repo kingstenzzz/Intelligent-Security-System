@@ -110,7 +110,7 @@ S * @brief Comment the line below if you will not use the peripherals drivers.
 S   In this case, these drivers will not be included and the application code will 
 S   be based on direct access to peripherals registers 
 S   */
-S  /*#define USE_STDPERIPH_DRIVER*/
+S  #define USE_STDPERIPH_DRIVER
 N#endif
 N
 N/**
@@ -11218,7 +11218,7 @@ S * @brief Comment the line below if you will not use the peripherals drivers.
 S   In this case, these drivers will not be included and the application code will 
 S   be based on direct access to peripherals registers 
 S   */
-S  /*#define USE_STDPERIPH_DRIVER*/
+S  #define USE_STDPERIPH_DRIVER
 S#endif
 S
 S/**
@@ -43221,6 +43221,8 @@ N	Door_GPIO_Config();
 N  //TIM4_PWM_Init();
 N  ILI9341_Init();
 N	USART_Config();  //调试串口
+N	Beep_Init();
+N	
 N	
 N	
 N  Camera_Init();
@@ -43262,8 +43264,6 @@ N	xTaskCreate((TaskFunction_t)Net_Task,"Net_Task",Net_Task_Stack,"Net_Task",Net_
 X	xTaskCreate((TaskFunction_t)Net_Task,"Net_Task",1024,"Net_Task",6,&NetTask_Handler);
 N	xTaskCreate((TaskFunction_t)CheckSensorTask,"Check_Task",CheckSensor_Stack,"Check_Task",CheckSensor_Priority,&CheckSensor_Handler);
 X	xTaskCreate((TaskFunction_t)CheckSensorTask,"Check_Task",512,"Check_Task",5,&CheckSensor_Handler);
-N
-N	//     xTaskCreate((TaskFunction_t)DisplayTask,"Display",Display_Stack,"Display",Display_Prioruty,&Display_Handler);
 N	vTaskStartScheduler();
 N
 N}
@@ -43279,12 +43279,6 @@ Nvoid CheckNetWork_Task()
 N{			  
 N	Net_status=(enum net_status)M8266_NetCheck(); //检查wifi模块的网络状态
 N
-N
-N			if( Net_status!=Conneted)
-N			{
-N				M8266_ReLink(Net_status);		
-N			}
-N	
 N}
 N
 N
@@ -43295,7 +43289,7 @@ N	while(1)
 N	{			
 N		if(OneNET_CmdHandle())
 N		{
-N		//	NET_Event_CallBack(NET_EVENT_Send_Data);//更新平台数据
+N			OneNet_SendData(&data_value);
 N		}
 N	
 N		vTaskDelay(400/portTICK_RATE_MS);
@@ -43374,14 +43368,14 @@ N#endif
 N		if(Net_status==Conneted)
 N		{
 N
-N		if(++data_count>=12)   //60s发送一次数据
+N		if(++data_count>=2||data_value.fire)   //60s发送一次数据
 N		{
 N			data_count=0;
 N			printf("send data");
 N			OneNet_SendData(&data_value);
 N		}
 N	
-N		else if(photo==1||photo_count++>=time_count)
+N		 if(photo==1)
 N		{
 N			photo_count=0;
 N			taskENTER_CRITICAL(); //禁止中断
@@ -43391,7 +43385,7 @@ N			photo=0;
 N			taskEXIT_CRITICAL();			
 X			vPortExitCritical();			
 N		}
-N		else if(++check_count>=20)
+N		 if(++check_count>=20)
 N		{			
 N			check_count=0;
 N			CheckNetWork_Task();
@@ -43402,6 +43396,11 @@ N  }
 N	else
 N	{
 N		M8266_ReLink(Net_status);
+N		while(OneNet_DevLink())			//接入OneNET
+N		mDelay(500);
+N		Net_status=Conneted;
+N		LED_BLUE; 
+X		{((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0C00))->BSRR=((uint16_t)0x0020);}; {((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0C00))->BSRR=((uint16_t)0x0001);} {((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x0C00))->BRR=((uint16_t)0x0002);}; 
 N		
 N		
 N	}
@@ -43409,6 +43408,7 @@ N	vTaskDelay(1000/portTICK_RATE_MS);
 X	vTaskDelay(1000/( ( TickType_t ) 1000 / ( ( TickType_t ) 1000 ) ));
 N	
 N}
+W "..\..\User\main.c" 200 30 variable "photo_count"  was set but never used
 N}
 N
 N
@@ -43420,4 +43420,4 @@ N
 N
 N/*********************************************END OF FILE**********************/
 N
-W "..\..\User\main.c" 193 13 function "DisplayTask"  was declared but never referenced
+W "..\..\User\main.c" 187 13 function "DisplayTask"  was declared but never referenced

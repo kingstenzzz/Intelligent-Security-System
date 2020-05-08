@@ -8,330 +8,346 @@
                           REQUIRE _printf_d
                           REQUIRE _printf_int_dec
                   Check_sensor PROC
-;;;132    
-;;;133    void Check_sensor(volatile data_Stream *data_stram)
+;;;133    
+;;;134    void Check_sensor(volatile data_Stream *data_stram)
 000000  b53e              PUSH     {r1-r5,lr}
-;;;134    {
+;;;135    {
 000002  4604              MOV      r4,r0
-;;;135    	Fire_Check(&fire);
-000004  4843              LDR      r0,|L1.276|
+;;;136    	Fire_Check(&fire);
+000004  4847              LDR      r0,|L1.292|
 000006  f7fffffe          BL       Fire_Check
-;;;136    	DHT11_Data_TypeDef DH11_data;
-;;;137    	if(DHT11_Read_TempAndHumidity(&DH11_data))
+;;;137    	DHT11_Data_TypeDef DH11_data;
+;;;138    	if(DHT11_Read_TempAndHumidity(&DH11_data))
 00000a  a801              ADD      r0,sp,#4
 00000c  f7fffffe          BL       DHT11_Read_TempAndHumidity
 000010  2800              CMP      r0,#0
 000012  d03d              BEQ      |L1.144|
-;;;138    	{
-;;;139    		DHT11_Check(&DH11_data,temp_max,temp_min,humi_max,humi_min);
-000014  4840              LDR      r0,|L1.280|
+;;;139    	{
+;;;140    		DHT11_Check(&DH11_data,temp_max,temp_min,humi_max,humi_min);
+000014  4844              LDR      r0,|L1.296|
 000016  7800              LDRB     r0,[r0,#0]  ; humi_min
 000018  9000              STR      r0,[sp,#0]
-00001a  4840              LDR      r0,|L1.284|
+00001a  4844              LDR      r0,|L1.300|
 00001c  7803              LDRB     r3,[r0,#0]  ; humi_max
-00001e  4840              LDR      r0,|L1.288|
+00001e  4844              LDR      r0,|L1.304|
 000020  f9b02000          LDRSH    r2,[r0,#0]  ; temp_min
-000024  483f              LDR      r0,|L1.292|
+000024  4843              LDR      r0,|L1.308|
 000026  f9b01000          LDRSH    r1,[r0,#0]  ; temp_max
 00002a  a801              ADD      r0,sp,#4
 00002c  f7fffffe          BL       DHT11_Check
-;;;140    			UsartPrintf(USART_DEBUG, "--------------监测数据--------------\r\n");			
-000030  a13d              ADR      r1,|L1.296|
-000032  4847              LDR      r0,|L1.336|
+;;;141    			UsartPrintf(USART_DEBUG, "--------------监测数据--------------\r\n");			
+000030  a141              ADR      r1,|L1.312|
+000032  484b              LDR      r0,|L1.352|
 000034  f7fffffe          BL       UsartPrintf
-;;;141    			UsartPrintf(USART_DEBUG, "温度：%d ℃\r\n", DH11_data.temp_int);
+;;;142    			UsartPrintf(USART_DEBUG, "温度：%d ℃\r\n", DH11_data.temp_int);
 000038  f89d2006          LDRB     r2,[sp,#6]
-00003c  a145              ADR      r1,|L1.340|
-00003e  4844              LDR      r0,|L1.336|
+00003c  a149              ADR      r1,|L1.356|
+00003e  4848              LDR      r0,|L1.352|
 000040  f7fffffe          BL       UsartPrintf
-;;;142    			UsartPrintf(USART_DEBUG, "湿度：%d ％RH\r\n", DH11_data.humi_int);
+;;;143    			UsartPrintf(USART_DEBUG, "湿度：%d ％RH\r\n", DH11_data.humi_int);
 000044  f89d2004          LDRB     r2,[sp,#4]
-000048  a146              ADR      r1,|L1.356|
-00004a  4841              LDR      r0,|L1.336|
+000048  a14a              ADR      r1,|L1.372|
+00004a  4845              LDR      r0,|L1.352|
 00004c  f7fffffe          BL       UsartPrintf
-;;;143    			UsartPrintf(USART_DEBUG, "最高温度：%d\r\n", temp_max);
-000050  4834              LDR      r0,|L1.292|
+;;;144    			UsartPrintf(USART_DEBUG, "最高温度：%d\r\n", temp_max);
+000050  4838              LDR      r0,|L1.308|
 000052  f9b02000          LDRSH    r2,[r0,#0]  ; temp_max
-000056  a147              ADR      r1,|L1.372|
-000058  483d              LDR      r0,|L1.336|
+000056  a14b              ADR      r1,|L1.388|
+000058  4841              LDR      r0,|L1.352|
 00005a  f7fffffe          BL       UsartPrintf
-;;;144    			UsartPrintf(USART_DEBUG, "最低温度：%d\r\n", temp_min);
-00005e  4830              LDR      r0,|L1.288|
+;;;145    			UsartPrintf(USART_DEBUG, "最低温度：%d\r\n", temp_min);
+00005e  4834              LDR      r0,|L1.304|
 000060  f9b02000          LDRSH    r2,[r0,#0]  ; temp_min
-000064  a147              ADR      r1,|L1.388|
-000066  483a              LDR      r0,|L1.336|
+000064  a14b              ADR      r1,|L1.404|
+000066  483e              LDR      r0,|L1.352|
 000068  f7fffffe          BL       UsartPrintf
-;;;145    			UsartPrintf(USART_DEBUG, "最大湿度：%d\r\n", humi_max);
-00006c  482b              LDR      r0,|L1.284|
+;;;146    			UsartPrintf(USART_DEBUG, "最大湿度：%d\r\n", humi_max);
+00006c  482f              LDR      r0,|L1.300|
 00006e  7802              LDRB     r2,[r0,#0]  ; humi_max
-000070  a148              ADR      r1,|L1.404|
-000072  4837              LDR      r0,|L1.336|
+000070  a14c              ADR      r1,|L1.420|
+000072  483b              LDR      r0,|L1.352|
 000074  f7fffffe          BL       UsartPrintf
-;;;146    			UsartPrintf(USART_DEBUG, "最小湿度：%d\r\n", humi_min);	
-000078  4827              LDR      r0,|L1.280|
+;;;147    			UsartPrintf(USART_DEBUG, "最小湿度：%d\r\n", humi_min);	
+000078  482b              LDR      r0,|L1.296|
 00007a  7802              LDRB     r2,[r0,#0]  ; humi_min
-00007c  a149              ADR      r1,|L1.420|
-00007e  4834              LDR      r0,|L1.336|
+00007c  a14d              ADR      r1,|L1.436|
+00007e  4838              LDR      r0,|L1.352|
 000080  f7fffffe          BL       UsartPrintf
-;;;147    		  data_stram->humidit=DH11_data.humi_int;
+;;;148    		  data_stram->humidit=DH11_data.humi_int;
 000084  f89d0004          LDRB     r0,[sp,#4]
 000088  70e0              STRB     r0,[r4,#3]
-;;;148    	    data_stram->temp=DH11_data.temp_int;
+;;;149    	    data_stram->temp=DH11_data.temp_int;
 00008a  f89d0006          LDRB     r0,[sp,#6]
 00008e  70a0              STRB     r0,[r4,#2]
                   |L1.144|
-;;;149    	}
-;;;150    			printf("火情%d",fire);
-000090  4820              LDR      r0,|L1.276|
+;;;150    	}
+;;;151    			printf("火情%d",fire);
+000090  4824              LDR      r0,|L1.292|
 000092  7801              LDRB     r1,[r0,#0]  ; fire
-000094  a047              ADR      r0,|L1.436|
+000094  a04b              ADR      r0,|L1.452|
 000096  f7fffffe          BL       __2printf
-;;;151    			data_stram->fire=fire;
-00009a  481e              LDR      r0,|L1.276|
+;;;152    	if(fire==1) printf("火情");
+00009a  4822              LDR      r0,|L1.292|
 00009c  7800              LDRB     r0,[r0,#0]  ; fire
-00009e  7120              STRB     r0,[r4,#4]
-;;;152    	    
-;;;153    			if(data_stram->tem_max!=temp_max)
-0000a0  7960              LDRB     r0,[r4,#5]
-0000a2  4920              LDR      r1,|L1.292|
-0000a4  f9b11000          LDRSH    r1,[r1,#0]  ; temp_max
-0000a8  4288              CMP      r0,r1
-0000aa  d008              BEQ      |L1.190|
-;;;154    			{
-;;;155    					data_stram->tem_max=temp_max;
-0000ac  481d              LDR      r0,|L1.292|
-0000ae  7800              LDRB     r0,[r0,#0]  ; temp_max
-0000b0  7160              STRB     r0,[r4,#5]
-;;;156    					ee_WriteBytes((u8)temp_max , 0x02);
-0000b2  491c              LDR      r1,|L1.292|
-0000b4  7808              LDRB     r0,[r1,#0]  ; temp_max
-0000b6  2102              MOVS     r1,#2
-0000b8  f7fffffe          BL       ee_WriteBytes
-0000bc  e029              B        |L1.274|
-                  |L1.190|
-;;;157    
-;;;158    			}
-;;;159    			else if(data_stram->tem_min!=temp_min)
-0000be  79a0              LDRB     r0,[r4,#6]
-0000c0  4917              LDR      r1,|L1.288|
-0000c2  f9b11000          LDRSH    r1,[r1,#0]  ; temp_min
-0000c6  4288              CMP      r0,r1
-0000c8  d008              BEQ      |L1.220|
-;;;160    				{
-;;;161    						data_stram->tem_min=temp_min;
-0000ca  4815              LDR      r0,|L1.288|
-0000cc  7800              LDRB     r0,[r0,#0]  ; temp_min
-0000ce  71a0              STRB     r0,[r4,#6]
-;;;162    				ee_WriteBytes((u8)temp_min, 0x03);
-0000d0  4913              LDR      r1,|L1.288|
-0000d2  7808              LDRB     r0,[r1,#0]  ; temp_min
-0000d4  2103              MOVS     r1,#3
-0000d6  f7fffffe          BL       ee_WriteBytes
-0000da  e01a              B        |L1.274|
-                  |L1.220|
-;;;163    					
-;;;164    				}
-;;;165    			else if(data_stram->hum_max!=humi_max)
-0000dc  79e0              LDRB     r0,[r4,#7]
-0000de  490f              LDR      r1,|L1.284|
-0000e0  7809              LDRB     r1,[r1,#0]  ; humi_max
-0000e2  4288              CMP      r0,r1
-0000e4  d008              BEQ      |L1.248|
-;;;166    				{
-;;;167    							data_stram->hum_max=humi_max;
-0000e6  480d              LDR      r0,|L1.284|
-0000e8  7800              LDRB     r0,[r0,#0]  ; humi_max
-0000ea  71e0              STRB     r0,[r4,#7]
-;;;168    							ee_WriteBytes((u8)humi_max , 0x00);
-0000ec  2100              MOVS     r1,#0
-0000ee  480b              LDR      r0,|L1.284|
-0000f0  7800              LDRB     r0,[r0,#0]  ; humi_max
-0000f2  f7fffffe          BL       ee_WriteBytes
-0000f6  e00c              B        |L1.274|
-                  |L1.248|
-;;;169    				}
-;;;170    				else if (data_stram->hum_min!=humi_min)
-0000f8  7a20              LDRB     r0,[r4,#8]
-0000fa  4907              LDR      r1,|L1.280|
-0000fc  7809              LDRB     r1,[r1,#0]  ; humi_min
-0000fe  4288              CMP      r0,r1
-000100  d007              BEQ      |L1.274|
-;;;171    			{
-;;;172    	
-;;;173    			data_stram->hum_min=humi_min;
-000102  4805              LDR      r0,|L1.280|
-000104  7800              LDRB     r0,[r0,#0]  ; humi_min
-000106  7220              STRB     r0,[r4,#8]
-;;;174    			ee_WriteBytes((u8)humi_min, 0x01);
-000108  2101              MOVS     r1,#1
-00010a  4803              LDR      r0,|L1.280|
-00010c  7800              LDRB     r0,[r0,#0]  ; humi_min
-00010e  f7fffffe          BL       ee_WriteBytes
-                  |L1.274|
-;;;175    		
-;;;176    		
-;;;177    			}
-;;;178    	
-;;;179    	
-;;;180    	
-;;;181    }
-000112  bd3e              POP      {r1-r5,pc}
-;;;182    
+00009e  2801              CMP      r0,#1
+0000a0  d102              BNE      |L1.168|
+0000a2  a04a              ADR      r0,|L1.460|
+0000a4  f7fffffe          BL       __2printf
+                  |L1.168|
+;;;153    			data_stram->fire=fire;
+0000a8  481e              LDR      r0,|L1.292|
+0000aa  7800              LDRB     r0,[r0,#0]  ; fire
+0000ac  7120              STRB     r0,[r4,#4]
+;;;154    	
+;;;155    	    
+;;;156    			if(data_stram->tem_max!=temp_max)
+0000ae  7960              LDRB     r0,[r4,#5]
+0000b0  4920              LDR      r1,|L1.308|
+0000b2  f9b11000          LDRSH    r1,[r1,#0]  ; temp_max
+0000b6  4288              CMP      r0,r1
+0000b8  d008              BEQ      |L1.204|
+;;;157    			{
+;;;158    					data_stram->tem_max=temp_max;
+0000ba  481e              LDR      r0,|L1.308|
+0000bc  7800              LDRB     r0,[r0,#0]  ; temp_max
+0000be  7160              STRB     r0,[r4,#5]
+;;;159    					ee_WriteBytes((u8)temp_max , 0x02);
+0000c0  491c              LDR      r1,|L1.308|
+0000c2  7808              LDRB     r0,[r1,#0]  ; temp_max
+0000c4  2102              MOVS     r1,#2
+0000c6  f7fffffe          BL       ee_WriteBytes
+0000ca  e029              B        |L1.288|
+                  |L1.204|
+;;;160    
+;;;161    			}
+;;;162    			else if(data_stram->tem_min!=temp_min)
+0000cc  79a0              LDRB     r0,[r4,#6]
+0000ce  4918              LDR      r1,|L1.304|
+0000d0  f9b11000          LDRSH    r1,[r1,#0]  ; temp_min
+0000d4  4288              CMP      r0,r1
+0000d6  d008              BEQ      |L1.234|
+;;;163    				{
+;;;164    						data_stram->tem_min=temp_min;
+0000d8  4815              LDR      r0,|L1.304|
+0000da  7800              LDRB     r0,[r0,#0]  ; temp_min
+0000dc  71a0              STRB     r0,[r4,#6]
+;;;165    				ee_WriteBytes((u8)temp_min, 0x03);
+0000de  4914              LDR      r1,|L1.304|
+0000e0  7808              LDRB     r0,[r1,#0]  ; temp_min
+0000e2  2103              MOVS     r1,#3
+0000e4  f7fffffe          BL       ee_WriteBytes
+0000e8  e01a              B        |L1.288|
+                  |L1.234|
+;;;166    					
+;;;167    				}
+;;;168    			else if(data_stram->hum_max!=humi_max)
+0000ea  79e0              LDRB     r0,[r4,#7]
+0000ec  490f              LDR      r1,|L1.300|
+0000ee  7809              LDRB     r1,[r1,#0]  ; humi_max
+0000f0  4288              CMP      r0,r1
+0000f2  d008              BEQ      |L1.262|
+;;;169    				{
+;;;170    							data_stram->hum_max=humi_max;
+0000f4  480d              LDR      r0,|L1.300|
+0000f6  7800              LDRB     r0,[r0,#0]  ; humi_max
+0000f8  71e0              STRB     r0,[r4,#7]
+;;;171    							ee_WriteBytes((u8)humi_max , 0x00);
+0000fa  2100              MOVS     r1,#0
+0000fc  480b              LDR      r0,|L1.300|
+0000fe  7800              LDRB     r0,[r0,#0]  ; humi_max
+000100  f7fffffe          BL       ee_WriteBytes
+000104  e00c              B        |L1.288|
+                  |L1.262|
+;;;172    				}
+;;;173    				else if (data_stram->hum_min!=humi_min)
+000106  7a20              LDRB     r0,[r4,#8]
+000108  4907              LDR      r1,|L1.296|
+00010a  7809              LDRB     r1,[r1,#0]  ; humi_min
+00010c  4288              CMP      r0,r1
+00010e  d007              BEQ      |L1.288|
+;;;174    			{
+;;;175    	
+;;;176    			data_stram->hum_min=humi_min;
+000110  4805              LDR      r0,|L1.296|
+000112  7800              LDRB     r0,[r0,#0]  ; humi_min
+000114  7220              STRB     r0,[r4,#8]
+;;;177    			ee_WriteBytes((u8)humi_min, 0x01);
+000116  2101              MOVS     r1,#1
+000118  4803              LDR      r0,|L1.296|
+00011a  7800              LDRB     r0,[r0,#0]  ; humi_min
+00011c  f7fffffe          BL       ee_WriteBytes
+                  |L1.288|
+;;;178    		
+;;;179    		
+;;;180    			}
+;;;181    	
+;;;182    	
+;;;183    	
+;;;184    }
+000120  bd3e              POP      {r1-r5,pc}
+;;;185    
                           ENDP
 
-                  |L1.276|
-                          DCD      fire
-                  |L1.280|
-                          DCD      humi_min
-                  |L1.284|
-                          DCD      humi_max
-                  |L1.288|
-                          DCD      temp_min
+000122  0000              DCW      0x0000
                   |L1.292|
-                          DCD      temp_max
+                          DCD      fire
                   |L1.296|
-000128  2d2d2d2d          DCB      "--------------",188,224,178,226,202,253,190,221,"------"
-00012c  2d2d2d2d
-000130  2d2d2d2d
-000134  2d2dbce0
-000138  b2e2cafd
-00013c  bedd2d2d
+                          DCD      humi_min
+                  |L1.300|
+                          DCD      humi_max
+                  |L1.304|
+                          DCD      temp_min
+                  |L1.308|
+                          DCD      temp_max
+                  |L1.312|
+000138  2d2d2d2d          DCB      "--------------",188,224,178,226,202,253,190,221,"------"
+00013c  2d2d2d2d
 000140  2d2d2d2d
-000144  2d2d2d2d          DCB      "--------\r\n",0
-000148  2d2d2d2d
-00014c  0d0a00  
-00014f  00                DCB      0
-                  |L1.336|
+000144  2d2dbce0
+000148  b2e2cafd
+00014c  bedd2d2d
+000150  2d2d2d2d
+000154  2d2d2d2d          DCB      "--------\r\n",0
+000158  2d2d2d2d
+00015c  0d0a00  
+00015f  00                DCB      0
+                  |L1.352|
                           DCD      0x40013800
-                  |L1.340|
-000154  cec2b6c8          DCB      206,194,182,200,163,186,"%d ",161,230,"\r\n",0
-000158  a3ba2564
-00015c  20a1e60d
-000160  0a00    
-000162  00                DCB      0
-000163  00                DCB      0
                   |L1.356|
-000164  caaab6c8          DCB      202,170,182,200,163,186,"%d ",163,165,"RH\r\n",0
+000164  cec2b6c8          DCB      206,194,182,200,163,186,"%d ",161,230,"\r\n",0
 000168  a3ba2564
-00016c  20a3a552
-000170  480d0a00
+00016c  20a1e60d
+000170  0a00    
+000172  00                DCB      0
+000173  00                DCB      0
                   |L1.372|
-000174  d7eeb8df          DCB      215,238,184,223,206,194,182,200,163,186,"%d\r\n",0
-000178  cec2b6c8
-00017c  a3ba2564
-000180  0d0a00  
-000183  00                DCB      0
+000174  caaab6c8          DCB      202,170,182,200,163,186,"%d ",163,165,"RH\r\n",0
+000178  a3ba2564
+00017c  20a3a552
+000180  480d0a00
                   |L1.388|
-000184  d7eeb5cd          DCB      215,238,181,205,206,194,182,200,163,186,"%d\r\n",0
+000184  d7eeb8df          DCB      215,238,184,223,206,194,182,200,163,186,"%d\r\n",0
 000188  cec2b6c8
 00018c  a3ba2564
 000190  0d0a00  
 000193  00                DCB      0
                   |L1.404|
-000194  d7eeb4f3          DCB      215,238,180,243,202,170,182,200,163,186,"%d\r\n",0
-000198  caaab6c8
+000194  d7eeb5cd          DCB      215,238,181,205,206,194,182,200,163,186,"%d\r\n",0
+000198  cec2b6c8
 00019c  a3ba2564
 0001a0  0d0a00  
 0001a3  00                DCB      0
                   |L1.420|
-0001a4  d7eed0a1          DCB      215,238,208,161,202,170,182,200,163,186,"%d\r\n",0
+0001a4  d7eeb4f3          DCB      215,238,180,243,202,170,182,200,163,186,"%d\r\n",0
 0001a8  caaab6c8
 0001ac  a3ba2564
 0001b0  0d0a00  
 0001b3  00                DCB      0
                   |L1.436|
-0001b4  bbf0c7e9          DCB      187,240,199,233,"%d",0
-0001b8  256400  
-0001bb  00                DCB      0
+0001b4  d7eed0a1          DCB      215,238,208,161,202,170,182,200,163,186,"%d\r\n",0
+0001b8  caaab6c8
+0001bc  a3ba2564
+0001c0  0d0a00  
+0001c3  00                DCB      0
+                  |L1.452|
+0001c4  bbf0c7e9          DCB      187,240,199,233,"%d",0
+0001c8  256400  
+0001cb  00                DCB      0
+                  |L1.460|
+0001cc  bbf0c7e9          DCB      187,240,199,233,0
+0001d0  00      
+0001d1  00                DCB      0
+0001d2  00                DCB      0
+0001d3  00                DCB      0
 
                           AREA ||i.DHT11_Check||, CODE, READONLY, ALIGN=2
 
                   DHT11_Check PROC
-;;;62     */
-;;;63     void DHT11_Check(DHT11_Data_TypeDef *DHT11_Data, int16_t temp_max, int16_t temp_min, uint16_t humi_max, uint16_t humi_min)
+;;;64     */
+;;;65     void DHT11_Check(DHT11_Data_TypeDef *DHT11_Data, int16_t temp_max, int16_t temp_min, uint16_t humi_max, uint16_t humi_min)
 000000  e92d41f0          PUSH     {r4-r8,lr}
-;;;64     {
+;;;66     {
 000004  4604              MOV      r4,r0
 000006  460d              MOV      r5,r1
 000008  4616              MOV      r6,r2
 00000a  461f              MOV      r7,r3
 00000c  f8dd8018          LDR      r8,[sp,#0x18]
-;;;65     	//温度越限检测
-;;;66     	if(DHT11_Data->temp_int >= temp_max)		//当前温度大于等于最高温度时,高温警告
+;;;67     	//温度越限检测
+;;;68     	if(DHT11_Data->temp_int >= temp_max)		//当前温度大于等于最高温度时,高温警告
 000010  78a0              LDRB     r0,[r4,#2]
 000012  42a8              CMP      r0,r5
 000014  db05              BLT      |L2.34|
-;;;67     	{
-;;;68     		alarm_mode=Hot;
+;;;69     	{
+;;;70     		alarm_mode=Hot;
 000016  2002              MOVS     r0,#2
 000018  4912              LDR      r1,|L2.100|
 00001a  7008              STRB     r0,[r1,#0]
-;;;69     		WARNING(Hot);
+;;;71     		WARNING(Hot);
 00001c  f7fffffe          BL       WARNING
 000020  e00d              B        |L2.62|
                   |L2.34|
-;;;70     		
-;;;71     	}			
-;;;72     	else if(DHT11_Data->temp_int <= temp_min)	//当前温度小于等于最低温度时,低温警告
+;;;72     		
+;;;73     	}			
+;;;74     	else if(DHT11_Data->temp_int <= temp_min)	//当前温度小于等于最低温度时,低温警告
 000022  78a0              LDRB     r0,[r4,#2]
 000024  42b0              CMP      r0,r6
 000026  dc05              BGT      |L2.52|
-;;;73     	{          
-;;;74     		alarm_mode=Cold;
+;;;75     	{          
+;;;76     		alarm_mode=Cold;
 000028  2003              MOVS     r0,#3
 00002a  490e              LDR      r1,|L2.100|
 00002c  7008              STRB     r0,[r1,#0]
-;;;75     		WARNING(Cold);
+;;;77     		WARNING(Cold);
 00002e  f7fffffe          BL       WARNING
 000032  e004              B        |L2.62|
                   |L2.52|
-;;;76     
-;;;77     	}
-;;;78     	else										//安全
-;;;79     	{             
-;;;80     		alarm_mode=Safe;
+;;;78     
+;;;79     	}
+;;;80     	else										//安全
+;;;81     	{             
+;;;82     		alarm_mode=Safe;
 000034  2000              MOVS     r0,#0
 000036  490b              LDR      r1,|L2.100|
 000038  7008              STRB     r0,[r1,#0]
-;;;81     		WARNING(Safe);
+;;;83     		WARNING(Safe);
 00003a  f7fffffe          BL       WARNING
                   |L2.62|
-;;;82     
-;;;83         }
-;;;84     	
-;;;85     	//湿度越限检测
-;;;86     	if(DHT11_Data->humi_int >= humi_max)		//当前温度大于等于最高温度时,高温警告
+;;;84     
+;;;85         }
+;;;86     	
+;;;87     	//湿度越限检测
+;;;88     	if(DHT11_Data->humi_int >= humi_max)		//当前温度大于等于最高温度时,高温警告
 00003e  7820              LDRB     r0,[r4,#0]
 000040  42b8              CMP      r0,r7
 000042  db05              BLT      |L2.80|
-;;;87     	{
-;;;88                  
-;;;89        alarm_mode=Wet;
+;;;89     	{
+;;;90                  
+;;;91        alarm_mode=Wet;
 000044  2004              MOVS     r0,#4
 000046  4907              LDR      r1,|L2.100|
 000048  7008              STRB     r0,[r1,#0]
-;;;90     		WARNING(Wet);
+;;;92     		WARNING(Wet);
 00004a  f7fffffe          BL       WARNING
 00004e  e007              B        |L2.96|
                   |L2.80|
-;;;91     	}			
-;;;92     	else if(DHT11_Data->humi_int <= humi_min)	//当前温度小于等于最低温度时,低温警告
+;;;93     	}			
+;;;94     	else if(DHT11_Data->humi_int <= humi_min)	//当前温度小于等于最低温度时,低温警告
 000050  7820              LDRB     r0,[r4,#0]
 000052  4540              CMP      r0,r8
 000054  dc04              BGT      |L2.96|
-;;;93     	{
-;;;94     		alarm_mode=Dry;
+;;;95     	{
+;;;96     		alarm_mode=Dry;
 000056  2005              MOVS     r0,#5
 000058  4902              LDR      r1,|L2.100|
 00005a  7008              STRB     r0,[r1,#0]
-;;;95     		WARNING(Dry);
+;;;97     		WARNING(Dry);
 00005c  f7fffffe          BL       WARNING
                   |L2.96|
-;;;96     	}
-;;;97     
-;;;98     }
-000060  e8bd81f0          POP      {r4-r8,pc}
+;;;98     	}
 ;;;99     
+;;;100    }
+000060  e8bd81f0          POP      {r4-r8,pc}
+;;;101    
                           ENDP
 
                   |L2.100|
@@ -340,65 +356,54 @@
                           AREA ||i.Fire_Check||, CODE, READONLY, ALIGN=2
 
                   Fire_Check PROC
-;;;113    */
-;;;114    void Fire_Check(u8 *fire)
+;;;115    */
+;;;116    void Fire_Check(u8 *fire)
 000000  b510              PUSH     {r4,lr}
-;;;115    {
+;;;117    {
 000002  4604              MOV      r4,r0
-;;;116    	if(FIRE_Data_IN() == 1)								//当输入信号为0时，有火焰
+;;;118    	if(FIRE_Data_IN() == Bit_RESET)								//当输入信号为0时，有火焰
 000004  2120              MOVS     r1,#0x20
-000006  480f              LDR      r0,|L3.68|
+000006  480d              LDR      r0,|L3.60|
 000008  f7fffffe          BL       GPIO_ReadInputDataBit
-00000c  2801              CMP      r0,#1
-00000e  d10e              BNE      |L3.46|
-;;;117    	{		
-;;;118    		UsartPrintf(USART_DEBUG, "火焰警报\r\n");
-000010  a10d              ADR      r1,|L3.72|
-000012  4810              LDR      r0,|L3.84|
-000014  f7fffffe          BL       UsartPrintf
-;;;119    		*fire = 1;			
-000018  2001              MOVS     r0,#1
-00001a  7020              STRB     r0,[r4,#0]
-;;;120    		alarm_mode=Fire;
-00001c  490e              LDR      r1,|L3.88|
-00001e  7008              STRB     r0,[r1,#0]
-;;;121    		WARNING(Fire);
-000020  f7fffffe          BL       WARNING
-;;;122    		mDelay(500);
-000024  f44f70fa          MOV      r0,#0x1f4
-000028  f7fffffe          BL       mDelay
-00002c  e008              B        |L3.64|
-                  |L3.46|
-;;;123    	}
-;;;124    	else if(FIRE_Data_IN() == 0)						//当输入信号为1时，无火焰
-00002e  2120              MOVS     r1,#0x20
-000030  4804              LDR      r0,|L3.68|
-000032  f7fffffe          BL       GPIO_ReadInputDataBit
-000036  b918              CBNZ     r0,|L3.64|
-;;;125    	{
-;;;126    		*fire = 0;
-000038  2000              MOVS     r0,#0
-00003a  7020              STRB     r0,[r4,#0]
-;;;127    		Beep_Set(BEEP_OFF);
-00003c  f7fffffe          BL       Beep_Set
-                  |L3.64|
-;;;128    	}
-;;;129    }
-000040  bd10              POP      {r4,pc}
-;;;130    
+00000c  b950              CBNZ     r0,|L3.36|
+;;;119    	{		
+;;;120    		*fire = 1;			
+00000e  2001              MOVS     r0,#1
+000010  7020              STRB     r0,[r4,#0]
+;;;121    		alarm_mode=Fire;
+000012  490b              LDR      r1,|L3.64|
+000014  7008              STRB     r0,[r1,#0]
+;;;122    		WARNING(Fire);
+000016  f7fffffe          BL       WARNING
+;;;123    		mDelay(500);
+00001a  f44f70fa          MOV      r0,#0x1f4
+00001e  f7fffffe          BL       mDelay
+000022  e009              B        |L3.56|
+                  |L3.36|
+;;;124    	}
+;;;125    	else if(FIRE_Data_IN() == Bit_SET)						//当输入信号为1时，无火焰
+000024  2120              MOVS     r1,#0x20
+000026  4805              LDR      r0,|L3.60|
+000028  f7fffffe          BL       GPIO_ReadInputDataBit
+00002c  2801              CMP      r0,#1
+00002e  d103              BNE      |L3.56|
+;;;126    	{
+;;;127    		*fire = 0;
+000030  2000              MOVS     r0,#0
+000032  7020              STRB     r0,[r4,#0]
+;;;128    		Beep_Set(BEEP_OFF);
+000034  f7fffffe          BL       Beep_Set
+                  |L3.56|
+;;;129    	}
+;;;130    }
+000038  bd10              POP      {r4,pc}
+;;;131    
                           ENDP
 
-000042  0000              DCW      0x0000
-                  |L3.68|
+00003a  0000              DCW      0x0000
+                  |L3.60|
                           DCD      0x40011800
-                  |L3.72|
-000048  bbf0d1e6          DCB      187,240,209,230,190,175,177,168,"\r\n",0
-00004c  beafb1a8
-000050  0d0a00  
-000053  00                DCB      0
-                  |L3.84|
-                          DCD      0x40013800
-                  |L3.88|
+                  |L3.64|
                           DCD      alarm_mode
 
                           AREA ||i.WARNING||, CODE, READONLY, ALIGN=2
@@ -411,94 +416,100 @@
 000002  4604              MOV      r4,r0
 ;;;28     	switch (flag)
 000004  2c06              CMP      r4,#6
-000006  d237              BCS      |L4.120|
+000006  d23a              BCS      |L4.126|
 000008  e8dff004          TBB      [pc,r4]
-00000c  030b0f19          DCB      0x03,0x0b,0x0f,0x19
-000010  222b              DCB      0x22,0x2b
+00000c  030b121c          DCB      0x03,0x0b,0x12,0x1c
+000010  252e              DCB      0x25,0x2e
 ;;;29     	{
 ;;;30     		case Safe:
 ;;;31     			LED_RGBOFF		//安全模式	
 000012  2020              MOVS     r0,#0x20
-000014  491a              LDR      r1,|L4.128|
+000014  491b              LDR      r1,|L4.132|
 000016  6008              STR      r0,[r1,#0]
 000018  2001              MOVS     r0,#1
 00001a  6008              STR      r0,[r1,#0]
 00001c  2002              MOVS     r0,#2
 00001e  6008              STR      r0,[r1,#0]
 ;;;32     		break;				
-000020  e02b              B        |L4.122|
+000020  e02e              B        |L4.128|
 ;;;33     		
 ;;;34     		case Fire:                     
 ;;;35     			Beep_Set(BEEP_ON);
 000022  2001              MOVS     r0,#1
 000024  f7fffffe          BL       Beep_Set
-;;;36     		break;						
-000028  e027              B        |L4.122|
-;;;37     		case Hot:	
-;;;38     			LED_RED		//高温模式，红灯亮	
-00002a  2020              MOVS     r0,#0x20
-00002c  4914              LDR      r1,|L4.128|
-00002e  1d09              ADDS     r1,r1,#4
-000030  6008              STR      r0,[r1,#0]
-000032  2001              MOVS     r0,#1
-000034  1f09              SUBS     r1,r1,#4
+;;;36     		photo=1;
+000028  2001              MOVS     r0,#1
+00002a  4917              LDR      r1,|L4.136|
+00002c  7008              STRB     r0,[r1,#0]
+;;;37     	
+;;;38     		break;						
+00002e  e027              B        |L4.128|
+;;;39     		case Hot:	
+;;;40     			LED_RED		//高温模式，红灯亮	
+000030  2020              MOVS     r0,#0x20
+000032  4914              LDR      r1,|L4.132|
+000034  1d09              ADDS     r1,r1,#4
 000036  6008              STR      r0,[r1,#0]
-000038  2002              MOVS     r0,#2
-00003a  6008              STR      r0,[r1,#0]
-;;;39     		break;
-00003c  e01d              B        |L4.122|
-;;;40     		case Cold:	
-;;;41     			LED_BLUE	//低温模式，蓝灯亮	
-00003e  2020              MOVS     r0,#0x20
-000040  490f              LDR      r1,|L4.128|
-000042  6008              STR      r0,[r1,#0]
-000044  2001              MOVS     r0,#1
-000046  6008              STR      r0,[r1,#0]
-000048  2002              MOVS     r0,#2
-00004a  1d09              ADDS     r1,r1,#4
+000038  2001              MOVS     r0,#1
+00003a  1f09              SUBS     r1,r1,#4
+00003c  6008              STR      r0,[r1,#0]
+00003e  2002              MOVS     r0,#2
+000040  6008              STR      r0,[r1,#0]
+;;;41     		break;
+000042  e01d              B        |L4.128|
+;;;42     		case Cold:	
+;;;43     			LED_BLUE	//低温模式，蓝灯亮	
+000044  2020              MOVS     r0,#0x20
+000046  490f              LDR      r1,|L4.132|
+000048  6008              STR      r0,[r1,#0]
+00004a  2001              MOVS     r0,#1
 00004c  6008              STR      r0,[r1,#0]
-;;;42     		break;		
-00004e  e014              B        |L4.122|
-;;;43     		case Wet:
-;;;44     			LED_CYAN;
-000050  2020              MOVS     r0,#0x20
-000052  490b              LDR      r1,|L4.128|
-000054  6008              STR      r0,[r1,#0]
-000056  2001              MOVS     r0,#1
-000058  1d09              ADDS     r1,r1,#4
+00004e  2002              MOVS     r0,#2
+000050  1d09              ADDS     r1,r1,#4
+000052  6008              STR      r0,[r1,#0]
+;;;44     		break;		
+000054  e014              B        |L4.128|
+;;;45     		case Wet:
+;;;46     			LED_CYAN;
+000056  2020              MOVS     r0,#0x20
+000058  490a              LDR      r1,|L4.132|
 00005a  6008              STR      r0,[r1,#0]
-00005c  2002              MOVS     r0,#2
-00005e  6008              STR      r0,[r1,#0]
-;;;45     		break;
-000060  e00b              B        |L4.122|
-;;;46     		case Dry:
-;;;47     			LED_PURPLE;
-000062  2020              MOVS     r0,#0x20
-000064  4906              LDR      r1,|L4.128|
-000066  1d09              ADDS     r1,r1,#4
-000068  6008              STR      r0,[r1,#0]
-00006a  2001              MOVS     r0,#1
-00006c  1f09              SUBS     r1,r1,#4
+00005c  2001              MOVS     r0,#1
+00005e  1d09              ADDS     r1,r1,#4
+000060  6008              STR      r0,[r1,#0]
+000062  2002              MOVS     r0,#2
+000064  6008              STR      r0,[r1,#0]
+;;;47     		break;
+000066  e00b              B        |L4.128|
+;;;48     		case Dry:
+;;;49     			LED_PURPLE;
+000068  2020              MOVS     r0,#0x20
+00006a  4906              LDR      r1,|L4.132|
+00006c  1d09              ADDS     r1,r1,#4
 00006e  6008              STR      r0,[r1,#0]
-000070  2002              MOVS     r0,#2
-000072  1d09              ADDS     r1,r1,#4
+000070  2001              MOVS     r0,#1
+000072  1f09              SUBS     r1,r1,#4
 000074  6008              STR      r0,[r1,#0]
-;;;48     		break;
-000076  e000              B        |L4.122|
-                  |L4.120|
-;;;49     		default: break;
-000078  bf00              NOP      
-                  |L4.122|
-00007a  bf00              NOP                            ;32
-;;;50     	}
-;;;51     }
-00007c  bd10              POP      {r4,pc}
-;;;52     
+000076  2002              MOVS     r0,#2
+000078  1d09              ADDS     r1,r1,#4
+00007a  6008              STR      r0,[r1,#0]
+;;;50     		break;
+00007c  e000              B        |L4.128|
+                  |L4.126|
+;;;51     		default: break;
+00007e  bf00              NOP      
+                  |L4.128|
+000080  bf00              NOP                            ;32
+;;;52     	}
+;;;53     }
+000082  bd10              POP      {r4,pc}
+;;;54     
                           ENDP
 
-00007e  0000              DCW      0x0000
-                  |L4.128|
+                  |L4.132|
                           DCD      0x40010c10
+                  |L4.136|
+                          DCD      photo
 
                           AREA ||.data||, DATA, ALIGN=0
 

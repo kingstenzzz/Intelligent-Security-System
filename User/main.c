@@ -77,6 +77,8 @@ void Hardware_Init()
   //TIM4_PWM_Init();
   ILI9341_Init();
 	USART_Config();  //调试串口
+	Beep_Init();
+	
 	
 	
   Camera_Init();
@@ -113,8 +115,6 @@ int main(void)
 	xTaskCreate((TaskFunction_t)ReceiveCmdTask,"ReceiveCmdTask",ReceiveCmd_Stack,"ReceiveCmdTask",ReceiveCMd_Priority,&ReceiveCmdTask_Handler);
 	xTaskCreate((TaskFunction_t)Net_Task,"Net_Task",Net_Task_Stack,"Net_Task",Net_Task_Prioruty,&NetTask_Handler);
 	xTaskCreate((TaskFunction_t)CheckSensorTask,"Check_Task",CheckSensor_Stack,"Check_Task",CheckSensor_Priority,&CheckSensor_Handler);
-
-	//     xTaskCreate((TaskFunction_t)DisplayTask,"Display",Display_Stack,"Display",Display_Prioruty,&Display_Handler);
 	vTaskStartScheduler();
 
 }
@@ -130,12 +130,6 @@ void CheckNetWork_Task()
 {			  
 	Net_status=(enum net_status)M8266_NetCheck(); //检查wifi模块的网络状态
 
-
-			if( Net_status!=Conneted)
-			{
-				M8266_ReLink(Net_status);		
-			}
-	
 }
 
 
@@ -146,7 +140,7 @@ static void ReceiveCmdTask(void *pvParameters)
 	{			
 		if(OneNET_CmdHandle())
 		{
-		//	NET_Event_CallBack(NET_EVENT_Send_Data);//更新平台数据
+			OneNet_SendData(&data_value);
 		}
 	
 		vTaskDelay(400/portTICK_RATE_MS);
@@ -214,14 +208,14 @@ static void Net_Task(void *pvParameters)
 		if(Net_status==Conneted)
 		{
 
-		if(++data_count>=12)   //60s发送一次数据
+		if(++data_count>=2||data_value.fire)   //60s发送一次数据
 		{
 			data_count=0;
 			printf("send data");
 			OneNet_SendData(&data_value);
 		}
 	
-		else if(photo==1||photo_count++>=time_count)
+		 if(photo==1)
 		{
 			photo_count=0;
 			taskENTER_CRITICAL(); //禁止中断
@@ -229,7 +223,7 @@ static void Net_Task(void *pvParameters)
 			photo=0;
 			taskEXIT_CRITICAL();			
 		}
-		else if(++check_count>=20)
+		 if(++check_count>=20)
 		{			
 			check_count=0;
 			CheckNetWork_Task();
@@ -240,6 +234,10 @@ static void Net_Task(void *pvParameters)
 	else
 	{
 		M8266_ReLink(Net_status);
+		while(OneNet_DevLink())			//接入OneNET
+		mDelay(500);
+		Net_status=Conneted;
+		LED_BLUE; 
 		
 		
 	}

@@ -19,7 +19,7 @@
 ;;;19     	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;       
 00000a  2020              MOVS     r0,#0x20
 00000c  f8ad0000          STRH     r0,[sp,#0]
-;;;20     	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;	//上拉输入 
+;;;20     	GPIO_InitStructure.GPIO_Mode =GPIO_Mode_IPU;	//上拉输入 
 000010  2048              MOVS     r0,#0x48
 000012  f88d0003          STRB     r0,[sp,#3]
 ;;;21     	GPIO_Init(GPIOE, &GPIO_InitStructure);

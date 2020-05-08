@@ -5,37 +5,37 @@
                           AREA ||i.OneNET_CmdHandle||, CODE, READONLY, ALIGN=1
 
                   OneNET_CmdHandle PROC
-;;;453    //==========================================================
-;;;454    unsigned char  OneNET_CmdHandle(void)
+;;;444    //==========================================================
+;;;445    unsigned char  OneNET_CmdHandle(void)
 000000  b510              PUSH     {r4,lr}
-;;;455    {
-;;;456    	
-;;;457    	unsigned char *dataPtr = NULL;		//数据指针
+;;;446    {
+;;;447    	
+;;;448    	unsigned char *dataPtr = NULL;		//数据指针
 000002  2400              MOVS     r4,#0
-;;;458    	
-;;;459    	dataPtr = M8266_GetIPD(5);		//检查是否是平台数据
+;;;449    	
+;;;450    	dataPtr = M8266_GetIPD(5);		//检查是否是平台数据
 000004  2005              MOVS     r0,#5
 000006  f7fffffe          BL       M8266_GetIPD
 00000a  4604              MOV      r4,r0
-;;;460    		if(dataPtr != NULL)
+;;;451    		if(dataPtr != NULL)
 00000c  b124              CBZ      r4,|L1.24|
-;;;461    		{	
-;;;462    				OneNet_RevPro(dataPtr);					//集中处理
+;;;452    		{	
+;;;453    				OneNet_RevPro(dataPtr);					//集中处理
 00000e  4620              MOV      r0,r4
 000010  f7fffffe          BL       OneNet_RevPro
-;;;463    			  return 1;
+;;;454    			  return 1;
 000014  2001              MOVS     r0,#1
                   |L1.22|
-;;;464    			
-;;;465    		}
-;;;466    		return 0;
-;;;467    
-;;;468    }
+;;;455    			
+;;;456    		}
+;;;457    		return 0;
+;;;458    
+;;;459    }
 000016  bd10              POP      {r4,pc}
                   |L1.24|
-000018  2000              MOVS     r0,#0                 ;466
+000018  2000              MOVS     r0,#0                 ;457
 00001a  e7fc              B        |L1.22|
-;;;469    
+;;;460    
                           ENDP
 
 
@@ -397,235 +397,239 @@
 ;;;123    {
 000002  4605              MOV      r5,r0
 000004  460c              MOV      r4,r1
-;;;124    
-;;;125    
-;;;126    	char text[16];
-;;;127    	
-;;;128    	memset(text, 0, sizeof(text));
+;;;124    	char text[16];
+;;;125    	memset(text, 0, sizeof(text));
 000006  2000              MOVS     r0,#0
 000008  9000              STR      r0,[sp,#0]
 00000a  9001              STR      r0,[sp,#4]
 00000c  9002              STR      r0,[sp,#8]
 00000e  9003              STR      r0,[sp,#0xc]
-;;;129    	
-;;;130    	strcpy(buf, "{");
-000010  a030              ADR      r0,|L3.212|
+;;;126    	strcpy(buf, "{");
+000010  a037              ADR      r0,|L3.240|
 000012  8800              LDRH     r0,[r0,#0]
 000014  8028              STRH     r0,[r5,#0]
-;;;131    	
-;;;132    	
-;;;133    		
-;;;134    	memset(text, 0, sizeof(text));
+;;;127    	memset(text, 0, sizeof(text));
 000016  2000              MOVS     r0,#0
 000018  9000              STR      r0,[sp,#0]
 00001a  9001              STR      r0,[sp,#4]
 00001c  9002              STR      r0,[sp,#8]
 00001e  9003              STR      r0,[sp,#0xc]
-;;;135    	sprintf(text,  "\"Temperature\":%d,",data_stream->temp);
-000020  78a2              LDRB     r2,[r4,#2]
-000022  a12d              ADR      r1,|L3.216|
+;;;128    	sprintf(text,  "\"Fire\":%d,",data_stream->fire);
+000020  7922              LDRB     r2,[r4,#4]
+000022  a134              ADR      r1,|L3.244|
 000024  4668              MOV      r0,sp
 000026  f7fffffe          BL       __2sprintf
-;;;136    	strcat(buf, text);
+;;;129    	strcat(buf, text);
 00002a  4669              MOV      r1,sp
 00002c  4628              MOV      r0,r5
 00002e  f7fffffe          BL       strcat
-;;;137    	
-;;;138    	memset(text, 0, sizeof(text));
+;;;130    	memset(text, 0, sizeof(text));
 000032  2000              MOVS     r0,#0
 000034  9000              STR      r0,[sp,#0]
 000036  9001              STR      r0,[sp,#4]
 000038  9002              STR      r0,[sp,#8]
 00003a  9003              STR      r0,[sp,#0xc]
-;;;139    	sprintf(text,  "\"Humidity\":%d,",data_stream->humidit);
-00003c  78e2              LDRB     r2,[r4,#3]
-00003e  a12b              ADR      r1,|L3.236|
+;;;131    	sprintf(text,  "\"Temperature\":%d,",data_stream->temp);
+00003c  78a2              LDRB     r2,[r4,#2]
+00003e  a130              ADR      r1,|L3.256|
 000040  4668              MOV      r0,sp
 000042  f7fffffe          BL       __2sprintf
-;;;140    	strcat(buf, text);
+;;;132    	strcat(buf, text);
 000046  4669              MOV      r1,sp
 000048  4628              MOV      r0,r5
 00004a  f7fffffe          BL       strcat
-;;;141    	
-;;;142    	
-;;;143    	memset(text, 0, sizeof(text));
+;;;133    	memset(text, 0, sizeof(text));
 00004e  2000              MOVS     r0,#0
 000050  9000              STR      r0,[sp,#0]
 000052  9001              STR      r0,[sp,#4]
 000054  9002              STR      r0,[sp,#8]
 000056  9003              STR      r0,[sp,#0xc]
-;;;144    	sprintf(text,  "\"Temp_Max\":%d,",data_stream->tem_max);
-000058  7962              LDRB     r2,[r4,#5]
-00005a  a128              ADR      r1,|L3.252|
+;;;134    	sprintf(text,  "\"Humidity\":%d,",data_stream->humidit);
+000058  78e2              LDRB     r2,[r4,#3]
+00005a  a12e              ADR      r1,|L3.276|
 00005c  4668              MOV      r0,sp
 00005e  f7fffffe          BL       __2sprintf
-;;;145    	strcat(buf, text);
+;;;135    	strcat(buf, text);
 000062  4669              MOV      r1,sp
 000064  4628              MOV      r0,r5
 000066  f7fffffe          BL       strcat
-;;;146    	
-;;;147    	memset(text, 0, sizeof(text));
+;;;136    	memset(text, 0, sizeof(text));
 00006a  2000              MOVS     r0,#0
 00006c  9000              STR      r0,[sp,#0]
 00006e  9001              STR      r0,[sp,#4]
 000070  9002              STR      r0,[sp,#8]
 000072  9003              STR      r0,[sp,#0xc]
-;;;148    	sprintf(text,  "\"Temp_Min\":%d,",data_stream->tem_min);
-000074  79a2              LDRB     r2,[r4,#6]
-000076  a125              ADR      r1,|L3.268|
+;;;137    	sprintf(text,  "\"Temp_Max\":%d,",data_stream->tem_max);
+000074  7962              LDRB     r2,[r4,#5]
+000076  a12b              ADR      r1,|L3.292|
 000078  4668              MOV      r0,sp
 00007a  f7fffffe          BL       __2sprintf
-;;;149    	strcat(buf, text);
+;;;138    	strcat(buf, text);
 00007e  4669              MOV      r1,sp
 000080  4628              MOV      r0,r5
 000082  f7fffffe          BL       strcat
-;;;150    	
-;;;151    	memset(text, 0, sizeof(text));
+;;;139    	memset(text, 0, sizeof(text));
 000086  2000              MOVS     r0,#0
 000088  9000              STR      r0,[sp,#0]
 00008a  9001              STR      r0,[sp,#4]
 00008c  9002              STR      r0,[sp,#8]
 00008e  9003              STR      r0,[sp,#0xc]
-;;;152    	sprintf(text,  "\"Hum_Max\":%d,",data_stream->hum_max);
-000090  79e2              LDRB     r2,[r4,#7]
-000092  a122              ADR      r1,|L3.284|
+;;;140    	sprintf(text,  "\"Temp_Min\":%d,",data_stream->tem_min);
+000090  79a2              LDRB     r2,[r4,#6]
+000092  a128              ADR      r1,|L3.308|
 000094  4668              MOV      r0,sp
 000096  f7fffffe          BL       __2sprintf
-;;;153    	strcat(buf, text);
+;;;141    	strcat(buf, text);
 00009a  4669              MOV      r1,sp
 00009c  4628              MOV      r0,r5
 00009e  f7fffffe          BL       strcat
-;;;154    	
-;;;155    	memset(text, 0, sizeof(text));
+;;;142    	memset(text, 0, sizeof(text));
 0000a2  2000              MOVS     r0,#0
 0000a4  9000              STR      r0,[sp,#0]
 0000a6  9001              STR      r0,[sp,#4]
 0000a8  9002              STR      r0,[sp,#8]
 0000aa  9003              STR      r0,[sp,#0xc]
-;;;156    	sprintf(text,  "\"Hum_Min\":%d",data_stream->hum_min);
-0000ac  7a22              LDRB     r2,[r4,#8]
-0000ae  a11f              ADR      r1,|L3.300|
+;;;143    	sprintf(text,  "\"Hum_Max\":%d,",data_stream->hum_max);///////注意逗号
+0000ac  79e2              LDRB     r2,[r4,#7]
+0000ae  a125              ADR      r1,|L3.324|
 0000b0  4668              MOV      r0,sp
 0000b2  f7fffffe          BL       __2sprintf
-;;;157    	strcat(buf, text);
+;;;144    	strcat(buf, text);
 0000b6  4669              MOV      r1,sp
 0000b8  4628              MOV      r0,r5
 0000ba  f7fffffe          BL       strcat
-;;;158    
-;;;159    	
-;;;160    	strcat(buf, "}");
-0000be  a11f              ADR      r1,|L3.316|
-0000c0  4628              MOV      r0,r5
-0000c2  f7fffffe          BL       strcat
-;;;161    	
-;;;162    	return strlen(buf);
-0000c6  4628              MOV      r0,r5
-0000c8  f7fffffe          BL       strlen
-0000cc  b2c0              UXTB     r0,r0
-;;;163    }
-0000ce  b004              ADD      sp,sp,#0x10
-0000d0  bd70              POP      {r4-r6,pc}
-;;;164    
+;;;145    	memset(text, 0, sizeof(text));
+0000be  2000              MOVS     r0,#0
+0000c0  9000              STR      r0,[sp,#0]
+0000c2  9001              STR      r0,[sp,#4]
+0000c4  9002              STR      r0,[sp,#8]
+0000c6  9003              STR      r0,[sp,#0xc]
+;;;146    	sprintf(text,  "\"Hum_Min\":%d",data_stream->hum_min);
+0000c8  7a22              LDRB     r2,[r4,#8]
+0000ca  a122              ADR      r1,|L3.340|
+0000cc  4668              MOV      r0,sp
+0000ce  f7fffffe          BL       __2sprintf
+;;;147    	strcat(buf, text);
+0000d2  4669              MOV      r1,sp
+0000d4  4628              MOV      r0,r5
+0000d6  f7fffffe          BL       strcat
+;;;148    	strcat(buf, "}");	
+0000da  a122              ADR      r1,|L3.356|
+0000dc  4628              MOV      r0,r5
+0000de  f7fffffe          BL       strcat
+;;;149    	return strlen(buf);
+0000e2  4628              MOV      r0,r5
+0000e4  f7fffffe          BL       strlen
+0000e8  b2c0              UXTB     r0,r0
+;;;150    }
+0000ea  b004              ADD      sp,sp,#0x10
+0000ec  bd70              POP      {r4-r6,pc}
+;;;151    
                           ENDP
 
-0000d2  0000              DCW      0x0000
-                  |L3.212|
-0000d4  7b00              DCB      "{",0
-0000d6  00                DCB      0
-0000d7  00                DCB      0
-                  |L3.216|
-0000d8  2254656d          DCB      """Temperature"":%d,",0
-0000dc  70657261
-0000e0  74757265
-0000e4  223a2564
-0000e8  2c00    
-0000ea  00                DCB      0
-0000eb  00                DCB      0
-                  |L3.236|
-0000ec  2248756d          DCB      """Humidity"":%d,",0
-0000f0  69646974
-0000f4  79223a25
-0000f8  642c00  
-0000fb  00                DCB      0
-                  |L3.252|
-0000fc  2254656d          DCB      """Temp_Max"":%d,",0
-000100  705f4d61
-000104  78223a25
-000108  642c00  
-00010b  00                DCB      0
-                  |L3.268|
-00010c  2254656d          DCB      """Temp_Min"":%d,",0
-000110  705f4d69
-000114  6e223a25
-000118  642c00  
-00011b  00                DCB      0
-                  |L3.284|
-00011c  2248756d          DCB      """Hum_Max"":%d,",0
-000120  5f4d6178
-000124  223a2564
-000128  2c00    
-00012a  00                DCB      0
-00012b  00                DCB      0
-                  |L3.300|
-00012c  2248756d          DCB      """Hum_Min"":%d",0
-000130  5f4d696e
-000134  223a2564
-000138  00      
-000139  00                DCB      0
-00013a  00                DCB      0
-00013b  00                DCB      0
-                  |L3.316|
-00013c  7d00              DCB      "}",0
-00013e  00                DCB      0
-00013f  00                DCB      0
+0000ee  0000              DCW      0x0000
+                  |L3.240|
+0000f0  7b00              DCB      "{",0
+0000f2  00                DCB      0
+0000f3  00                DCB      0
+                  |L3.244|
+0000f4  22466972          DCB      """Fire"":%d,",0
+0000f8  65223a25
+0000fc  642c00  
+0000ff  00                DCB      0
+                  |L3.256|
+000100  2254656d          DCB      """Temperature"":%d,",0
+000104  70657261
+000108  74757265
+00010c  223a2564
+000110  2c00    
+000112  00                DCB      0
+000113  00                DCB      0
+                  |L3.276|
+000114  2248756d          DCB      """Humidity"":%d,",0
+000118  69646974
+00011c  79223a25
+000120  642c00  
+000123  00                DCB      0
+                  |L3.292|
+000124  2254656d          DCB      """Temp_Max"":%d,",0
+000128  705f4d61
+00012c  78223a25
+000130  642c00  
+000133  00                DCB      0
+                  |L3.308|
+000134  2254656d          DCB      """Temp_Min"":%d,",0
+000138  705f4d69
+00013c  6e223a25
+000140  642c00  
+000143  00                DCB      0
+                  |L3.324|
+000144  2248756d          DCB      """Hum_Max"":%d,",0
+000148  5f4d6178
+00014c  223a2564
+000150  2c00    
+000152  00                DCB      0
+000153  00                DCB      0
+                  |L3.340|
+000154  2248756d          DCB      """Hum_Min"":%d",0
+000158  5f4d696e
+00015c  223a2564
+000160  00      
+000161  00                DCB      0
+000162  00                DCB      0
+000163  00                DCB      0
+                  |L3.356|
+000164  7d00              DCB      "}",0
+000166  00                DCB      0
+000167  00                DCB      0
 
                           AREA ||i.OneNet_RevPro||, CODE, READONLY, ALIGN=2
 
                   OneNet_RevPro PROC
-;;;220    
-;;;221    void OneNet_RevPro(unsigned char *cmd)
+;;;207    
+;;;208    void OneNet_RevPro(unsigned char *cmd)
 000000  e92d41f0          PUSH     {r4-r8,lr}
-;;;222    {
+;;;209    {
 000004  b08c              SUB      sp,sp,#0x30
 000006  4607              MOV      r7,r0
-;;;223    	
-;;;224    	EDP_PACKET_STRUCTURE edpPacket = {NULL, 0, 0, 0};	//协议包
+;;;210    	
+;;;211    	EDP_PACKET_STRUCTURE edpPacket = {NULL, 0, 0, 0};	//协议包
 000008  2000              MOVS     r0,#0
 00000a  9008              STR      r0,[sp,#0x20]
 00000c  9009              STR      r0,[sp,#0x24]
 00000e  900a              STR      r0,[sp,#0x28]
 000010  900b              STR      r0,[sp,#0x2c]
-;;;225    	
-;;;226    	char *cmdid_devid = NULL;
+;;;212    	
+;;;213    	char *cmdid_devid = NULL;
 000012  9007              STR      r0,[sp,#0x1c]
-;;;227    	unsigned short cmdid_len = 0;
+;;;214    	unsigned short cmdid_len = 0;
 000014  9006              STR      r0,[sp,#0x18]
-;;;228    	char *req = NULL;
+;;;215    	char *req = NULL;
 000016  9005              STR      r0,[sp,#0x14]
-;;;229    	unsigned int req_len = 0;
+;;;216    	unsigned int req_len = 0;
 000018  9004              STR      r0,[sp,#0x10]
-;;;230    	unsigned char type = 0;
+;;;217    	unsigned char type = 0;
 00001a  4680              MOV      r8,r0
-;;;231    	
-;;;232    	short result = 0;
+;;;218    	
+;;;219    	short result = 0;
 00001c  2600              MOVS     r6,#0
-;;;233    
-;;;234    	char *dataPtr = NULL;
+;;;220    
+;;;221    	char *dataPtr = NULL;
 00001e  2500              MOVS     r5,#0
-;;;235    	char numBuf[10];
-;;;236    	int num = 0;
+;;;222    	char numBuf[10];
+;;;223    	int num = 0;
 000020  2400              MOVS     r4,#0
-;;;237    	heart_flag=Heart_err;//先初始化未丢失
-000022  496d              LDR      r1,|L4.472|
+;;;224    	heart_flag=Heart_err;//先初始化未丢失
+000022  4978              LDR      r1,|L4.516|
 000024  7008              STRB     r0,[r1,#0]
-;;;238    	hexdump(edpPacket._data,edpPacket._len);//打印收到的信息
+;;;225    	hexdump(edpPacket._data,edpPacket._len);//打印收到的信息
 000026  e9dd0108          LDRD     r0,r1,[sp,#0x20]
 00002a  f7fffffe          BL       hexdump
-;;;239    	type = EDP_UnPacketRecv(cmd);
+;;;226    	type = EDP_UnPacketRecv(cmd);
 00002e  4638              MOV      r0,r7
 000030  f7fffffe          BL       EDP_UnPacketRecv
 000034  4680              MOV      r8,r0
-;;;240    	switch(type)										//判断是pushdata还是命令下发
+;;;227    	switch(type)										//判断是pushdata还是命令下发
 000036  f1b80f30          CMP      r8,#0x30
 00003a  d009              BEQ      |L4.80|
 00003c  f1b80f90          CMP      r8,#0x90
@@ -636,35 +640,35 @@
 00004c  d13f              BNE      |L4.206|
 00004e  e037              B        |L4.192|
                   |L4.80|
-;;;241    	{
-;;;242    			case PUSHDATA:									//解pushdata包
-;;;243    			
-;;;244    			result = EDP_UnPacketPushData(cmd, &cmdid_devid, &req, &req_len);
+;;;228    	{
+;;;229    			case PUSHDATA:									//解pushdata包
+;;;230    			
+;;;231    			result = EDP_UnPacketPushData(cmd, &cmdid_devid, &req, &req_len);
 000050  ab04              ADD      r3,sp,#0x10
 000052  aa05              ADD      r2,sp,#0x14
 000054  a907              ADD      r1,sp,#0x1c
 000056  4638              MOV      r0,r7
 000058  f7fffffe          BL       EDP_UnPacketPushData
 00005c  4606              MOV      r6,r0
-;;;245    		
-;;;246    			if(result == 0)
+;;;232    		
+;;;233    			if(result == 0)
 00005e  b93e              CBNZ     r6,|L4.112|
-;;;247    				UsartPrintf(USART_DEBUG, "src_devid: %s, req: %s, req_len: %d\r\n", cmdid_devid, req, req_len);
+;;;234    				UsartPrintf(USART_DEBUG, "src_devid: %s, req: %s, req_len: %d\r\n", cmdid_devid, req, req_len);
 000060  9804              LDR      r0,[sp,#0x10]
 000062  9000              STR      r0,[sp,#0]
-000064  a15d              ADR      r1,|L4.476|
-000066  4867              LDR      r0,|L4.516|
+000064  a168              ADR      r1,|L4.520|
+000066  4872              LDR      r0,|L4.560|
 000068  9b05              LDR      r3,[sp,#0x14]
 00006a  9a07              LDR      r2,[sp,#0x1c]
 00006c  f7fffffe          BL       UsartPrintf
                   |L4.112|
-;;;248    			
-;;;249    		break;
+;;;235    			
+;;;236    		break;
 000070  e030              B        |L4.212|
                   |L4.114|
-;;;250    		case CMDREQ:									//解命令包
-;;;251    			
-;;;252    			result = EDP_UnPacketCmd(cmd, &cmdid_devid, &cmdid_len, &req, &req_len);
+;;;237    		case CMDREQ:									//解命令包
+;;;238    			
+;;;239    			result = EDP_UnPacketCmd(cmd, &cmdid_devid, &cmdid_len, &req, &req_len);
 000072  a804              ADD      r0,sp,#0x10
 000074  ab05              ADD      r3,sp,#0x14
 000076  aa06              ADD      r2,sp,#0x18
@@ -673,35 +677,35 @@
 00007c  4638              MOV      r0,r7
 00007e  f7fffffe          BL       EDP_UnPacketCmd
 000082  4606              MOV      r6,r0
-;;;253    			
-;;;254    			if(result == 0)								//解包成功，则进行命令回复的组包
+;;;240    			
+;;;241    			if(result == 0)								//解包成功，则进行命令回复的组包
 000084  b986              CBNZ     r6,|L4.168|
-;;;255    			{
-;;;256    				EDP_PacketCmdResp(cmdid_devid, cmdid_len, req, req_len, &edpPacket);
+;;;242    			{
+;;;243    				EDP_PacketCmdResp(cmdid_devid, cmdid_len, req, req_len, &edpPacket);
 000086  a808              ADD      r0,sp,#0x20
 000088  9000              STR      r0,[sp,#0]
 00008a  f8bd1018          LDRH     r1,[sp,#0x18]
 00008e  e9dd3204          LDRD     r3,r2,[sp,#0x10]
 000092  9807              LDR      r0,[sp,#0x1c]
 000094  f7fffffe          BL       EDP_PacketCmdResp
-;;;257    				UsartPrintf(USART_DEBUG, "cmdid: %s, req: %s, req_len: %d\r\n", cmdid_devid, req, req_len);
+;;;244    				UsartPrintf(USART_DEBUG, "cmdid: %s, req: %s, req_len: %d\r\n", cmdid_devid, req, req_len);
 000098  9804              LDR      r0,[sp,#0x10]
 00009a  9000              STR      r0,[sp,#0]
-00009c  a15a              ADR      r1,|L4.520|
-00009e  4859              LDR      r0,|L4.516|
+00009c  a165              ADR      r1,|L4.564|
+00009e  4864              LDR      r0,|L4.560|
 0000a0  9b05              LDR      r3,[sp,#0x14]
 0000a2  9a07              LDR      r2,[sp,#0x1c]
 0000a4  f7fffffe          BL       UsartPrintf
                   |L4.168|
-;;;258    			}
-;;;259    			
-;;;260    		break;
+;;;245    			}
+;;;246    			
+;;;247    		break;
 0000a8  e014              B        |L4.212|
                   |L4.170|
-;;;261    			
-;;;262    		case SAVEACK:
-;;;263    			
-;;;264    			if(cmd[3] == MSG_ID_HIGH && cmd[4] == MSG_ID_LOW)
+;;;248    			
+;;;249    		case SAVEACK:
+;;;250    			
+;;;251    			if(cmd[3] == MSG_ID_HIGH && cmd[4] == MSG_ID_LOW)
 0000aa  78f8              LDRB     r0,[r7,#3]
 0000ac  2855              CMP      r0,#0x55
 0000ae  d102              BNE      |L4.182|
@@ -709,99 +713,112 @@
 0000b2  28aa              CMP      r0,#0xaa
 0000b4  d003              BEQ      |L4.190|
                   |L4.182|
-;;;265    			{
-;;;266    				//UsartPrintf(USART_DEBUG, "Tips:	Send %s\r\n", cmd[5] ? "Err" : "Ok");
-;;;267    			}
-;;;268    			else
-;;;269    				UsartPrintf(USART_DEBUG, "Tips:	Message ID Err\r\n");
-0000b6  a15d              ADR      r1,|L4.556|
-0000b8  4852              LDR      r0,|L4.516|
+;;;252    			{
+;;;253    				//UsartPrintf(USART_DEBUG, "Tips:	Send %s\r\n", cmd[5] ? "Err" : "Ok");
+;;;254    			}
+;;;255    			else
+;;;256    				UsartPrintf(USART_DEBUG, "Tips:	Message ID Err\r\n");
+0000b6  a168              ADR      r1,|L4.600|
+0000b8  485d              LDR      r0,|L4.560|
 0000ba  f7fffffe          BL       UsartPrintf
                   |L4.190|
-;;;270    			
-;;;271    		break;
+;;;257    			
+;;;258    		break;
 0000be  e009              B        |L4.212|
                   |L4.192|
-;;;272    		case PINGRESP:
-;;;273    			printf("心跳回应");
-0000c0  a060              ADR      r0,|L4.580|
+;;;259    		case PINGRESP:
+;;;260    			printf("心跳回应");
+0000c0  a06b              ADR      r0,|L4.624|
 0000c2  f7fffffe          BL       __2printf
-;;;274    			heart_flag=Heart_OK;
+;;;261    			heart_flag=Heart_OK;
 0000c6  2001              MOVS     r0,#1
-0000c8  4943              LDR      r1,|L4.472|
+0000c8  494e              LDR      r1,|L4.516|
 0000ca  7008              STRB     r0,[r1,#0]
-;;;275    		break;
+;;;262    		break;
 0000cc  e002              B        |L4.212|
                   |L4.206|
-;;;276    				
-;;;277    			
-;;;278    		default:
-;;;279    			result = -1;
+;;;263    				
+;;;264    			
+;;;265    		default:
+;;;266    			result = -1;
 0000ce  f04f36ff          MOV      r6,#0xffffffff
-;;;280    		break;
+;;;267    		break;
 0000d2  bf00              NOP      
                   |L4.212|
-0000d4  bf00              NOP                            ;249
-;;;281    	}
-;;;282    	
-;;;283    		//M8266_Clear();
-;;;284    			
-;;;285    	
-;;;286    	if(result == -1)
+0000d4  bf00              NOP                            ;236
+;;;268    	}
+;;;269    	
+;;;270    		//M8266_Clear();
+;;;271    			
+;;;272    	
+;;;273    	if(result == -1)
 0000d6  1c70              ADDS     r0,r6,#1
 0000d8  b910              CBNZ     r0,|L4.224|
                   |L4.218|
-;;;287    		return;
-;;;288    	
-;;;289    	dataPtr = strchr(req, ':');							//搜索':'
-;;;290    	
-;;;291    	if(dataPtr != NULL)									//如果找到了
-;;;292    	{
-;;;293    		dataPtr++;
-;;;294    		
-;;;295    		while(*dataPtr >= '0' && *dataPtr <= '9')		//判断是否是下发的命令控制数据
-;;;296    		{
-;;;297    			numBuf[num++] = *dataPtr++;
-;;;298    		}
-;;;299    		
-;;;300    		num = atoi((const char *)numBuf);				//转为数值形式
-;;;301    		if(strstr((char *)req, "photo"))				//搜索"Fire"
-;;;302    		{
-;;;303    			
-;;;304    			if(num == 1)       photo=1;
-;;;305    			else             	 photo=0;	
-;;;306    	
-;;;307    		}
-;;;308    				else if(strstr((char *)req, "time"))				//搜索"Fire"
-;;;309    				{
-;;;310    					time_count=num;   //赋值
-;;;311    
-;;;312    				}
-;;;313    					else if(strstr((char *)req, "Hum_Max"))				//搜索"Fire"
-;;;314    				{
-;;;315    					humi_max=num;   //赋值
-;;;316    
-;;;317    				}
-;;;318    					else if(strstr((char *)req, "Hum_Min"))				//搜索"Fire"
-;;;319    				{
-;;;320    					humi_min=num;   //赋值
-;;;321    
-;;;322    				}
-;;;323    						else if(strstr((char *)req, "Temp_Max"))				//搜索"Fire"
-;;;324    				{
-;;;325    					temp_max=num;   //赋值
-;;;326    
-;;;327    				}
-;;;328    						else if(strstr((char *)req, "Temp_Min"))				//搜索"Fire"
-;;;329    				{
-;;;330    					temp_min=num;   //赋值
-;;;331    
-;;;332    				}
-;;;333    				else if(strstr((char *)req, "door"))
-;;;334    				{
-;;;335    					if(num == 1)       Door_OPEN;
-;;;336    			    else             	 Door_ClOSE;	
-;;;337    					
+;;;274    		return;
+;;;275    	
+;;;276    	dataPtr = strchr(req, ':');							//搜索':'
+;;;277    	
+;;;278    	if(dataPtr != NULL)									//如果找到了
+;;;279    	{
+;;;280    		dataPtr++;
+;;;281    		
+;;;282    		while(*dataPtr >= '0' && *dataPtr <= '9')		//判断是否是下发的命令控制数据
+;;;283    		{
+;;;284    			numBuf[num++] = *dataPtr++;
+;;;285    		}
+;;;286    		
+;;;287    		num = atoi((const char *)numBuf);				//转为数值形式
+;;;288    		if(strstr((char *)req, "photo"))				//搜索"Fire"
+;;;289    		{
+;;;290    			
+;;;291    			if(num == 1)       photo=1;
+;;;292    			else             	 photo=0;	
+;;;293    	
+;;;294    		}
+;;;295    				else if(strstr((char *)req, "time"))				//搜索"Fire"
+;;;296    				{
+;;;297    					time_count=num;   //赋值
+;;;298    
+;;;299    				}
+;;;300    					else if(strstr((char *)req, "Hum_Max"))				//搜索"Fire"
+;;;301    				{
+;;;302    					humi_max=num;   //赋值
+;;;303    
+;;;304    				}
+;;;305    					else if(strstr((char *)req, "Hum_Min"))				//搜索"Fire"
+;;;306    				{
+;;;307    					humi_min=num;   //赋值
+;;;308    
+;;;309    				}
+;;;310    						else if(strstr((char *)req, "Temp_Max"))				//搜索"Fire"
+;;;311    				{
+;;;312    					temp_max=num;   //赋值
+;;;313    
+;;;314    				}
+;;;315    						else if(strstr((char *)req, "Temp_Min"))				//搜索"Fire"
+;;;316    				{
+;;;317    					temp_min=num;   //赋值
+;;;318    
+;;;319    				}
+;;;320    				else if(strstr((char *)req, "door"))
+;;;321    				{
+;;;322    					if(num == 1)       
+;;;323    					{Door_OPEN;
+;;;324    					 mDelay(3000);
+;;;325    					Door_ClOSE;
+;;;326    					}
+;;;327    			    else             	 Door_ClOSE;	
+;;;328    					
+;;;329    				}
+;;;330    				else if(strstr((char *)req, "Door"))
+;;;331    				{
+;;;332    					if(num == 1)       
+;;;333    					{
+;;;334    					photo=1;
+;;;335    					printf("有人开门\r\n");
+;;;336    
+;;;337    					}
 ;;;338    				}
 ;;;339    	}
 ;;;340    	
@@ -817,268 +834,297 @@
 0000da  b00c              ADD      sp,sp,#0x30
 0000dc  e8bd81f0          POP      {r4-r8,pc}
                   |L4.224|
-0000e0  213a              MOVS     r1,#0x3a              ;289
-0000e2  9805              LDR      r0,[sp,#0x14]         ;289
+0000e0  213a              MOVS     r1,#0x3a              ;276
+0000e2  9805              LDR      r0,[sp,#0x14]         ;276
 0000e4  f7fffffe          BL       strchr
-0000e8  4605              MOV      r5,r0                 ;289
-0000ea  2d00              CMP      r5,#0                 ;291
-0000ec  d05c              BEQ      |L4.424|
-0000ee  1c6d              ADDS     r5,r5,#1              ;293
+0000e8  4605              MOV      r5,r0                 ;276
+0000ea  2d00              CMP      r5,#0                 ;278
+0000ec  d073              BEQ      |L4.470|
+0000ee  1c6d              ADDS     r5,r5,#1              ;280
 0000f0  e005              B        |L4.254|
                   |L4.242|
-0000f2  f8152b01          LDRB     r2,[r5],#1            ;297
-0000f6  4620              MOV      r0,r4                 ;297
-0000f8  1c64              ADDS     r4,r4,#1              ;297
-0000fa  a901              ADD      r1,sp,#4              ;297
-0000fc  540a              STRB     r2,[r1,r0]            ;297
+0000f2  f8152b01          LDRB     r2,[r5],#1            ;284
+0000f6  4620              MOV      r0,r4                 ;284
+0000f8  1c64              ADDS     r4,r4,#1              ;284
+0000fa  a901              ADD      r1,sp,#4              ;284
+0000fc  540a              STRB     r2,[r1,r0]            ;284
                   |L4.254|
-0000fe  7828              LDRB     r0,[r5,#0]            ;295
-000100  2830              CMP      r0,#0x30              ;295
+0000fe  7828              LDRB     r0,[r5,#0]            ;282
+000100  2830              CMP      r0,#0x30              ;282
 000102  db02              BLT      |L4.266|
-000104  7828              LDRB     r0,[r5,#0]            ;295
-000106  2839              CMP      r0,#0x39              ;295
+000104  7828              LDRB     r0,[r5,#0]            ;282
+000106  2839              CMP      r0,#0x39              ;282
 000108  ddf3              BLE      |L4.242|
                   |L4.266|
-00010a  a801              ADD      r0,sp,#4              ;300
+00010a  a801              ADD      r0,sp,#4              ;287
 00010c  f7fffffe          BL       atoi
-000110  4604              MOV      r4,r0                 ;300
-000112  a14f              ADR      r1,|L4.592|
-000114  9805              LDR      r0,[sp,#0x14]         ;301
+000110  4604              MOV      r4,r0                 ;287
+000112  a15a              ADR      r1,|L4.636|
+000114  9805              LDR      r0,[sp,#0x14]         ;288
 000116  f7fffffe          BL       strstr
 00011a  b148              CBZ      r0,|L4.304|
-00011c  2c01              CMP      r4,#1                 ;304
+00011c  2c01              CMP      r4,#1                 ;291
 00011e  d103              BNE      |L4.296|
-000120  2001              MOVS     r0,#1                 ;304
-000122  494d              LDR      r1,|L4.600|
-000124  7008              STRB     r0,[r1,#0]            ;304
-000126  e03f              B        |L4.424|
+000120  2001              MOVS     r0,#1                 ;291
+000122  4958              LDR      r1,|L4.644|
+000124  7008              STRB     r0,[r1,#0]            ;291
+000126  e056              B        |L4.470|
                   |L4.296|
-000128  2000              MOVS     r0,#0                 ;305
-00012a  494b              LDR      r1,|L4.600|
-00012c  7008              STRB     r0,[r1,#0]            ;305
-00012e  e03b              B        |L4.424|
+000128  2000              MOVS     r0,#0                 ;292
+00012a  4956              LDR      r1,|L4.644|
+00012c  7008              STRB     r0,[r1,#0]            ;292
+00012e  e052              B        |L4.470|
                   |L4.304|
-000130  a14a              ADR      r1,|L4.604|
-000132  9805              LDR      r0,[sp,#0x14]         ;308
+000130  a155              ADR      r1,|L4.648|
+000132  9805              LDR      r0,[sp,#0x14]         ;295
 000134  f7fffffe          BL       strstr
 000138  b110              CBZ      r0,|L4.320|
-00013a  494a              LDR      r1,|L4.612|
-00013c  800c              STRH     r4,[r1,#0]            ;310
-00013e  e033              B        |L4.424|
+00013a  4955              LDR      r1,|L4.656|
+00013c  800c              STRH     r4,[r1,#0]            ;297
+00013e  e04a              B        |L4.470|
                   |L4.320|
-000140  a149              ADR      r1,|L4.616|
-000142  9805              LDR      r0,[sp,#0x14]         ;313
+000140  a154              ADR      r1,|L4.660|
+000142  9805              LDR      r0,[sp,#0x14]         ;300
 000144  f7fffffe          BL       strstr
 000148  b110              CBZ      r0,|L4.336|
-00014a  4949              LDR      r1,|L4.624|
-00014c  700c              STRB     r4,[r1,#0]            ;315
-00014e  e02b              B        |L4.424|
+00014a  4954              LDR      r1,|L4.668|
+00014c  700c              STRB     r4,[r1,#0]            ;302
+00014e  e042              B        |L4.470|
                   |L4.336|
-000150  a148              ADR      r1,|L4.628|
-000152  9805              LDR      r0,[sp,#0x14]         ;318
+000150  a153              ADR      r1,|L4.672|
+000152  9805              LDR      r0,[sp,#0x14]         ;305
 000154  f7fffffe          BL       strstr
 000158  b110              CBZ      r0,|L4.352|
-00015a  4948              LDR      r1,|L4.636|
-00015c  700c              STRB     r4,[r1,#0]            ;320
-00015e  e023              B        |L4.424|
+00015a  4953              LDR      r1,|L4.680|
+00015c  700c              STRB     r4,[r1,#0]            ;307
+00015e  e03a              B        |L4.470|
                   |L4.352|
-000160  a147              ADR      r1,|L4.640|
-000162  9805              LDR      r0,[sp,#0x14]         ;323
+000160  a152              ADR      r1,|L4.684|
+000162  9805              LDR      r0,[sp,#0x14]         ;310
 000164  f7fffffe          BL       strstr
 000168  b118              CBZ      r0,|L4.370|
-00016a  b220              SXTH     r0,r4                 ;325
-00016c  4947              LDR      r1,|L4.652|
-00016e  8008              STRH     r0,[r1,#0]            ;325
-000170  e01a              B        |L4.424|
+00016a  b220              SXTH     r0,r4                 ;312
+00016c  4952              LDR      r1,|L4.696|
+00016e  8008              STRH     r0,[r1,#0]            ;312
+000170  e031              B        |L4.470|
                   |L4.370|
-000172  a147              ADR      r1,|L4.656|
-000174  9805              LDR      r0,[sp,#0x14]         ;328
+000172  a152              ADR      r1,|L4.700|
+000174  9805              LDR      r0,[sp,#0x14]         ;315
 000176  f7fffffe          BL       strstr
 00017a  b118              CBZ      r0,|L4.388|
-00017c  b220              SXTH     r0,r4                 ;330
-00017e  4947              LDR      r1,|L4.668|
-000180  8008              STRH     r0,[r1,#0]            ;330
-000182  e011              B        |L4.424|
+00017c  b220              SXTH     r0,r4                 ;317
+00017e  4952              LDR      r1,|L4.712|
+000180  8008              STRH     r0,[r1,#0]            ;317
+000182  e028              B        |L4.470|
                   |L4.388|
-000184  a146              ADR      r1,|L4.672|
-000186  9805              LDR      r0,[sp,#0x14]         ;333
+000184  a151              ADR      r1,|L4.716|
+000186  9805              LDR      r0,[sp,#0x14]         ;320
 000188  f7fffffe          BL       strstr
-00018c  b160              CBZ      r0,|L4.424|
-00018e  2c01              CMP      r4,#1                 ;335
-000190  d105              BNE      |L4.414|
-000192  2200              MOVS     r2,#0                 ;335
-000194  0321              LSLS     r1,r4,#12             ;335
-000196  4844              LDR      r0,|L4.680|
+00018c  b1b0              CBZ      r0,|L4.444|
+00018e  2c01              CMP      r4,#1                 ;322
+000190  d10e              BNE      |L4.432|
+000192  2200              MOVS     r2,#0                 ;323
+000194  0321              LSLS     r1,r4,#12             ;323
+000196  484f              LDR      r0,|L4.724|
 000198  f7fffffe          BL       GPIO_WriteBit
-00019c  e004              B        |L4.424|
-                  |L4.414|
-00019e  2201              MOVS     r2,#1                 ;336
-0001a0  0311              LSLS     r1,r2,#12             ;336
-0001a2  4841              LDR      r0,|L4.680|
-0001a4  f7fffffe          BL       GPIO_WriteBit
-                  |L4.424|
-0001a8  f1b80fa0          CMP      r8,#0xa0              ;341
-0001ac  d111              BNE      |L4.466|
-0001ae  b986              CBNZ     r6,|L4.466|
-0001b0  9807              LDR      r0,[sp,#0x1c]         ;343
-0001b2  f7fffffe          BL       free
-0001b6  9805              LDR      r0,[sp,#0x14]         ;344
-0001b8  f7fffffe          BL       free
-0001bc  9a09              LDR      r2,[sp,#0x24]         ;345
-0001be  b291              UXTH     r1,r2                 ;345
-0001c0  4b3a              LDR      r3,|L4.684|
-0001c2  4a3b              LDR      r2,|L4.688|
-0001c4  7812              LDRB     r2,[r2,#0]            ;345  ; link_no
-0001c6  9808              LDR      r0,[sp,#0x20]         ;345
-0001c8  f7fffffe          BL       M8266WIFI_SPI_Send_Data
-0001cc  a808              ADD      r0,sp,#0x20           ;346
-0001ce  f7fffffe          BL       EDP_DeleteBuffer
-                  |L4.466|
-0001d2  bf00              NOP      
-0001d4  e781              B        |L4.218|
+00019c  f64030b8          MOV      r0,#0xbb8             ;324
+0001a0  f7fffffe          BL       mDelay
+0001a4  2201              MOVS     r2,#1                 ;325
+0001a6  0311              LSLS     r1,r2,#12             ;325
+0001a8  484a              LDR      r0,|L4.724|
+0001aa  f7fffffe          BL       GPIO_WriteBit
+0001ae  e012              B        |L4.470|
+                  |L4.432|
+0001b0  2201              MOVS     r2,#1                 ;327
+0001b2  0311              LSLS     r1,r2,#12             ;327
+0001b4  4847              LDR      r0,|L4.724|
+0001b6  f7fffffe          BL       GPIO_WriteBit
+0001ba  e00c              B        |L4.470|
+                  |L4.444|
+0001bc  a146              ADR      r1,|L4.728|
+0001be  9805              LDR      r0,[sp,#0x14]         ;330
+0001c0  f7fffffe          BL       strstr
+0001c4  b138              CBZ      r0,|L4.470|
+0001c6  2c01              CMP      r4,#1                 ;332
+0001c8  d105              BNE      |L4.470|
+0001ca  2001              MOVS     r0,#1                 ;334
+0001cc  492d              LDR      r1,|L4.644|
+0001ce  7008              STRB     r0,[r1,#0]            ;334
+0001d0  a043              ADR      r0,|L4.736|
+0001d2  f7fffffe          BL       __2printf
+                  |L4.470|
+0001d6  f1b80fa0          CMP      r8,#0xa0              ;341
+0001da  d111              BNE      |L4.512|
+0001dc  b986              CBNZ     r6,|L4.512|
+0001de  9807              LDR      r0,[sp,#0x1c]         ;343
+0001e0  f7fffffe          BL       free
+0001e4  9805              LDR      r0,[sp,#0x14]         ;344
+0001e6  f7fffffe          BL       free
+0001ea  9a09              LDR      r2,[sp,#0x24]         ;345
+0001ec  b291              UXTH     r1,r2                 ;345
+0001ee  4b3f              LDR      r3,|L4.748|
+0001f0  4a3f              LDR      r2,|L4.752|
+0001f2  7812              LDRB     r2,[r2,#0]            ;345  ; link_no
+0001f4  9808              LDR      r0,[sp,#0x20]         ;345
+0001f6  f7fffffe          BL       M8266WIFI_SPI_Send_Data
+0001fa  a808              ADD      r0,sp,#0x20           ;346
+0001fc  f7fffffe          BL       EDP_DeleteBuffer
+                  |L4.512|
+000200  bf00              NOP      
+000202  e76a              B        |L4.218|
 ;;;350    
                           ENDP
 
-0001d6  0000              DCW      0x0000
-                  |L4.472|
-                          DCD      heart_flag
-                  |L4.476|
-0001dc  7372635f          DCB      "src_devid: %s, req: %s, req_len: %d\r\n",0
-0001e0  64657669
-0001e4  643a2025
-0001e8  732c2072
-0001ec  65713a20
-0001f0  25732c20
-0001f4  7265715f
-0001f8  6c656e3a
-0001fc  2025640d
-000200  0a00    
-000202  00                DCB      0
-000203  00                DCB      0
                   |L4.516|
-                          DCD      0x40013800
+                          DCD      heart_flag
                   |L4.520|
-000208  636d6469          DCB      "cmdid: %s, req: %s, req_len: %d\r\n",0
-00020c  643a2025
-000210  732c2072
-000214  65713a20
-000218  25732c20
-00021c  7265715f
-000220  6c656e3a
-000224  2025640d
-000228  0a00    
-00022a  00                DCB      0
-00022b  00                DCB      0
-                  |L4.556|
-00022c  54697073          DCB      "Tips:\tMessage ID Err\r\n",0
-000230  3a094d65
-000234  73736167
-000238  65204944
-00023c  20457272
-000240  0d0a00  
-000243  00                DCB      0
-                  |L4.580|
-000244  d0c4ccf8          DCB      208,196,204,248,187,216,211,166,0
-000248  bbd8d3a6
-00024c  00      
-00024d  00                DCB      0
-00024e  00                DCB      0
-00024f  00                DCB      0
-                  |L4.592|
-000250  70686f74          DCB      "photo",0
-000254  6f00    
+000208  7372635f          DCB      "src_devid: %s, req: %s, req_len: %d\r\n",0
+00020c  64657669
+000210  643a2025
+000214  732c2072
+000218  65713a20
+00021c  25732c20
+000220  7265715f
+000224  6c656e3a
+000228  2025640d
+00022c  0a00    
+00022e  00                DCB      0
+00022f  00                DCB      0
+                  |L4.560|
+                          DCD      0x40013800
+                  |L4.564|
+000234  636d6469          DCB      "cmdid: %s, req: %s, req_len: %d\r\n",0
+000238  643a2025
+00023c  732c2072
+000240  65713a20
+000244  25732c20
+000248  7265715f
+00024c  6c656e3a
+000250  2025640d
+000254  0a00    
 000256  00                DCB      0
 000257  00                DCB      0
                   |L4.600|
-                          DCD      photo
-                  |L4.604|
-00025c  74696d65          DCB      "time",0
-000260  00      
-000261  00                DCB      0
-000262  00                DCB      0
-000263  00                DCB      0
-                  |L4.612|
-                          DCD      time_count
-                  |L4.616|
-000268  48756d5f          DCB      "Hum_Max",0
-00026c  4d617800
+000258  54697073          DCB      "Tips:\tMessage ID Err\r\n",0
+00025c  3a094d65
+000260  73736167
+000264  65204944
+000268  20457272
+00026c  0d0a00  
+00026f  00                DCB      0
                   |L4.624|
-                          DCD      humi_max
-                  |L4.628|
-000274  48756d5f          DCB      "Hum_Min",0
-000278  4d696e00
+000270  d0c4ccf8          DCB      208,196,204,248,187,216,211,166,0
+000274  bbd8d3a6
+000278  00      
+000279  00                DCB      0
+00027a  00                DCB      0
+00027b  00                DCB      0
                   |L4.636|
-                          DCD      humi_min
-                  |L4.640|
-000280  54656d70          DCB      "Temp_Max",0
-000284  5f4d6178
-000288  00      
-000289  00                DCB      0
-00028a  00                DCB      0
-00028b  00                DCB      0
-                  |L4.652|
-                          DCD      temp_max
+00027c  70686f74          DCB      "photo",0
+000280  6f00    
+000282  00                DCB      0
+000283  00                DCB      0
+                  |L4.644|
+                          DCD      photo
+                  |L4.648|
+000288  74696d65          DCB      "time",0
+00028c  00      
+00028d  00                DCB      0
+00028e  00                DCB      0
+00028f  00                DCB      0
                   |L4.656|
-000290  54656d70          DCB      "Temp_Min",0
-000294  5f4d696e
-000298  00      
-000299  00                DCB      0
-00029a  00                DCB      0
-00029b  00                DCB      0
+                          DCD      time_count
+                  |L4.660|
+000294  48756d5f          DCB      "Hum_Max",0
+000298  4d617800
                   |L4.668|
-                          DCD      temp_min
+                          DCD      humi_max
                   |L4.672|
-0002a0  646f6f72          DCB      "door",0
-0002a4  00      
-0002a5  00                DCB      0
-0002a6  00                DCB      0
-0002a7  00                DCB      0
+0002a0  48756d5f          DCB      "Hum_Min",0
+0002a4  4d696e00
                   |L4.680|
-                          DCD      0x40010800
+                          DCD      humi_min
                   |L4.684|
+0002ac  54656d70          DCB      "Temp_Max",0
+0002b0  5f4d6178
+0002b4  00      
+0002b5  00                DCB      0
+0002b6  00                DCB      0
+0002b7  00                DCB      0
+                  |L4.696|
+                          DCD      temp_max
+                  |L4.700|
+0002bc  54656d70          DCB      "Temp_Min",0
+0002c0  5f4d696e
+0002c4  00      
+0002c5  00                DCB      0
+0002c6  00                DCB      0
+0002c7  00                DCB      0
+                  |L4.712|
+                          DCD      temp_min
+                  |L4.716|
+0002cc  646f6f72          DCB      "door",0
+0002d0  00      
+0002d1  00                DCB      0
+0002d2  00                DCB      0
+0002d3  00                DCB      0
+                  |L4.724|
+                          DCD      0x40010800
+                  |L4.728|
+0002d8  446f6f72          DCB      "Door",0
+0002dc  00      
+0002dd  00                DCB      0
+0002de  00                DCB      0
+0002df  00                DCB      0
+                  |L4.736|
+0002e0  d3d0c8cb          DCB      211,208,200,203,191,170,195,197,"\r\n",0
+0002e4  bfaac3c5
+0002e8  0d0a00  
+0002eb  00                DCB      0
+                  |L4.748|
                           DCD      link_status
-                  |L4.688|
+                  |L4.752|
                           DCD      link_no
 
                           AREA ||i.OneNet_SendData||, CODE, READONLY, ALIGN=2
 
                   OneNet_SendData PROC
-;;;175    //==========================================================
-;;;176    void OneNet_SendData(volatile data_Stream *data_stream)
+;;;162    //==========================================================
+;;;163    void OneNet_SendData(volatile data_Stream *data_stream)
 000000  b570              PUSH     {r4-r6,lr}
-;;;177    {
+;;;164    {
 000002  b0a6              SUB      sp,sp,#0x98
 000004  4606              MOV      r6,r0
-;;;178    	
-;;;179    	EDP_PACKET_STRUCTURE edpPacket = {NULL, 0, 0, 0};												//协议包
+;;;165    	
+;;;166    	EDP_PACKET_STRUCTURE edpPacket = {NULL, 0, 0, 0};												//协议包
 000006  2000              MOVS     r0,#0
 000008  9022              STR      r0,[sp,#0x88]
 00000a  9023              STR      r0,[sp,#0x8c]
 00000c  9024              STR      r0,[sp,#0x90]
 00000e  9025              STR      r0,[sp,#0x94]
-;;;180    	
-;;;181    	char buf[128];
-;;;182    	
-;;;183    	short int body_len = 0, i = 0;
+;;;167    	
+;;;168    	char buf[128];
+;;;169    	
+;;;170    	short int body_len = 0, i = 0;
 000010  2400              MOVS     r4,#0
 000012  2500              MOVS     r5,#0
-;;;184    		
-;;;185    	memset(buf, 0, sizeof(buf));
+;;;171    		
+;;;172    	memset(buf, 0, sizeof(buf));
 000014  2180              MOVS     r1,#0x80
 000016  a802              ADD      r0,sp,#8
 000018  f7fffffe          BL       __aeabi_memclr4
-;;;186    	
-;;;187    	body_len = OneNet_FillBuf(buf,data_stream);		//获取当前需要发送的数据流的总长度
+;;;173    	
+;;;174    	body_len = OneNet_FillBuf(buf,data_stream);		//获取当前需要发送的数据流的总长度
 00001c  4631              MOV      r1,r6
 00001e  a802              ADD      r0,sp,#8
 000020  f7fffffe          BL       OneNet_FillBuf
 000024  4604              MOV      r4,r0
-;;;188    	
-;;;189    	if(body_len)
+;;;175    	
+;;;176    	if(body_len)
 000026  2c00              CMP      r4,#0
 000028  d024              BEQ      |L5.116|
-;;;190    	{
-;;;191    		if(EDP_PacketSaveData(DEVID, body_len, NULL, kTypeSimpleJsonWithoutTime, &edpPacket) == 0)	//封包
+;;;177    	{
+;;;178    		if(EDP_PacketSaveData(DEVID, body_len, NULL, kTypeSimpleJsonWithoutTime, &edpPacket) == 0)	//封包
 00002a  a822              ADD      r0,sp,#0x88
 00002c  2303              MOVS     r3,#3
 00002e  2200              MOVS     r2,#0
@@ -1087,11 +1133,11 @@
 000034  a010              ADR      r0,|L5.120|
 000036  f7fffffe          BL       EDP_PacketSaveData
 00003a  b9b8              CBNZ     r0,|L5.108|
-;;;192    		{
-;;;193    			for(; i < body_len; i++)
+;;;179    		{
+;;;180    			for(; i < body_len; i++)
 00003c  e008              B        |L5.80|
                   |L5.62|
-;;;194    				edpPacket._data[edpPacket._len++] = buf[i];
+;;;181    				edpPacket._data[edpPacket._len++] = buf[i];
 00003e  a802              ADD      r0,sp,#8
 000040  5d41              LDRB     r1,[r0,r5]
 000042  9a23              LDR      r2,[sp,#0x8c]
@@ -1099,13 +1145,13 @@
 000046  9023              STR      r0,[sp,#0x8c]
 000048  9822              LDR      r0,[sp,#0x88]
 00004a  5481              STRB     r1,[r0,r2]
-00004c  1c68              ADDS     r0,r5,#1              ;193
-00004e  b205              SXTH     r5,r0                 ;193
+00004c  1c68              ADDS     r0,r5,#1              ;180
+00004e  b205              SXTH     r5,r0                 ;180
                   |L5.80|
-000050  42a5              CMP      r5,r4                 ;193
+000050  42a5              CMP      r5,r4                 ;180
 000052  dbf4              BLT      |L5.62|
-;;;195    			
-;;;196    		M8266WIFI_SPI_Send_Data(edpPacket._data, edpPacket._len,link_no,&link_status);
+;;;182    			
+;;;183    		M8266WIFI_SPI_Send_Data(edpPacket._data, edpPacket._len,link_no,&link_status);
 000054  9a23              LDR      r2,[sp,#0x8c]
 000056  b291              UXTH     r1,r2
 000058  4b0a              LDR      r3,|L5.132|
@@ -1113,26 +1159,26 @@
 00005c  7812              LDRB     r2,[r2,#0]  ; link_no
 00005e  9822              LDR      r0,[sp,#0x88]
 000060  f7fffffe          BL       M8266WIFI_SPI_Send_Data
-;;;197    										//上传数据到平台
-;;;198    			EDP_DeleteBuffer(&edpPacket);
+;;;184    										//上传数据到平台
+;;;185    			EDP_DeleteBuffer(&edpPacket);
 000064  a822              ADD      r0,sp,#0x88
 000066  f7fffffe          BL       EDP_DeleteBuffer
 00006a  e003              B        |L5.116|
                   |L5.108|
-;;;199    		}
-;;;200    		else
-;;;201    			UsartPrintf(USART_DEBUG, "WARN:	EDP_NewBuffer Failed\r\n");
+;;;186    		}
+;;;187    		else
+;;;188    			UsartPrintf(USART_DEBUG, "WARN:	EDP_NewBuffer Failed\r\n");
 00006c  a107              ADR      r1,|L5.140|
 00006e  480f              LDR      r0,|L5.172|
 000070  f7fffffe          BL       UsartPrintf
                   |L5.116|
-;;;202    	}
-;;;203    	//ESP8266_Clear();
-;;;204    	
-;;;205    }
+;;;189    	}
+;;;190    	//ESP8266_Clear();
+;;;191    	
+;;;192    }
 000074  b026              ADD      sp,sp,#0x98
 000076  bd70              POP      {r4-r6,pc}
-;;;206    
+;;;193    
                           ENDP
 
                   |L5.120|
@@ -1229,10 +1275,7 @@
 ;;;392    	{	
 ;;;393    			M8266_Clear();
 00005e  f7fffffe          BL       M8266_Clear
-;;;394    			
-;;;395    		
-;;;396    		//UsartPrintf(USART_DEBUG, "Send %d Bytes\r\n", edpPacket._len);
-;;;397    				M8266WIFI_SPI_Send_Data(edpPacket._data, edpPacket._len,link_no,&link_status);
+;;;394    			M8266WIFI_SPI_Send_Data(edpPacket._data, edpPacket._len,link_no,&link_status);
 000062  9a08              LDR      r2,[sp,#0x20]
 000064  b291              UXTH     r1,r2
 000066  4b2e              LDR      r3,|L6.288|
@@ -1240,32 +1283,27 @@
 00006a  7812              LDRB     r2,[r2,#0]  ; link_no
 00006c  9807              LDR      r0,[sp,#0x1c]
 00006e  f7fffffe          BL       M8266WIFI_SPI_Send_Data
-;;;398    				//上传数据到平台
-;;;399    		//hexdump(edpPacket._data,edpPacket._len);
-;;;400    		EDP_DeleteBuffer(&edpPacket);									//删包
+;;;395    		//hexdump(edpPacket._data,edpPacket._len);
+;;;396    		EDP_DeleteBuffer(&edpPacket);									//删包
 000072  a807              ADD      r0,sp,#0x1c
 000074  f7fffffe          BL       EDP_DeleteBuffer
-;;;401    		
-;;;402    		UsartPrintf(USART_DEBUG, "image len = %d\r\n", pic_len);
+;;;397    		UsartPrintf(USART_DEBUG, "image len = %d\r\n", pic_len);
 000078  4622              MOV      r2,r4
 00007a  a12b              ADR      r1,|L6.296|
 00007c  482f              LDR      r0,|L6.316|
 00007e  f7fffffe          BL       UsartPrintf
-;;;403    		
-;;;404    		while(pic_len > 0)
+;;;398    		while(pic_len > 0)
 000082  e02b              B        |L6.220|
                   |L6.132|
-;;;405    		{
-;;;406    			mDelay(500);												//传图时，时间间隔会大一点，这里额外增加一个延时
+;;;399    		{
+;;;400    			mDelay(500);												//传图时，时间间隔会大一点，这里额外增加一个延时	
 000084  f44f70fa          MOV      r0,#0x1f4
 000088  f7fffffe          BL       mDelay
-;;;407    			
-;;;408    			if(pic_len >= PKT_SIZE)
+;;;401    			if(pic_len >= PKT_SIZE)
 00008c  f5b47f7a          CMP      r4,#0x3e8
 000090  db14              BLT      |L6.188|
-;;;409    			{
-;;;410    
-;;;411    bmpres=f_read(&bmpfsrc,&camera_buf,PKT_SIZE*sizeof(unsigned char),&read_num);
+;;;402    			{
+;;;403    			bmpres=f_read(&bmpfsrc,&camera_buf,PKT_SIZE*sizeof(unsigned char),&read_num);
 000092  ab02              ADD      r3,sp,#8
 000094  f44f727a          MOV      r2,#0x3e8
 000098  4929              LDR      r1,|L6.320|
@@ -1273,29 +1311,28 @@
 00009c  f7fffffe          BL       f_read
 0000a0  491a              LDR      r1,|L6.268|
 0000a2  7008              STRB     r0,[r1,#0]
-;;;412    //if(read_num||res==0) break;
-;;;413    
-;;;414    						M8266WIFI_SPI_Send_Data(camera_buf,PKT_SIZE,link_no,&link_status);
+;;;404    			//if(read_num||res==0) break;
+;;;405    			M8266WIFI_SPI_Send_Data(camera_buf,PKT_SIZE,link_no,&link_status);
 0000a4  4b1e              LDR      r3,|L6.288|
 0000a6  481f              LDR      r0,|L6.292|
 0000a8  7802              LDRB     r2,[r0,#0]  ; link_no
 0000aa  f44f717a          MOV      r1,#0x3e8
 0000ae  4824              LDR      r0,|L6.320|
 0000b0  f7fffffe          BL       M8266WIFI_SPI_Send_Data
-;;;415    				//串口发送分片
-;;;416    				
-;;;417    		//		pImage += PKT_SIZE;
-;;;418    				pic_len -= PKT_SIZE;
+;;;406    				//串口发送分片
+;;;407    				
+;;;408    		//		pImage += PKT_SIZE;
+;;;409    				pic_len -= PKT_SIZE;
 0000b4  f5a4707a          SUB      r0,r4,#0x3e8
 0000b8  b284              UXTH     r4,r0
 0000ba  e00f              B        |L6.220|
                   |L6.188|
-;;;419    			}
-;;;420    			
-;;;421    			else
-;;;422    			{
-;;;423    			
-;;;424    				bmpres=f_read(&bmpfsrc,&camera_buf,ucAlign*sizeof(unsigned char),&read_num);
+;;;410    			}
+;;;411    			
+;;;412    			else
+;;;413    			{
+;;;414    			
+;;;415    				bmpres=f_read(&bmpfsrc,&camera_buf,ucAlign*sizeof(unsigned char),&read_num);
 0000bc  462a              MOV      r2,r5
 0000be  ab02              ADD      r3,sp,#8
 0000c0  491f              LDR      r1,|L6.320|
@@ -1303,44 +1340,44 @@
 0000c4  f7fffffe          BL       f_read
 0000c8  4910              LDR      r1,|L6.268|
 0000ca  7008              STRB     r0,[r1,#0]
-;;;425    				M8266WIFI_SPI_Send_Data(camera_buf,ucAlign,link_no,&link_status);
+;;;416    				M8266WIFI_SPI_Send_Data(camera_buf,ucAlign,link_no,&link_status);
 0000cc  4b14              LDR      r3,|L6.288|
 0000ce  4815              LDR      r0,|L6.292|
 0000d0  7802              LDRB     r2,[r0,#0]  ; link_no
 0000d2  4629              MOV      r1,r5
 0000d4  481a              LDR      r0,|L6.320|
 0000d6  f7fffffe          BL       M8266WIFI_SPI_Send_Data
-;;;426    				//ESP8266_SendData(camera_buf, ucAlign);					//串口发送最后一个分片
-;;;427    				pic_len = 0;
+;;;417    				//ESP8266_SendData(camera_buf, ucAlign);					//串口发送最后一个分片
+;;;418    				pic_len = 0;
 0000da  2400              MOVS     r4,#0
                   |L6.220|
-0000dc  2c00              CMP      r4,#0                 ;404
+0000dc  2c00              CMP      r4,#0                 ;398
 0000de  dcd1              BGT      |L6.132|
-;;;428    			}
-;;;429    		}
-;;;430    		
-;;;431    		UsartPrintf(USART_DEBUG, "image send ok\r\n");
+;;;419    			}
+;;;420    		}
+;;;421    		
+;;;422    		UsartPrintf(USART_DEBUG, "image send ok\r\n");
 0000e0  a118              ADR      r1,|L6.324|
 0000e2  4816              LDR      r0,|L6.316|
 0000e4  f7fffffe          BL       UsartPrintf
 0000e8  e003              B        |L6.242|
                   |L6.234|
-;;;432    	}
-;;;433    	else
-;;;434    		UsartPrintf(USART_DEBUG, "EDP_PacketSaveData Failed\r\n");
+;;;423    	}
+;;;424    	else
+;;;425    		UsartPrintf(USART_DEBUG, "EDP_PacketSaveData Failed\r\n");
 0000ea  a11a              ADR      r1,|L6.340|
 0000ec  4813              LDR      r0,|L6.316|
 0000ee  f7fffffe          BL       UsartPrintf
                   |L6.242|
-;;;435    
-;;;436    	
-;;;437    
-;;;438    }
-;;;439    	
-;;;440    	}
+;;;426    
+;;;427    	
+;;;428    
+;;;429    }
+;;;430    	
+;;;431    	}
 0000f2  b00b              ADD      sp,sp,#0x2c
 0000f4  bdf0              POP      {r4-r7,pc}
-;;;441    
+;;;432    
                           ENDP
 
 0000f6  0000              DCW      0x0000
@@ -1396,61 +1433,61 @@
                           REQUIRE _printf_d
                           REQUIRE _printf_int_dec
                   OneNet_SendPhoto PROC
-;;;472    
-;;;473     u8 OneNet_SendPhoto(void)
+;;;463    
+;;;464     u8 OneNet_SendPhoto(void)
 000000  b500              PUSH     {lr}
-;;;474    {
+;;;465    {
 000002  b08b              SUB      sp,sp,#0x2c
-;;;475    		static int name_count=0;
-;;;476    	  char name[40];
-;;;477    		name_count++;
+;;;466    		static int name_count=0;
+;;;467    	  char name[40];
+;;;468    		name_count++;
 000004  4810              LDR      r0,|L7.72|
 000006  6800              LDR      r0,[r0,#0]  ; name_count
 000008  1c40              ADDS     r0,r0,#1
 00000a  490f              LDR      r1,|L7.72|
 00000c  6008              STR      r0,[r1,#0]  ; name_count
-;;;478    		sprintf(name,"0:photos_%d.jpg",name_count); //字符串格式化
+;;;469    		sprintf(name,"0:photos_%d.jpg",name_count); //字符串格式化
 00000e  4608              MOV      r0,r1
 000010  a10e              ADR      r1,|L7.76|
 000012  6802              LDR      r2,[r0,#0]  ; name_count
 000014  a801              ADD      r0,sp,#4
 000016  f7fffffe          BL       __2sprintf
-;;;479    		printf("\r\n正在拍照...");	
+;;;470    		printf("\r\n正在拍照...");	
 00001a  a010              ADR      r0,|L7.92|
 00001c  f7fffffe          BL       __2printf
-;;;480    	  Ov7725_vsync=0;
+;;;471    	  Ov7725_vsync=0;
 000020  2000              MOVS     r0,#0
 000022  4912              LDR      r1,|L7.108|
 000024  7008              STRB     r0,[r1,#0]
-;;;481    		if(JPEG_encode(name)== 0)
+;;;472    		if(JPEG_encode(name)== 0)
 000026  a801              ADD      r0,sp,#4
 000028  f7fffffe          BL       JPEG_encode
 00002c  b930              CBNZ     r0,|L7.60|
-;;;482    			{
-;;;483    			  OneNet_SendData_Picture(NULL,name);
+;;;473    			{
+;;;474    			  OneNet_SendData_Picture(NULL,name);
 00002e  a901              ADD      r1,sp,#4
 000030  2000              MOVS     r0,#0
 000032  f7fffffe          BL       OneNet_SendData_Picture
-;;;484    				return 1;	
+;;;475    				return 1;	
 000036  2001              MOVS     r0,#1
                   |L7.56|
-;;;485    			}
-;;;486    			else
-;;;487    			{
-;;;488    			  printf("\r\n拍照失败");
-;;;489    				return 0;
-;;;490    				
-;;;491    				
-;;;492    			}	
-;;;493    }
+;;;476    			}
+;;;477    			else
+;;;478    			{
+;;;479    			  printf("\r\n拍照失败");
+;;;480    				return 0;
+;;;481    				
+;;;482    				
+;;;483    			}	
+;;;484    }
 000038  b00b              ADD      sp,sp,#0x2c
 00003a  bd00              POP      {pc}
                   |L7.60|
 00003c  a00c              ADR      r0,|L7.112|
 00003e  f7fffffe          BL       __2printf
-000042  2000              MOVS     r0,#0                 ;489
+000042  2000              MOVS     r0,#0                 ;480
 000044  e7f8              B        |L7.56|
-;;;494    
+;;;485    
                           ENDP
 
 000046  0000              DCW      0x0000

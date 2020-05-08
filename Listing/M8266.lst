@@ -110,7 +110,7 @@ S * @brief Comment the line below if you will not use the peripherals drivers.
 S   In this case, these drivers will not be included and the application code will 
 S   be based on direct access to peripherals registers 
 S   */
-S  /*#define USE_STDPERIPH_DRIVER*/
+S  #define USE_STDPERIPH_DRIVER
 N#endif
 N
 N/**
@@ -11218,7 +11218,7 @@ S * @brief Comment the line below if you will not use the peripherals drivers.
 S   In this case, these drivers will not be included and the application code will 
 S   be based on direct access to peripherals registers 
 S   */
-S  /*#define USE_STDPERIPH_DRIVER*/
+S  #define USE_STDPERIPH_DRIVER
 S#endif
 S
 S/**
@@ -32026,30 +32026,7 @@ N
 N	return REV_WAIT;								//返回接收未完成标志
 X	return 0;								
 N	
-N	/*
-N	if(M8266WIFI_SPI_Has_DataReceived())
-N			{
-N				//u16 M8266WIFI_SPI_RecvData(u8 data[], u16 max_len, uint16_t max_wait_in_ms, u8* link_no, u16* status);
-N	      received = M8266WIFI_SPI_RecvData(M8266buf, RECV_DATA_MAX_SIZE, 5*1000, &link_no, &link_status);
 N
-N			  if(  (link_status&0xFF)!= 0 )  
-N			  {
-N				    if( (link_status&0xFF)==0x22 )      // 0x22 = Module buffer has no data received
-N				    {  
-N			         return 0;
-N				    }
-N          }
-N					else
-N						{
-N							printf("接受失败");
-N							return 0;
-N					   
-N						}
-N				
-N				}
-N			else
-N			return 0;
-N			*/
 N			
 N			}
 N
@@ -32064,19 +32041,14 @@ N	if(M8266WIFI_SPI_Has_DataReceived())
 N	{
 N		received = M8266WIFI_SPI_RecvData(M8266buf, RECV_DATA_MAX_SIZE, 1000, &link_no, &link_status);
 X		received = M8266WIFI_SPI_RecvData(M8266buf, 128, 1000, &link_no, &link_status);
-N			
-N
-N		//if(M8266_WaitRecive()==REV_OK)								//如果接收完成
-N		//{
-N						return (unsigned char *)(M8266buf);
-N		
-N		//}
+N		return (unsigned char *)(M8266buf);
+N	
 N	}
 N	return NULL;
 X	return 0;
 N
 N
-W "..\..\User\M8266WIFI\M8266.c" 145 8 variable "ptrIPD"  was declared but never referenced
+W "..\..\User\M8266WIFI\M8266.c" 122 8 variable "ptrIPD"  was declared but never referenced
 N}
 N
 Nvoid M8266_Clear(void)
@@ -32142,6 +32114,7 @@ N		;
 N		}
 N		
 N	}
+N 
 N	
 N	UsartPrintf(USART_DEBUG, "重新连接\r\n");
 X	UsartPrintf(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "重新连接\r\n");

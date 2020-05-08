@@ -121,44 +121,31 @@ _Bool OneNet_DevLink(void)
 
 unsigned char OneNet_FillBuf(char *buf,data_Stream *data_stream)
 {
-
-
 	char text[16];
-	
 	memset(text, 0, sizeof(text));
-	
 	strcpy(buf, "{");
-	
-	
-		
+	memset(text, 0, sizeof(text));
+	sprintf(text,  "\"Fire\":%d,",data_stream->fire);
+	strcat(buf, text);
 	memset(text, 0, sizeof(text));
 	sprintf(text,  "\"Temperature\":%d,",data_stream->temp);
 	strcat(buf, text);
-	
 	memset(text, 0, sizeof(text));
 	sprintf(text,  "\"Humidity\":%d,",data_stream->humidit);
 	strcat(buf, text);
-	
-	
 	memset(text, 0, sizeof(text));
 	sprintf(text,  "\"Temp_Max\":%d,",data_stream->tem_max);
 	strcat(buf, text);
-	
 	memset(text, 0, sizeof(text));
 	sprintf(text,  "\"Temp_Min\":%d,",data_stream->tem_min);
 	strcat(buf, text);
-	
 	memset(text, 0, sizeof(text));
-	sprintf(text,  "\"Hum_Max\":%d,",data_stream->hum_max);
+	sprintf(text,  "\"Hum_Max\":%d,",data_stream->hum_max);///////注意逗号
 	strcat(buf, text);
-	
 	memset(text, 0, sizeof(text));
 	sprintf(text,  "\"Hum_Min\":%d",data_stream->hum_min);
 	strcat(buf, text);
-
-	
-	strcat(buf, "}");
-	
+	strcat(buf, "}");	
 	return strlen(buf);
 }
 
@@ -332,9 +319,22 @@ void OneNet_RevPro(unsigned char *cmd)
 				}
 				else if(strstr((char *)req, "door"))
 				{
-					if(num == 1)       Door_OPEN;
+					if(num == 1)       
+					{Door_OPEN;
+					 mDelay(3000);
+					Door_ClOSE;
+					}
 			    else             	 Door_ClOSE;	
 					
+				}
+				else if(strstr((char *)req, "Door"))
+				{
+					if(num == 1)       
+					{
+					photo=1;
+					printf("有人开门\r\n");
+
+					}
 				}
 	}
 	
@@ -391,27 +391,18 @@ void OneNet_SendData_Picture(char *devid,  char * pic_name)
 	if(EDP_PacketSaveData(devid, pic_len, type_bin_head, kTypeBin, &edpPacket) == 0)
 	{	
 			M8266_Clear();
-			
-		
-		//UsartPrintf(USART_DEBUG, "Send %d Bytes\r\n", edpPacket._len);
-				M8266WIFI_SPI_Send_Data(edpPacket._data, edpPacket._len,link_no,&link_status);
-				//上传数据到平台
+			M8266WIFI_SPI_Send_Data(edpPacket._data, edpPacket._len,link_no,&link_status);
 		//hexdump(edpPacket._data,edpPacket._len);
 		EDP_DeleteBuffer(&edpPacket);									//删包
-		
 		UsartPrintf(USART_DEBUG, "image len = %d\r\n", pic_len);
-		
 		while(pic_len > 0)
 		{
-			mDelay(500);												//传图时，时间间隔会大一点，这里额外增加一个延时
-			
+			mDelay(500);												//传图时，时间间隔会大一点，这里额外增加一个延时	
 			if(pic_len >= PKT_SIZE)
 			{
-
-bmpres=f_read(&bmpfsrc,&camera_buf,PKT_SIZE*sizeof(unsigned char),&read_num);
-//if(read_num||res==0) break;
-
-						M8266WIFI_SPI_Send_Data(camera_buf,PKT_SIZE,link_no,&link_status);
+			bmpres=f_read(&bmpfsrc,&camera_buf,PKT_SIZE*sizeof(unsigned char),&read_num);
+			//if(read_num||res==0) break;
+			M8266WIFI_SPI_Send_Data(camera_buf,PKT_SIZE,link_no,&link_status);
 				//串口发送分片
 				
 		//		pImage += PKT_SIZE;

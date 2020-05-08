@@ -110,30 +110,7 @@ u8 M8266_WaitRecive()
 	
 	return REV_WAIT;								//返回接收未完成标志
 	
-	/*
-	if(M8266WIFI_SPI_Has_DataReceived())
-			{
-				//u16 M8266WIFI_SPI_RecvData(u8 data[], u16 max_len, uint16_t max_wait_in_ms, u8* link_no, u16* status);
-	      received = M8266WIFI_SPI_RecvData(M8266buf, RECV_DATA_MAX_SIZE, 5*1000, &link_no, &link_status);
 
-			  if(  (link_status&0xFF)!= 0 )  
-			  {
-				    if( (link_status&0xFF)==0x22 )      // 0x22 = Module buffer has no data received
-				    {  
-			         return 0;
-				    }
-          }
-					else
-						{
-							printf("接受失败");
-							return 0;
-					   
-						}
-				
-				}
-			else
-			return 0;
-			*/
 			
 			}
 
@@ -146,13 +123,8 @@ unsigned char *M8266_GetIPD(unsigned short timeOut)
 	if(M8266WIFI_SPI_Has_DataReceived())
 	{
 		received = M8266WIFI_SPI_RecvData(M8266buf, RECV_DATA_MAX_SIZE, 1000, &link_no, &link_status);
-			
-
-		//if(M8266_WaitRecive()==REV_OK)								//如果接收完成
-		//{
-						return (unsigned char *)(M8266buf);
-		
-		//}
+		return (unsigned char *)(M8266buf);
+	
 	}
 	return NULL;
 
@@ -220,6 +192,7 @@ void M8266_ReLink(u8 status )
 		}
 		
 	}
+ 
 	
 	UsartPrintf(USART_DEBUG, "重新连接\r\n");
 	

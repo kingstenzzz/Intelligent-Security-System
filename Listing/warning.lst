@@ -113,7 +113,7 @@ S * @brief Comment the line below if you will not use the peripherals drivers.
 S   In this case, these drivers will not be included and the application code will 
 S   be based on direct access to peripherals registers 
 S   */
-S  /*#define USE_STDPERIPH_DRIVER*/
+S  #define USE_STDPERIPH_DRIVER
 N#endif
 N
 N/**
@@ -11221,7 +11221,7 @@ S * @brief Comment the line below if you will not use the peripherals drivers.
 S   In this case, these drivers will not be included and the application code will 
 S   be based on direct access to peripherals registers 
 S   */
-S  /*#define USE_STDPERIPH_DRIVER*/
+S  #define USE_STDPERIPH_DRIVER
 S#endif
 S
 S/**
@@ -30988,7 +30988,7 @@ Nextern int16_t temp_max;
 Nextern int16_t temp_min;
 Nextern u8 humi_max;
 Nextern u8 humi_min;
-Nextern _Bool fire;
+Nextern _Bool fire,photo;
 N
 N
 N//读取数据对LED灯和蜂鸣器进行控制
@@ -31004,6 +31004,8 @@ N
 N		case Fire:                     
 N			Beep_Set(BEEP_ON);
 X			Beep_Set(1);
+N		photo=1;
+N	
 N		break;						
 N		case Hot:	
 N			LED_RED		//高温模式，红灯亮	
@@ -31088,18 +31090,16 @@ N************************************************************
 N*/
 Nvoid Fire_Check(u8 *fire)
 N{
-N	if(FIRE_Data_IN() == 1)								//当输入信号为0时，有火焰
-X	if(GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1800)), ((uint16_t)0x0020)) == 1)								
+N	if(FIRE_Data_IN() == Bit_RESET)								//当输入信号为0时，有火焰
+X	if(GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1800)), ((uint16_t)0x0020)) == Bit_RESET)								
 N	{		
-N		UsartPrintf(USART_DEBUG, "火焰警报\r\n");
-X		UsartPrintf(((USART_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x3800)), "火焰警报\r\n");
 N		*fire = 1;			
 N		alarm_mode=Fire;
 N		WARNING(Fire);
 N		mDelay(500);
 N	}
-N	else if(FIRE_Data_IN() == 0)						//当输入信号为1时，无火焰
-X	else if(GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1800)), ((uint16_t)0x0020)) == 0)						
+N	else if(FIRE_Data_IN() == Bit_SET)						//当输入信号为1时，无火焰
+X	else if(GPIO_ReadInputDataBit(((GPIO_TypeDef *) ((((uint32_t)0x40000000) + 0x10000) + 0x1800)), ((uint16_t)0x0020)) == Bit_SET)						
 N	{
 N		*fire = 0;
 N		Beep_Set(BEEP_OFF);
@@ -31111,7 +31111,7 @@ N
 N
 Nvoid Check_sensor(volatile data_Stream *data_stram)
 N{
-W "..\..\User\warning\warning.c" 135 13 argument of type "_Bool *" is incompatible with parameter of type "u8 *"
+W "..\..\User\warning\warning.c" 136 13 argument of type "_Bool *" is incompatible with parameter of type "u8 *"
 N	Fire_Check(&fire);
 N	DHT11_Data_TypeDef DH11_data;
 N	if(DHT11_Read_TempAndHumidity(&DH11_data))
@@ -31135,7 +31135,9 @@ N		  data_stram->humidit=DH11_data.humi_int;
 N	    data_stram->temp=DH11_data.temp_int;
 N	}
 N			printf("火情%d",fire);
+N	if(fire==1) printf("火情");
 N			data_stram->fire=fire;
+N	
 N	    
 N			if(data_stram->tem_max!=temp_max)
 N			{

@@ -25,23 +25,23 @@
                           AREA ||i.M8266_Clear||, CODE, READONLY, ALIGN=2
 
                   M8266_Clear PROC
-;;;161    
-;;;162    void M8266_Clear(void)
+;;;133    
+;;;134    void M8266_Clear(void)
 000000  b510              PUSH     {r4,lr}
-;;;163    {
-;;;164    
-;;;165    	memset(M8266buf, 0, sizeof(M8266buf));
+;;;135    {
+;;;136    
+;;;137    	memset(M8266buf, 0, sizeof(M8266buf));
 000002  2180              MOVS     r1,#0x80
 000004  4803              LDR      r0,|L2.20|
 000006  f7fffffe          BL       __aeabi_memclr
-;;;166    	received = 0;
+;;;138    	received = 0;
 00000a  2000              MOVS     r0,#0
 00000c  4902              LDR      r1,|L2.24|
 00000e  8008              STRH     r0,[r1,#0]
-;;;167    
-;;;168    }
+;;;139    
+;;;140    }
 000010  bd10              POP      {r4,pc}
-;;;169    
+;;;141    
                           ENDP
 
 000012  0000              DCW      0x0000
@@ -53,19 +53,19 @@
                           AREA ||i.M8266_GetIPD||, CODE, READONLY, ALIGN=2
 
                   M8266_GetIPD PROC
-;;;141    
-;;;142    unsigned char *M8266_GetIPD(unsigned short timeOut)
+;;;118    
+;;;119    unsigned char *M8266_GetIPD(unsigned short timeOut)
 000000  b538              PUSH     {r3-r5,lr}
-;;;143    {
+;;;120    {
 000002  4605              MOV      r5,r0
-;;;144    
-;;;145    	char *ptrIPD = NULL;
+;;;121    
+;;;122    	char *ptrIPD = NULL;
 000004  2400              MOVS     r4,#0
-;;;146    	if(M8266WIFI_SPI_Has_DataReceived())
+;;;123    	if(M8266WIFI_SPI_Has_DataReceived())
 000006  f7fffffe          BL       M8266WIFI_SPI_Has_DataReceived
 00000a  b160              CBZ      r0,|L3.38|
-;;;147    	{
-;;;148    		received = M8266WIFI_SPI_RecvData(M8266buf, RECV_DATA_MAX_SIZE, 1000, &link_no, &link_status);
+;;;124    	{
+;;;125    		received = M8266WIFI_SPI_RecvData(M8266buf, RECV_DATA_MAX_SIZE, 1000, &link_no, &link_status);
 00000c  4807              LDR      r0,|L3.44|
 00000e  4b08              LDR      r3,|L3.48|
 000010  f44f727a          MOV      r2,#0x3e8
@@ -75,25 +75,20 @@
 00001a  f7fffffe          BL       M8266WIFI_SPI_RecvData
 00001e  4906              LDR      r1,|L3.56|
 000020  8008              STRH     r0,[r1,#0]
-;;;149    			
-;;;150    
-;;;151    		//if(M8266_WaitRecive()==REV_OK)								//如果接收完成
-;;;152    		//{
-;;;153    						return (unsigned char *)(M8266buf);
+;;;126    		return (unsigned char *)(M8266buf);
 000022  4804              LDR      r0,|L3.52|
                   |L3.36|
-;;;154    		
-;;;155    		//}
-;;;156    	}
-;;;157    	return NULL;
-;;;158    
-;;;159    
-;;;160    }
+;;;127    	
+;;;128    	}
+;;;129    	return NULL;
+;;;130    
+;;;131    
+;;;132    }
 000024  bd38              POP      {r3-r5,pc}
                   |L3.38|
-000026  2000              MOVS     r0,#0                 ;157
+000026  2000              MOVS     r0,#0                 ;129
 000028  e7fc              B        |L3.36|
-;;;161    
+;;;133    
                           ENDP
 
 00002a  0000              DCW      0x0000
@@ -109,22 +104,22 @@
                           AREA ||i.M8266_NetCheck||, CODE, READONLY, ALIGN=2
 
                   M8266_NetCheck PROC
-;;;171    
-;;;172    u8 M8266_NetCheck()
+;;;143    
+;;;144    u8 M8266_NetCheck()
 000000  b51f              PUSH     {r0-r4,lr}
-;;;173    {
-;;;174    	u16 status;
-;;;175    	M8266WIFI_SPI_Get_STA_Connection_Status(&STA_Status,&status);
+;;;145    {
+;;;146    	u16 status;
+;;;147    	M8266WIFI_SPI_Get_STA_Connection_Status(&STA_Status,&status);
 000002  a903              ADD      r1,sp,#0xc
 000004  4824              LDR      r0,|L4.152|
 000006  f7fffffe          BL       M8266WIFI_SPI_Get_STA_Connection_Status
-;;;176    	if(status==0) printf("sta check faild");
+;;;148    	if(status==0) printf("sta check faild");
 00000a  f8bd000c          LDRH     r0,[sp,#0xc]
 00000e  b910              CBNZ     r0,|L4.22|
 000010  a022              ADR      r0,|L4.156|
 000012  f7fffffe          BL       __2printf
                   |L4.22|
-;;;177    	M8266WIFI_SPI_Query_Connection(link_no,NULL,&TCP_Status,NULL,NULL,NULL,&status);
+;;;149    	M8266WIFI_SPI_Query_Connection(link_no,NULL,&TCP_Status,NULL,NULL,NULL,&status);
 000016  a803              ADD      r0,sp,#0xc
 000018  2100              MOVS     r1,#0
 00001a  9100              STR      r1,[sp,#0]
@@ -134,13 +129,13 @@
 000024  4822              LDR      r0,|L4.176|
 000026  7800              LDRB     r0,[r0,#0]  ; link_no
 000028  f7fffffe          BL       M8266WIFI_SPI_Query_Connection
-;;;178    	if(status==0) printf("tcp check faild");
+;;;150    	if(status==0) printf("tcp check faild");
 00002c  f8bd000c          LDRH     r0,[sp,#0xc]
 000030  b910              CBNZ     r0,|L4.56|
 000032  a020              ADR      r0,|L4.180|
 000034  f7fffffe          BL       __2printf
                   |L4.56|
-;;;179    	switch(STA_Status)
+;;;151    	switch(STA_Status)
 000038  4817              LDR      r0,|L4.152|
 00003a  7800              LDRB     r0,[r0,#0]  ; STA_Status
 00003c  2806              CMP      r0,#6
@@ -148,63 +143,63 @@
 000040  e8dff000          TBB      [pc,r0]
 000044  0317070b          DCB      0x03,0x17,0x07,0x0b
 000048  0f13              DCB      0x0f,0x13
-;;;180    	{
-;;;181    		case 0:  printf("没有连接\r\n"); break;
+;;;152    	{
+;;;153    		case 0:  printf("没有连接\r\n"); break;
 00004a  a01e              ADR      r0,|L4.196|
 00004c  f7fffffe          BL       __2printf
 000050  e00f              B        |L4.114|
-;;;182    		case 2: printf("连接失败，密码错误\r\n");break;
+;;;154    		case 2: printf("连接失败，密码错误\r\n");break;
 000052  a01f              ADR      r0,|L4.208|
 000054  f7fffffe          BL       __2printf
 000058  e00b              B        |L4.114|
-;;;183    		case 3: printf("连接失败，没有指定ssid\r\n");break;
+;;;155    		case 3: printf("连接失败，没有指定ssid\r\n");break;
 00005a  a023              ADR      r0,|L4.232|
 00005c  f7fffffe          BL       __2printf
 000060  e007              B        |L4.114|
-;;;184    		case 4: printf("连接失败，其他原因\r\n");break;
+;;;156    		case 4: printf("连接失败，其他原因\r\n");break;
 000062  a028              ADR      r0,|L4.260|
 000064  f7fffffe          BL       __2printf
 000068  e003              B        |L4.114|
-;;;185    		case 5: printf("连接正常\r\n");break;
+;;;157    		case 5: printf("连接正常\r\n");break;
 00006a  a02c              ADR      r0,|L4.284|
 00006c  f7fffffe          BL       __2printf
 000070  bf00              NOP      
                   |L4.114|
-000072  bf00              NOP                            ;181
-;;;186    		
-;;;187    	}
-;;;188    	if(STA_Status!=5)
+000072  bf00              NOP                            ;153
+;;;158    		
+;;;159    	}
+;;;160    	if(STA_Status!=5)
 000074  4808              LDR      r0,|L4.152|
 000076  7800              LDRB     r0,[r0,#0]  ; STA_Status
 000078  2805              CMP      r0,#5
 00007a  d002              BEQ      |L4.130|
-;;;189    		return 1;
+;;;161    		return 1;
 00007c  2001              MOVS     r0,#1
                   |L4.126|
-;;;190    	else if(TCP_Status!=3)
-;;;191    	{
-;;;192    	printf("tcp链接丢失");
-;;;193    	return 2;
-;;;194    	}
-;;;195    	else
-;;;196    		return 0;
-;;;197    
-;;;198    }
+;;;162    	else if(TCP_Status!=3)
+;;;163    	{
+;;;164    	printf("tcp链接丢失");
+;;;165    	return 2;
+;;;166    	}
+;;;167    	else
+;;;168    		return 0;
+;;;169    
+;;;170    }
 00007e  b004              ADD      sp,sp,#0x10
 000080  bd10              POP      {r4,pc}
                   |L4.130|
 000082  480a              LDR      r0,|L4.172|
-000084  7800              LDRB     r0,[r0,#0]            ;190  ; TCP_Status
-000086  2803              CMP      r0,#3                 ;190
+000084  7800              LDRB     r0,[r0,#0]            ;162  ; TCP_Status
+000086  2803              CMP      r0,#3                 ;162
 000088  d004              BEQ      |L4.148|
 00008a  a027              ADR      r0,|L4.296|
 00008c  f7fffffe          BL       __2printf
-000090  2002              MOVS     r0,#2                 ;193
+000090  2002              MOVS     r0,#2                 ;165
 000092  e7f4              B        |L4.126|
                   |L4.148|
-000094  2000              MOVS     r0,#0                 ;196
+000094  2000              MOVS     r0,#0                 ;168
 000096  e7f2              B        |L4.126|
-;;;199    
+;;;171    
                           ENDP
 
                   |L4.152|
@@ -272,77 +267,78 @@
                           AREA ||i.M8266_ReLink||, CODE, READONLY, ALIGN=2
 
                   M8266_ReLink PROC
-;;;199    
-;;;200    void M8266_ReLink(u8 status )
+;;;171    
+;;;172    void M8266_ReLink(u8 status )
 000000  b53e              PUSH     {r1-r5,lr}
-;;;201    {
+;;;173    {
 000002  4604              MOV      r4,r0
-;;;202    	if(status==1)//closed
+;;;174    	if(status==1)//closed
 000004  2c01              CMP      r4,#1
 000006  d10b              BNE      |L5.32|
-;;;203    	{
-;;;204    		while(!M8266WIFI_Module_Init_Via_SPI())
+;;;175    	{
+;;;176    		while(!M8266WIFI_Module_Init_Via_SPI())
 000008  e006              B        |L5.24|
                   |L5.10|
-;;;205    		{
-;;;206    			printf("正在重连wifi\r\n");
+;;;177    		{
+;;;178    			printf("正在重连wifi\r\n");
 00000a  a015              ADR      r0,|L5.96|
 00000c  f7fffffe          BL       __2printf
-;;;207    			mDelay(500);
+;;;179    			mDelay(500);
 000010  f44f70fa          MOV      r0,#0x1f4
 000014  f7fffffe          BL       mDelay
                   |L5.24|
 000018  f7fffffe          BL       M8266WIFI_Module_Init_Via_SPI
-00001c  2800              CMP      r0,#0                 ;204
+00001c  2800              CMP      r0,#0                 ;176
 00001e  d0f4              BEQ      |L5.10|
                   |L5.32|
-;;;208    
-;;;209    	
-;;;210    		}
-;;;211    		
-;;;212    	}
-;;;213    	if(status==2) //lost
+;;;180    
+;;;181    	
+;;;182    		}
+;;;183    		
+;;;184    	}
+;;;185    	if(status==2) //lost
 000020  2c02              CMP      r4,#2
 000022  d117              BNE      |L5.84|
-;;;214    	{
-;;;215    		while(M8266WIFI_SPI_Setup_Connection(TEST_CONNECTION_TYPE, 80, TEST_REMOTE_ADDR, TEST_REMOTE_PORT, link_no, 20, &link_status)==0)
+;;;186    	{
+;;;187    		while(M8266WIFI_SPI_Setup_Connection(TEST_CONNECTION_TYPE, 80, TEST_REMOTE_ADDR, TEST_REMOTE_PORT, link_no, 20, &link_status)==0)
 000024  e006              B        |L5.52|
                   |L5.38|
-;;;216    		{		 
-;;;217    		  mDelay(500);
+;;;188    		{		 
+;;;189    		  mDelay(500);
 000026  f44f70fa          MOV      r0,#0x1f4
 00002a  f7fffffe          BL       mDelay
-;;;218    			printf("正在重连服务器\r\n");
+;;;190    			printf("正在重连服务器\r\n");
 00002e  a010              ADR      r0,|L5.112|
 000030  f7fffffe          BL       __2printf
                   |L5.52|
 000034  4813              LDR      r0,|L5.132|
-000036  2114              MOVS     r1,#0x14              ;215
+000036  2114              MOVS     r1,#0x14              ;187
 000038  4a13              LDR      r2,|L5.136|
-00003a  7812              LDRB     r2,[r2,#0]            ;215  ; link_no
-00003c  f44f735b          MOV      r3,#0x36c             ;215
-000040  e9cd2100          STRD     r2,r1,[sp,#0]         ;215
-000044  9002              STR      r0,[sp,#8]            ;215
+00003a  7812              LDRB     r2,[r2,#0]            ;187  ; link_no
+00003c  f44f735b          MOV      r3,#0x36c             ;187
+000040  e9cd2100          STRD     r2,r1,[sp,#0]         ;187
+000044  9002              STR      r0,[sp,#8]            ;187
 000046  a211              ADR      r2,|L5.140|
-000048  2150              MOVS     r1,#0x50              ;215
-00004a  2001              MOVS     r0,#1                 ;215
+000048  2150              MOVS     r1,#0x50              ;187
+00004a  2001              MOVS     r0,#1                 ;187
 00004c  f7fffffe          BL       M8266WIFI_SPI_Setup_Connection
-000050  2800              CMP      r0,#0                 ;215
+000050  2800              CMP      r0,#0                 ;187
 000052  d0e8              BEQ      |L5.38|
                   |L5.84|
-;;;219    		;
-;;;220    		}
-;;;221    		
-;;;222    	}
-;;;223    	
-;;;224    	UsartPrintf(USART_DEBUG, "重新连接\r\n");
+;;;191    		;
+;;;192    		}
+;;;193    		
+;;;194    	}
+;;;195     
+;;;196    	
+;;;197    	UsartPrintf(USART_DEBUG, "重新连接\r\n");
 000054  a111              ADR      r1,|L5.156|
 000056  4814              LDR      r0,|L5.168|
 000058  f7fffffe          BL       UsartPrintf
-;;;225    	
-;;;226    }
+;;;198    	
+;;;199    }
 00005c  bd3e              POP      {r1-r5,pc}
-;;;227    
+;;;200    
                           ENDP
 
 00005e  0000              DCW      0x0000
@@ -420,32 +416,9 @@
 ;;;110    	
 ;;;111    	return REV_WAIT;								//返回接收未完成标志
 ;;;112    	
-;;;113    	/*
-;;;114    	if(M8266WIFI_SPI_Has_DataReceived())
-;;;115    			{
-;;;116    				//u16 M8266WIFI_SPI_RecvData(u8 data[], u16 max_len, uint16_t max_wait_in_ms, u8* link_no, u16* status);
-;;;117    	      received = M8266WIFI_SPI_RecvData(M8266buf, RECV_DATA_MAX_SIZE, 5*1000, &link_no, &link_status);
-;;;118    
-;;;119    			  if(  (link_status&0xFF)!= 0 )  
-;;;120    			  {
-;;;121    				    if( (link_status&0xFF)==0x22 )      // 0x22 = Module buffer has no data received
-;;;122    				    {  
-;;;123    			         return 0;
-;;;124    				    }
-;;;125              }
-;;;126    					else
-;;;127    						{
-;;;128    							printf("接受失败");
-;;;129    							return 0;
-;;;130    					   
-;;;131    						}
-;;;132    				
-;;;133    				}
-;;;134    			else
-;;;135    			return 0;
-;;;136    			*/
-;;;137    			
-;;;138    			}
+;;;113    
+;;;114    			
+;;;115    			}
 000008  4770              BX       lr
                   |L7.10|
 00000a  4808              LDR      r0,|L7.44|
@@ -466,7 +439,7 @@
 000026  8008              STRH     r0,[r1,#0]            ;109
 000028  2000              MOVS     r0,#0                 ;111
 00002a  e7ed              B        |L7.8|
-;;;139    
+;;;116    
                           ENDP
 
                   |L7.44|
